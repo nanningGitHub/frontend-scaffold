@@ -24,6 +24,31 @@
 npm install
 ```
 
+## 🌐 在线演示
+
+- **GitHub Pages**: [在线演示链接](https://YOUR_USERNAME.github.io/YOUR_REPO_NAME/)
+- **本地开发**: `http://localhost:5173`
+
+## 🚀 部署
+
+### GitHub Pages 自动部署
+
+本项目配置了 GitHub Actions 工作流，会自动部署到 GitHub Pages：
+
+1. 推送代码到 `main` 分支
+2. GitHub Actions 自动构建项目
+3. 部署到 GitHub Pages
+
+### 手动部署
+
+```bash
+# 构建项目
+npm run build
+
+# 部署到 GitHub Pages
+npm run deploy
+```
+
 ## 🚀 开发
 
 ```bash

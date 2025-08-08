@@ -1,137 +1,127 @@
 # GitHub 发布指南
 
-## 🚀 发布到 GitHub 的步骤
+本指南将帮助你将项目发布到 GitHub 并配置自动部署。
 
-### 方法一：使用 GitHub CLI（推荐）
+## 📋 前置要求
 
-1. **安装 GitHub CLI**
-   ```bash
-   brew install gh
-   ```
+1. 拥有 GitHub 账户
+2. 已安装 Git
+3. 项目已初始化为 Git 仓库
 
-2. **登录 GitHub**
-   ```bash
-   gh auth login
-   ```
+## 🚀 发布步骤
 
-3. **创建仓库并推送**
-   ```bash
-   gh repo create frontend-scaffold --public --source=. --remote=origin --push
-   ```
+### 1. 在 GitHub 上创建仓库
 
-### 方法二：手动创建（如果 CLI 不可用）
+1. 访问 [GitHub.com](https://github.com)
+2. 点击右上角的 "+" 号，选择 "New repository"
+3. 填写仓库信息：
+   - **Repository name**: `cli` 或 `react-cli-app`
+   - **Description**: `现代化的 React + TypeScript + Vite 项目模板`
+   - **Visibility**: 选择 Public 或 Private
+   - **不要**勾选 "Initialize this repository with a README"
+4. 点击 "Create repository"
 
-1. **在 GitHub 上创建新仓库**
-   - 访问 https://github.com/new
-   - 仓库名称：`frontend-scaffold`
-   - 描述：`Modern React + TypeScript + Vite project template with comprehensive tooling`
-   - 选择 Public
-   - 不要初始化 README（我们已经有了）
-   - 点击 "Create repository"
+### 2. 添加远程仓库
 
-2. **添加远程仓库**
-   ```bash
-   git remote add origin https://github.com/YOUR_USERNAME/frontend-scaffold.git
-   ```
+创建仓库后，GitHub 会显示仓库 URL。执行以下命令：
 
-3. **推送代码**
-   ```bash
-   git branch -M main
-   git push -u origin main
-   ```
-
-### 方法三：使用 GitHub Desktop
-
-1. 下载并安装 GitHub Desktop
-2. 添加现有仓库
-3. 发布到 GitHub
-
-## 📋 仓库信息
-
-### 仓库名称建议
-- `frontend-scaffold`
-- `react-ts-vite-template`
-- `modern-react-scaffold`
-
-### 描述
-```
-Modern React + TypeScript + Vite project template with comprehensive tooling
-
-Features:
-- ⚡️ Vite - Lightning fast build tool
-- ⚛️ React 18 - Latest React features
-- 🔷 TypeScript - Type-safe JavaScript
-- 🎨 Tailwind CSS - Utility-first CSS framework
-- 🛣️ React Router - Declarative routing
-- 🧪 Jest + Testing Library - Complete testing solution
-- 📝 ESLint + Prettier - Code quality and formatting
-- 🐶 Husky + lint-staged - Git hooks
-- 📦 Axios - HTTP client
-- 🌐 i18next - Internationalization support
-- 📚 Storybook - Component documentation
-- 📱 PWA - Progressive Web App support
-- 📊 Monitoring - Error tracking and performance monitoring
+```bash
+# 替换 YOUR_USERNAME 和 YOUR_REPO_NAME
+git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
 ```
 
-### 标签
+### 3. 推送代码到 GitHub
+
+```bash
+# 确保在 main 分支
+git branch -M main
+
+# 推送代码
+git push -u origin main
 ```
-react, typescript, vite, template, scaffold, frontend, modern, tailwind, testing, storybook, pwa, i18n
+
+### 4. 配置 GitHub Pages
+
+#### 方法一：使用 GitHub Actions（推荐）
+
+1. 项目已配置 GitHub Actions 工作流
+2. 推送代码到 `main` 分支会自动触发部署
+3. 在仓库设置中启用 GitHub Pages：
+   - 进入仓库 Settings → Pages
+   - Source 选择 "GitHub Actions"
+
+#### 方法二：使用 gh-pages 分支
+
+```bash
+# 手动部署
+npm run deploy
 ```
 
-## 🔧 发布后配置
+### 5. 更新文档中的链接
 
-### 1. 启用 GitHub Pages
-- 进入仓库设置
-- 找到 Pages 选项
-- 选择 GitHub Actions 作为源
-- 我们的 CI/CD 已经配置了自动部署
+将 README.md 中的链接更新为你的实际仓库：
 
-### 2. 配置仓库主题
-- 在仓库根目录添加 `.github/ISSUE_TEMPLATE.md`
-- 添加 `.github/PULL_REQUEST_TEMPLATE.md`
+```markdown
+- **GitHub Pages**: [在线演示链接](https://YOUR_USERNAME.github.io/YOUR_REPO_NAME/)
+```
 
-### 3. 设置分支保护
-- 进入 Settings > Branches
-- 添加规则保护 main 分支
-- 要求 PR 审查和状态检查
+## 🔧 配置说明
 
-### 4. 配置 Actions 权限
-- 进入 Settings > Actions > General
-- 允许 Actions 读写权限
+### GitHub Actions 工作流
 
-## 📊 发布后检查清单
+项目包含 `.github/workflows/deploy.yml` 文件，配置了自动部署：
 
-- [ ] 代码已推送到 GitHub
-- [ ] README.md 显示正确
-- [ ] 许可证文件存在
-- [ ] CI/CD 工作流正常运行
-- [ ] GitHub Pages 部署成功
-- [ ] 仓库描述和标签设置正确
-- [ ] 分支保护规则已配置
+- 触发条件：推送到 `main` 分支或创建 Pull Request
+- 构建环境：Ubuntu 最新版 + Node.js 18
+- 部署目标：GitHub Pages
 
-## 🎯 下一步
+### 部署脚本
 
-1. **创建 Release**
-   ```bash
-   git tag v1.0.0
-   git push origin v1.0.0
-   gh release create v1.0.0 --title "v1.0.0" --notes "Initial release"
-   ```
+项目包含 `scripts/deploy.sh` 脚本，用于手动部署：
 
-2. **添加徽章到 README**
-   ```markdown
-   ![CI](https://github.com/YOUR_USERNAME/frontend-scaffold/workflows/CI/badge.svg)
-   ![License](https://img.shields.io/github/license/YOUR_USERNAME/frontend-scaffold)
-   ![Version](https://img.shields.io/github/package-json/v/YOUR_USERNAME/frontend-scaffold)
-   ```
+```bash
+npm run deploy
+```
 
-3. **创建模板仓库**
-   - 在仓库设置中启用 "Template repository"
-   - 这样其他人可以直接使用模板创建新项目
+## 📝 后续步骤
 
-## 🔗 有用的链接
+### 1. 添加项目描述
 
-- [GitHub CLI 文档](https://cli.github.com/)
+在 GitHub 仓库页面添加项目描述和标签。
+
+### 2. 配置仓库设置
+
+- **Settings → Pages**: 启用 GitHub Pages
+- **Settings → Actions → General**: 确保 Actions 权限已启用
+- **Settings → Branches**: 保护 `main` 分支
+
+### 3. 添加徽章
+
+在 README.md 中添加状态徽章：
+
+```markdown
+[![Deploy to GitHub Pages](https://github.com/YOUR_USERNAME/YOUR_REPO_NAME/workflows/Deploy%20to%20GitHub%20Pages/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPO_NAME/actions)
+```
+
+## 🐛 常见问题
+
+### Q: 部署失败怎么办？
+
+A: 检查以下几点：
+1. GitHub Actions 权限是否启用
+2. 构建日志中是否有错误
+3. 确保 `main` 分支名称正确
+
+### Q: 如何更新部署？
+
+A: 推送代码到 `main` 分支即可自动触发重新部署。
+
+### Q: 如何查看部署状态？
+
+A: 在 GitHub 仓库页面点击 "Actions" 标签查看部署状态。
+
+## 📚 相关链接
+
 - [GitHub Pages 文档](https://pages.github.com/)
 - [GitHub Actions 文档](https://docs.github.com/en/actions)
-- [创建模板仓库](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-template-repository)
+- [Vite 部署指南](https://vitejs.dev/guide/static-deploy.html)
