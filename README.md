@@ -15,8 +15,9 @@
 - 📦 **Axios** - HTTP 客户端
 - 🌐 **i18next** - 国际化支持
 - 📚 **Storybook** - 组件文档和交互式示例
-- 📱 **PWA** - 渐进式 Web 应用支持
-- 📊 **监控系统** - 错误监控和性能追踪
+- 📱 **PWA** - 渐进式 Web 应用支持（vite-plugin-pwa 自动注册）
+- 📊 **可观测性** - Sentry 初始化、Web Vitals 上报（可选）
+- 🧪 **E2E** - Playwright 集成（可选启用 MSW 模拟后端）
 
 ## 📦 安装
 
@@ -26,8 +27,7 @@ npm install
 
 ## 🌐 在线演示
 
-- **GitHub Pages**: [在线演示链接](https://YOUR_USERNAME.github.io/YOUR_REPO_NAME/)
-- **本地开发**: `http://localhost:5173`
+- **本地开发**: `http://localhost:3000`
 
 ## 🚀 部署
 
@@ -60,6 +60,17 @@ npm run build
 
 # 预览生产构建
 npm run preview
+### 开启 Mock（MSW）
+
+开发环境可开启 MSW 模拟后端接口：
+
+```bash
+echo "VITE_ENABLE_MSW=true" >> .env
+npm run dev
+```
+
+MSW handlers 位置：`src/mocks/handlers.ts`
+
 ```
 
 ## 🧪 测试
@@ -73,6 +84,14 @@ npm run test:watch
 
 # 测试覆盖率
 npm run test:coverage
+### 端到端测试（E2E）
+
+```bash
+npm run test:e2e
+```
+
+Playwright 将自动启动开发服务器。可在 `playwright.config.ts` 中配置。
+
 ```
 
 ## 📚 文档
@@ -90,6 +109,36 @@ npm run storybook
 # 构建 Storybook
 npm run build-storybook
 ```
+
+## 🔐 认证与安全
+
+- 认证支持 Cookie 会话 + CSRF：
+  - 前端将自动携带凭证（`withCredentials`）并从 Cookie 读取 CSRF Token 注入到自定义头
+  - 需要后端提供 HttpOnly Cookie、SameSite 与 CSRF 校验
+- Token 模式兼容：如未启用 Cookie，会从本地存储读取 Token 并注入 Authorization 头
+
+环境变量（`.env`）：
+
+```bash
+VITE_AUTH_USE_COOKIES=false
+VITE_CSRF_HEADER_NAME=X-CSRF-Token
+VITE_CSRF_COOKIE_NAME=XHRF-TOKEN
+```
+
+## 📱 PWA
+
+- 已启用 `vite-plugin-pwa`：生产环境将自动注册 Service Worker
+- 需提供应用图标：`public/icon-192.png`、`public/icon-512.png`
+
+## 🛡️ 安全与 CSP（建议）
+
+- 在生产环境入口中添加严格 CSP/SRI；在 CI 中做响应头检查
+- 启用 Dependabot/CodeQL 进行依赖与代码安全扫描
+
+## 📈 性能与构建分析
+
+- 运行 `npm run analyze` 生成 bundle 可视化（rollup-plugin-visualizer）
+
 
 ## 📝 代码质量
 
