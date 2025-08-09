@@ -1,10 +1,53 @@
 # Page snapshot
 
 ```yaml
-- text: '[plugin:vite:import-analysis] Failed to resolve import "virtual:pwa-register" from "src/main.tsx". Does the file exist? /Users/nanning/cli/src/main.tsx:10:27 9 | import * as Sentry from "@sentry/react"; 10 | import { onCLS, onFID, onLCP } from "web-vitals"; 11 | import { registerSW } from "virtual:pwa-register"; | ^ 12 | if (import.meta.env?.DEV && import.meta.env?.VITE_ENABLE_MSW === "true") { 13 | import("./mocks/browser").then(({ worker }) => worker.start({ onUnhandledRequest: "bypass" })); at formatError (file:///Users/nanning/cli/node_modules/vite/dist/node/chunks/dep-827b23df.js:44066:46) at TransformContext.error (file:///Users/nanning/cli/node_modules/vite/dist/node/chunks/dep-827b23df.js:44062:19) at normalizeUrl (file:///Users/nanning/cli/node_modules/vite/dist/node/chunks/dep-827b23df.js:41845:33) at process.processTicksAndRejections (node:internal/process/task_queues:105:5) at async file:///Users/nanning/cli/node_modules/vite/dist/node/chunks/dep-827b23df.js:41999:47 at async Promise.all (index 10) at async TransformContext.transform (file:///Users/nanning/cli/node_modules/vite/dist/node/chunks/dep-827b23df.js:41915:13) at async Object.transform (file:///Users/nanning/cli/node_modules/vite/dist/node/chunks/dep-827b23df.js:44356:30) at async loadAndTransform (file:///Users/nanning/cli/node_modules/vite/dist/node/chunks/dep-827b23df.js:55088:29) at async viteTransformMiddleware (file:///Users/nanning/cli/node_modules/vite/dist/node/chunks/dep-827b23df.js:64699:32 Click outside, press Esc key, or fix the code to dismiss. You can also disable this overlay by setting'
-- code: server.hmr.overlay
-- text: to
-- code: 'false'
-- text: in
-- code: vite.config.js.
+- navigation:
+    - link "前端脚手架":
+        - /url: /
+    - link "首页":
+        - /url: /
+    - link "关于":
+        - /url: /about
+    - link "状态管理":
+        - /url: /state-demo
+    - link "国际化":
+        - /url: /i18n-demo
+    - button "🇨🇳":
+        - text: 🇨🇳
+        - img
+    - button "切换到深色主题":
+        - img
+    - link "登录":
+        - /url: /login
+    - link "注册":
+        - /url: /register
+- main:
+    - heading "用户认证" [level=1]
+    - paragraph: 登录或注册以访问完整功能
+    - button "登录"
+    - button "注册"
+    - heading "用户登录" [level=2]
+    - text: 邮箱地址
+    - textbox "邮箱地址": user@example.com
+    - text: 密码
+    - textbox "密码": password123
+    - paragraph: Request failed with status code 500
+    - button "登录"
+    - paragraph:
+        - text: 还没有账号？
+        - link "立即注册":
+            - /url: /register
+    - img
+    - heading "安全认证" [level=3]
+    - paragraph: 使用安全的认证机制，保护您的账户安全
+    - img
+    - heading "状态管理" [level=3]
+    - paragraph: 自动管理登录状态，提供无缝的用户体验
+    - img
+    - heading "快速访问" [level=3]
+    - paragraph: 登录后可以快速访问所有受保护的功能
+- contentinfo:
+    - text: © 2025 前端脚手架
+    - link "关于":
+        - /url: /about
 ```
