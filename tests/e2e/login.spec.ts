@@ -20,8 +20,11 @@ test.describe('Login flow (UI + API via MSW)', () => {
         timeout: 15000,
       }
     );
-    // 登录后跳转到首页，随后可进入受保护页面
-    await page.goto('/profile');
-    await expect(page.getByText('个人资料')).toBeVisible({ timeout: 15000 });
+    // 登录后导航应出现“登出”和“个人中心”
+    await expect(page.getByRole('button', { name: '登出' })).toBeVisible({
+      timeout: 15000,
+    });
+    await page.getByRole('link', { name: '个人中心' }).click();
+    await expect(page).toHaveURL(/\/profile$/);
   });
 });
