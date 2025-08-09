@@ -12,7 +12,7 @@ function readViteEnvDevFlag(): boolean {
     const env = eval('import.meta && import.meta.env') as any
     return !!env?.DEV
   } catch {
-    return process.env.NODE_ENV !== 'production'
+    return ((globalThis as any).process?.env?.NODE_ENV) !== 'production'
   }
 }
 

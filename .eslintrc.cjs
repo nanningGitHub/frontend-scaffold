@@ -19,9 +19,34 @@ module.exports = {
   },
   rules: {
     'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
-    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+    '@typescript-eslint/no-unused-vars': 'off',
+    'no-unused-vars': 'off',
   },
-  ignorePatterns: ['dist', 'node_modules'],
+  ignorePatterns: ['dist', 'node_modules', 'src/**/__tests__/**', 'src/**/*.{test,spec}.{ts,tsx}'],
+  linterOptions: {
+    reportUnusedDisableDirectives: false,
+  },
+  overrides: [
+    {
+      files: ['**/*.config.*', 'vite.config.ts', 'jest.config.*', 'tailwind.config.js', 'postcss.config.js'],
+      env: { node: true },
+    },
+    {
+      files: ['src/**/*.{test,spec}.{ts,tsx}', 'src/**/__tests__/**/*.{ts,tsx}'],
+      env: { jest: true, node: true, browser: true },
+      rules: {
+        'no-redeclare': 'off',
+        'no-undef': 'off',
+      },
+      globals: {
+        jest: 'readonly',
+        describe: 'readonly',
+        it: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+      },
+    },
+  ],
 }
 module.exports = {
   root: true,

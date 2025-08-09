@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios'
-import { API_CONFIG, STORAGE_KEYS } from '../constants'
+import { API_CONFIG, STORAGE_KEYS, AUTH_SECURITY } from '../constants'
 import { logger } from './logger'
 
 /**
@@ -29,6 +29,7 @@ const api: AxiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: AUTH_SECURITY.USE_COOKIES,
 })
 
 /**
@@ -65,11 +66,23 @@ api.interceptors.request.use(
     ;(config as any).startTime = startTime
     
     // 从 localStorage 获取认证 token
-    const token = getAuthToken()
-    
-    // 如果存在 token，自动添加到请求头
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+    // Cookie 会话模式下不加 Authorization；否则按 Bearer 添加
+    if (!AUTH_SECURITY.USE_COOKIES) {
+      const token = getAuthToken()
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
+    }
+
+    // CSRF: 从 Cookie 读取并设置自定义头
+    if (AUTH_SECURITY.USE_COOKIES) {
+      const csrfToken = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith(`${AUTH_SECURITY.CSRF_COOKIE_NAME}=`))
+        ?.split('=')[1]
+      if (csrfToken) {
+        ;(config.headers as any)[AUTH_SECURITY.CSRF_HEADER_NAME] = decodeURIComponent(csrfToken)
+      }
     }
     
     // 记录请求日志

@@ -5,6 +5,8 @@ import App from './App'
 import './index.css'
 import './i18n'
 import i18n from './i18n'
+import * as Sentry from '@sentry/react'
+import { onCLS, onFID, onLCP } from 'web-vitals'
 
 /**
  * 应用入口文件
@@ -32,6 +34,40 @@ document.documentElement.setAttribute('dir', i18n.dir())
 i18n.on('languageChanged', () => {
   document.documentElement.setAttribute('dir', i18n.dir())
 })
+
+// 初始化 Sentry（如果配置了 DSN）
+const sentryDsn = (import.meta as any).env?.VITE_SENTRY_DSN
+if (sentryDsn) {
+  Sentry.init({
+    dsn: sentryDsn,
+    integrations: [new Sentry.BrowserTracing()],
+    tracesSampleRate: 0.1,
+  })
+}
+
+// Web Vitals 上报（仅生产或需要时启用）
+const shouldReportVitals = (import.meta as any).env?.VITE_REPORT_WEB_VITALS === 'true'
+if (shouldReportVitals && (import.meta as any).env?.PROD) {
+  const report = (metric: any) => {
+    if ((window as any).gtag) {
+      (window as any).gtag('event', metric.name, {
+        value: Math.round(metric.name === 'CLS' ? metric.value * 1000 : metric.value),
+        event_category: 'Web Vitals',
+        event_label: metric.id,
+        non_interaction: true,
+      })
+    }
+    if (Sentry.getCurrentHub().getClient()) {
+      Sentry.captureMessage(`WebVital:${metric.name}`, {
+        level: 'info',
+        extra: metric,
+      })
+    }
+  }
+  onCLS(report)
+  onFID(report)
+  onLCP(report)
+}
 
 // 渲染应用
 root.render(

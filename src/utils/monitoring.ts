@@ -72,7 +72,6 @@ export class ErrorMonitor {
     // 这里可以集成 Sentry、LogRocket 等监控服务
     const monitoringUrl = ((): string | undefined => {
       try {
-        // eslint-disable-next-line no-eval
         const env = eval('import.meta && import.meta.env') as any
         return env?.VITE_SENTRY_DSN || (globalThis as any).process?.env?.VITE_SENTRY_DSN
       } catch {
@@ -188,7 +187,6 @@ export class PerformanceMonitor {
   private sendToAnalyticsService(type: string, data: any) {
     const analyticsUrl = ((): string | undefined => {
       try {
-        // eslint-disable-next-line no-eval
         const env = eval('import.meta && import.meta.env') as any
         return env?.VITE_GA_TRACKING_ID || (globalThis as any).process?.env?.VITE_GA_TRACKING_ID
       } catch {

@@ -24,6 +24,13 @@ export const API_CONFIG = {
   RETRY_DELAY: 1000,
 } as const
 
+// 认证与 CSRF 配置
+export const AUTH_SECURITY = {
+  USE_COOKIES: !!(viteEnv && viteEnv.VITE_AUTH_USE_COOKIES === 'true'),
+  CSRF_HEADER_NAME: (viteEnv && viteEnv.VITE_CSRF_HEADER_NAME) || 'X-CSRF-Token',
+  CSRF_COOKIE_NAME: (viteEnv && viteEnv.VITE_CSRF_COOKIE_NAME) || 'XSRF-TOKEN',
+} as const
+
 // 认证相关常量
 export const AUTH_CONFIG = {
   TOKEN_KEY: 'auth-token',
