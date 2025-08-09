@@ -11,10 +11,15 @@ test.describe('Login flow (UI + API via MSW)', () => {
 
   test('successful login redirects to profile', async ({ page }) => {
     await page.goto('/login');
-    await page.waitForFunction(() => (window as any).__mswReady !== undefined);
     await page.getByLabel('邮箱地址').fill('user@example.com');
     await page.getByLabel('密码').fill('password123');
     await page.locator('form').getByRole('button', { name: '登录' }).click();
+    await page.waitForFunction(
+      () => localStorage.getItem('auth-token') === 'mock-token',
+      {
+        timeout: 15000,
+      }
+    );
     // 登录后跳转到首页，随后可进入受保护页面
     await page.goto('/profile');
     await expect(page.getByText('个人资料')).toBeVisible({ timeout: 15000 });
