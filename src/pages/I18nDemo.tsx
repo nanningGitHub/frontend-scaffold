@@ -1,10 +1,10 @@
-import { useTranslation } from 'react-i18next'
-import { useI18n } from '../hooks/useI18n'
-import LanguageSwitcher from '../components/LanguageSwitcher'
+import { useTranslation } from 'react-i18next';
+import { useI18n } from '../hooks/useI18n';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 /**
  * 国际化演示页面
- * 
+ *
  * 功能：
  * 1. 展示国际化功能
  * 2. 演示语言切换
@@ -12,8 +12,9 @@ import LanguageSwitcher from '../components/LanguageSwitcher'
  * 4. 提供使用示例
  */
 const I18nDemo = () => {
-  const { t } = useTranslation()
-  const { currentLanguage, formatDate, formatNumber, formatCurrency, isRTL } = useI18n()
+  const { t } = useTranslation();
+  const { currentLanguage, formatDate, formatNumber, formatCurrency, isRTL } =
+    useI18n();
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -35,10 +36,12 @@ const I18nDemo = () => {
         <div className="flex flex-wrap gap-4 items-center">
           <div>
             <p className="text-sm text-gray-600 mb-2">
-              {t('i18n.demo.currentLanguage', '当前语言')}: <strong>{currentLanguage}</strong>
+              {t('i18n.demo.currentLanguage', '当前语言')}:{' '}
+              <strong>{currentLanguage}</strong>
             </p>
             <p className="text-sm text-gray-600">
-              {t('i18n.demo.direction', '文字方向')}: <strong>{isRTL() ? 'RTL' : 'LTR'}</strong>
+              {t('i18n.demo.direction', '文字方向')}:{' '}
+              <strong>{isRTL() ? 'RTL' : 'LTR'}</strong>
             </p>
           </div>
           <div className="flex gap-2">
@@ -95,7 +98,8 @@ const I18nDemo = () => {
             </div>
             <div>
               <p className="text-sm text-gray-600">
-                {t('i18n.demo.percentage', '百分比')}: {formatNumber(0.1234, { style: 'percent' })}
+                {t('i18n.demo.percentage', '百分比')}:{' '}
+                {formatNumber(0.1234, { style: 'percent' })}
               </p>
             </div>
           </div>
@@ -115,9 +119,9 @@ const I18nDemo = () => {
             {t('i18n.demo.items', '您有 {{count}} 个项目', { count: 5 })}
           </p>
           <p className="text-sm text-gray-600">
-            {t('i18n.demo.price', '价格：{{currency}}{{amount}}', { 
-              currency: '¥', 
-              amount: formatNumber(99.99) 
+            {t('i18n.demo.price', '价格：{{currency}}{{amount}}', {
+              currency: '¥',
+              amount: formatNumber(99.99),
             })}
           </p>
         </div>
@@ -129,7 +133,7 @@ const I18nDemo = () => {
           {t('i18n.demo.plural', '复数示例')}
         </h3>
         <div className="space-y-2">
-          {[0, 1, 2, 5].map(count => (
+          {[0, 1, 2, 5].map((count) => (
             <p key={count} className="text-sm text-gray-600">
               {t('i18n.demo.item', '{{count}} 个项目', { count })}
             </p>
@@ -147,7 +151,7 @@ const I18nDemo = () => {
             {t('i18n.demo.basicUsage', '基本使用')}
           </h4>
           <pre className="bg-gray-100 p-3 rounded text-sm overflow-x-auto">
-{`import { useTranslation } from 'react-i18next'
+            {`import { useTranslation } from 'react-i18next'
 
 function MyComponent() {
   const { t } = useTranslation()
@@ -165,7 +169,7 @@ function MyComponent() {
             {t('i18n.demo.advancedUsage', '高级使用')}
           </h4>
           <pre className="bg-gray-100 p-3 rounded text-sm overflow-x-auto">
-{`import { useI18n } from '@/hooks/useI18n'
+            {`import { useI18n } from '@/hooks/useI18n'
 
 function MyComponent() {
   const { t, currentLanguage, formatDate, formatCurrency } = useI18n()
@@ -182,7 +186,7 @@ function MyComponent() {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default I18nDemo
+export default I18nDemo;

@@ -1,18 +1,18 @@
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
-import { userService, User } from '../services/userService'
-import { logger } from '../utils/logger'
-import { ERROR_MESSAGES, AUTH_SECURITY, STORAGE_KEYS } from '../constants'
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { userService, User } from '../services/userService';
+import { logger } from '../utils/logger';
+import { ERROR_MESSAGES, AUTH_SECURITY, STORAGE_KEYS } from '../constants';
 
 /**
  * 认证状态接口
  */
 interface AuthState {
-  user: User | null
-  token: string | null
-  isAuthenticated: boolean
-  loading: boolean
-  error: string | null
+  user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  loading: boolean;
+  error: string | null;
 }
 
 /**
@@ -20,23 +20,27 @@ interface AuthState {
  */
 interface AuthActions {
   // 状态更新
-  setLoading: (loading: boolean) => void
-  setError: (error: string | null) => void
-  clearError: () => void
-  
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
+  clearError: () => void;
+
   // 认证操作
-  login: (email: string, password: string) => Promise<void>
-  register: (userData: { name: string; email: string; password: string }) => Promise<void>
-  logout: () => Promise<void>
-  
+  login: (email: string, password: string) => Promise<void>;
+  register: (userData: {
+    name: string;
+    email: string;
+    password: string;
+  }) => Promise<void>;
+  logout: () => Promise<void>;
+
   // 初始化
-  initializeAuth: () => Promise<void>
+  initializeAuth: () => Promise<void>;
 }
 
 /**
  * 认证 Store 类型
  */
-type AuthStore = AuthState & AuthActions
+type AuthStore = AuthState & AuthActions;
 
 /**
  * 创建认证 Store
@@ -58,76 +62,86 @@ export const useAuthStore = create<AuthStore>()(
 
       // 用户登录
       login: async (_email: string, _password: string) => {
-        set({ loading: true, error: null })
+        set({ loading: true, error: null });
 
         try {
-          logger.info('User login attempt', { email: _email })
-          const { user, token } = await userService.login(_email, _password)
-          
+          logger.info('User login attempt', { email: _email });
+          const { user, token } = await userService.login(_email, _password);
+
           set({
             user,
             token: AUTH_SECURITY.USE_COOKIES ? null : token,
             isAuthenticated: true,
             loading: false,
             error: null,
-          })
-          
-          logger.info('User login successful', { userId: user.id })
+          });
+
+          logger.info('User login successful', { userId: user.id });
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : ERROR_MESSAGES.UNKNOWN_ERROR
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : ERROR_MESSAGES.UNKNOWN_ERROR;
           set({
             user: null,
             token: null,
             isAuthenticated: false,
             loading: false,
             error: errorMessage,
-          })
-          
-          logger.error('User login failed', error)
-          throw error
+          });
+
+          logger.error('User login failed', error);
+          throw error;
         }
       },
 
       // 用户注册
-      register: async (_userData: { name: string; email: string; password: string }) => {
-        set({ loading: true, error: null })
+      register: async (_userData: {
+        name: string;
+        email: string;
+        password: string;
+      }) => {
+        set({ loading: true, error: null });
 
         try {
-          logger.info('User registration attempt', { email: _userData.email })
-          const { user, token } = await userService.register(_userData)
-          
+          logger.info('User registration attempt', { email: _userData.email });
+          const { user, token } = await userService.register(_userData);
+
           set({
             user,
             token: AUTH_SECURITY.USE_COOKIES ? null : token,
             isAuthenticated: true,
             loading: false,
             error: null,
-          })
-          
-          logger.info('User registration successful', { userId: user.id })
+          });
+
+          logger.info('User registration successful', { userId: user.id });
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : ERROR_MESSAGES.UNKNOWN_ERROR
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : ERROR_MESSAGES.UNKNOWN_ERROR;
           set({
             user: null,
             token: null,
             isAuthenticated: false,
             loading: false,
             error: errorMessage,
-          })
-          
-          logger.error('User registration failed', error)
-          throw error
+          });
+
+          logger.error('User registration failed', error);
+          throw error;
         }
       },
 
       // 用户登出
       logout: async () => {
         try {
-          logger.info('User logout attempt')
-          await userService.logout()
-          logger.info('User logout successful')
+          logger.info('User logout attempt');
+          await userService.logout();
+          logger.info('User logout successful');
         } catch (error) {
-          logger.error('Logout API call failed', error)
+          logger.error('Logout API call failed', error);
         } finally {
           set({
             user: null,
@@ -135,35 +149,35 @@ export const useAuthStore = create<AuthStore>()(
             isAuthenticated: false,
             loading: false,
             error: null,
-          })
+          });
         }
       },
 
       // 初始化认证状态
       initializeAuth: async () => {
-        set({ loading: true })
+        set({ loading: true });
         try {
           if (AUTH_SECURITY.USE_COOKIES) {
-            const currentUser = await userService.getCurrentUser()
-            set({ user: currentUser, isAuthenticated: true })
-            return
+            const currentUser = await userService.getCurrentUser();
+            set({ user: currentUser, isAuthenticated: true });
+            return;
           }
           // 非 Cookie 模式：尝试从状态或本地存储恢复 token
-          let { token } = get()
+          let { token } = get();
           if (!token) {
             try {
-              const stored = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)
+              const stored = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
               if (stored) {
-                token = stored
-                set({ token })
+                token = stored;
+                set({ token });
               } else {
-                const persisted = localStorage.getItem('auth-storage')
+                const persisted = localStorage.getItem('auth-storage');
                 if (persisted) {
-                  const parsed = JSON.parse(persisted)
-                  const persistedToken = parsed?.state?.token || parsed?.token
+                  const parsed = JSON.parse(persisted);
+                  const persistedToken = parsed?.state?.token || parsed?.token;
                   if (persistedToken) {
-                    token = persistedToken
-                    set({ token })
+                    token = persistedToken;
+                    set({ token });
                   }
                 }
               }
@@ -172,13 +186,13 @@ export const useAuthStore = create<AuthStore>()(
             }
           }
           if (token) {
-            const currentUser = await userService.getCurrentUser()
-            set({ user: currentUser, isAuthenticated: true })
+            const currentUser = await userService.getCurrentUser();
+            set({ user: currentUser, isAuthenticated: true });
           }
         } catch {
-          set({ user: null, token: null, isAuthenticated: false })
+          set({ user: null, token: null, isAuthenticated: false });
         } finally {
-          set({ loading: false })
+          set({ loading: false });
         }
       },
     }),
@@ -190,4 +204,4 @@ export const useAuthStore = create<AuthStore>()(
       }), // Cookie 模式不持久化 token
     }
   )
-)
+);

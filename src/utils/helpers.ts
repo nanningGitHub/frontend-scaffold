@@ -1,6 +1,6 @@
 /**
  * 通用工具函数
- * 
+ *
  * 功能：
  * 1. 数据处理工具
  * 2. 格式化工具
@@ -13,28 +13,28 @@
  */
 export function deepClone<T>(obj: T): T {
   if (obj === null || typeof obj !== 'object') {
-    return obj
+    return obj;
   }
 
   if (obj instanceof Date) {
-    return new Date(obj.getTime()) as unknown as T
+    return new Date(obj.getTime()) as unknown as T;
   }
 
   if (obj instanceof Array) {
-    return obj.map(item => deepClone(item)) as unknown as T
+    return obj.map((item) => deepClone(item)) as unknown as T;
   }
 
   if (typeof obj === 'object') {
-    const clonedObj = {} as T
+    const clonedObj = {} as T;
     for (const key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        clonedObj[key] = deepClone(obj[key])
+        clonedObj[key] = deepClone(obj[key]);
       }
     }
-    return clonedObj
+    return clonedObj;
   }
 
-  return obj
+  return obj;
 }
 
 /**
@@ -45,21 +45,21 @@ export function debounce<T extends (..._args: any[]) => any>(
   wait: number,
   immediate = false
 ): (...args: Parameters<T>) => void {
-  let timeout: ReturnType<typeof setTimeout> | null = null
+  let timeout: ReturnType<typeof setTimeout> | null = null;
 
   return function executedFunction(..._args: Parameters<T>) {
     const later = () => {
-      timeout = null
-      if (!immediate) func(..._args)
-    }
+      timeout = null;
+      if (!immediate) func(..._args);
+    };
 
-    const callNow = immediate && !timeout
+    const callNow = immediate && !timeout;
 
-    if (timeout) clearTimeout(timeout)
-    timeout = setTimeout(later, wait)
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
 
-    if (callNow) func(..._args)
-  }
+    if (callNow) func(..._args);
+  };
 }
 
 /**
@@ -69,27 +69,27 @@ export function throttle<T extends (..._args: any[]) => any>(
   func: T,
   limit: number
 ): (...args: Parameters<T>) => void {
-  let inThrottle: boolean
+  let inThrottle: boolean;
   return function executedFunction(..._args: Parameters<T>) {
     if (!inThrottle) {
-      func(..._args)
-      inThrottle = true
-      setTimeout(() => (inThrottle = false), limit)
+      func(..._args);
+      inThrottle = true;
+      setTimeout(() => (inThrottle = false), limit);
     }
-  }
+  };
 }
 
 /**
  * 格式化文件大小
  */
 export function formatFileSize(bytes: number): string {
-  if (bytes === 0) return '0 Bytes'
+  if (bytes === 0) return '0 Bytes';
 
-  const k = 1024
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
 /**
@@ -99,11 +99,11 @@ export function formatDate(
   date: Date | string | number,
   format: 'short' | 'long' | 'relative' | 'iso' = 'short'
 ): string {
-  const d = new Date(date)
+  const d = new Date(date);
 
   switch (format) {
     case 'short':
-      return d.toLocaleDateString('zh-CN')
+      return d.toLocaleDateString('zh-CN');
     case 'long':
       return d.toLocaleDateString('zh-CN', {
         year: 'numeric',
@@ -111,13 +111,13 @@ export function formatDate(
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
-      })
+      });
     case 'relative':
-      return formatRelativeTime(d)
+      return formatRelativeTime(d);
     case 'iso':
-      return d.toISOString()
+      return d.toISOString();
     default:
-      return d.toLocaleDateString('zh-CN')
+      return d.toLocaleDateString('zh-CN');
   }
 }
 
@@ -125,21 +125,21 @@ export function formatDate(
  * 格式化相对时间
  */
 function formatRelativeTime(date: Date): string {
-  const now = new Date()
-  const diff = now.getTime() - date.getTime()
-  const seconds = Math.floor(diff / 1000)
-  const minutes = Math.floor(seconds / 60)
-  const hours = Math.floor(minutes / 60)
-  const days = Math.floor(hours / 24)
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
 
   if (days > 0) {
-    return `${days}天前`
+    return `${days}天前`;
   } else if (hours > 0) {
-    return `${hours}小时前`
+    return `${hours}小时前`;
   } else if (minutes > 0) {
-    return `${minutes}分钟前`
+    return `${minutes}分钟前`;
   } else {
-    return '刚刚'
+    return '刚刚';
   }
 }
 
@@ -147,60 +147,61 @@ function formatRelativeTime(date: Date): string {
  * 生成唯一ID
  */
 export function generateId(length = 8): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  let result = ''
+  const chars =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
   for (let i = 0; i < length; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length))
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
-  return result
+  return result;
 }
 
 /**
  * 检查对象是否为空
  */
 export function isEmpty(value: any): boolean {
-  if (value == null) return true
-  if (typeof value === 'string') return value.trim().length === 0
-  if (Array.isArray(value)) return value.length === 0
-  if (typeof value === 'object') return Object.keys(value).length === 0
-  return false
+  if (value == null) return true;
+  if (typeof value === 'string') return value.trim().length === 0;
+  if (Array.isArray(value)) return value.length === 0;
+  if (typeof value === 'object') return Object.keys(value).length === 0;
+  return false;
 }
 
 /**
  * 安全获取嵌套对象属性
  */
 export function get(obj: any, path: string, defaultValue?: any): any {
-  const keys = path.split('.')
-  let result = obj
+  const keys = path.split('.');
+  let result = obj;
 
   for (const key of keys) {
     if (result == null || typeof result !== 'object') {
-      return defaultValue
+      return defaultValue;
     }
-    result = result[key]
+    result = result[key];
   }
 
-  return result !== undefined ? result : defaultValue
+  return result !== undefined ? result : defaultValue;
 }
 
 /**
  * 设置嵌套对象属性
  */
 export function set(obj: any, path: string, value: any): any {
-  const keys = path.split('.')
-  const result = { ...obj }
-  let current = result
+  const keys = path.split('.');
+  const result = { ...obj };
+  let current = result;
 
   for (let i = 0; i < keys.length - 1; i++) {
-    const key = keys[i]
+    const key = keys[i];
     if (!(key in current) || typeof current[key] !== 'object') {
-      current[key] = {}
+      current[key] = {};
     }
-    current = current[key]
+    current = current[key];
   }
 
-  current[keys[keys.length - 1]] = value
-  return result
+  current[keys[keys.length - 1]] = value;
+  return result;
 }
 
 /**
@@ -208,18 +209,18 @@ export function set(obj: any, path: string, value: any): any {
  */
 export function unique<T>(array: T[], key?: keyof T): T[] {
   if (!key) {
-    return [...new Set(array)]
+    return [...new Set(array)];
   }
 
-  const seen = new Set()
-  return array.filter(item => {
-    const value = item[key]
+  const seen = new Set();
+  return array.filter((item) => {
+    const value = item[key];
     if (seen.has(value)) {
-      return false
+      return false;
     }
-    seen.add(value)
-    return true
-  })
+    seen.add(value);
+    return true;
+  });
 }
 
 /**
@@ -227,32 +228,36 @@ export function unique<T>(array: T[], key?: keyof T): T[] {
  */
 export function groupBy<T>(array: T[], key: keyof T): Record<string, T[]> {
   return array.reduce((groups, item) => {
-    const group = String(item[key])
-    groups[group] = groups[group] || []
-    groups[group].push(item)
-    return groups
-  }, {} as Record<string, T[]>)
+    const group = String(item[key]);
+    groups[group] = groups[group] || [];
+    groups[group].push(item);
+    return groups;
+  }, {} as Record<string, T[]>);
 }
 
 /**
  * 数组排序
  */
-export function sortBy<T>(array: T[], key: keyof T, order: 'asc' | 'desc' = 'asc'): T[] {
+export function sortBy<T>(
+  array: T[],
+  key: keyof T,
+  order: 'asc' | 'desc' = 'asc'
+): T[] {
   return [...array].sort((a, b) => {
-    const aValue = a[key]
-    const bValue = b[key]
+    const aValue = a[key];
+    const bValue = b[key];
 
-    if (aValue < bValue) return order === 'asc' ? -1 : 1
-    if (aValue > bValue) return order === 'asc' ? 1 : -1
-    return 0
-  })
+    if (aValue < bValue) return order === 'asc' ? -1 : 1;
+    if (aValue > bValue) return order === 'asc' ? 1 : -1;
+    return 0;
+  });
 }
 
 /**
  * 延迟执行
  */
 export function delay(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms))
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
@@ -263,20 +268,20 @@ export async function retry<T>(
   maxAttempts = 3,
   delayMs = 1000
 ): Promise<T> {
-  let lastError: Error
+  let lastError: Error;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
-      return await fn()
+      return await fn();
     } catch (error) {
-      lastError = error as Error
+      lastError = error as Error;
       if (attempt < maxAttempts) {
-        await delay(delayMs * attempt) // 指数退避
+        await delay(delayMs * attempt); // 指数退避
       }
     }
   }
 
-  throw lastError!
+  throw lastError!;
 }
 
 /**
@@ -286,19 +291,19 @@ export function memoize<T extends (..._args: any[]) => any>(
   fn: T,
   getKey?: (...args: Parameters<T>) => string
 ): T {
-  const cache = new Map<string, ReturnType<T>>()
+  const cache = new Map<string, ReturnType<T>>();
 
   return ((..._args: Parameters<T>) => {
-    const key = getKey ? getKey(..._args) : JSON.stringify(_args)
-    
+    const key = getKey ? getKey(..._args) : JSON.stringify(_args);
+
     if (cache.has(key)) {
-      return cache.get(key)
+      return cache.get(key);
     }
 
-    const result = fn(..._args)
-    cache.set(key, result)
-    return result
-  }) as T
+    const result = fn(..._args);
+    cache.set(key, result);
+    return result;
+  }) as T;
 }
 
 /**
@@ -307,14 +312,14 @@ export function memoize<T extends (..._args: any[]) => any>(
 export function isMobile(): boolean {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
     navigator.userAgent
-  )
+  );
 }
 
 /**
  * 检查是否为触摸设备
  */
 export function isTouchDevice(): boolean {
-  return 'ontouchstart' in window || navigator.maxTouchPoints > 0
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 }
 
 /**
@@ -324,20 +329,20 @@ export function getViewportSize(): { width: number; height: number } {
   return {
     width: window.innerWidth || document.documentElement.clientWidth,
     height: window.innerHeight || document.documentElement.clientHeight,
-  }
+  };
 }
 
 /**
  * 检查元素是否在视口中
  */
 export function isInViewport(element: HTMLElement): boolean {
-  const rect = element.getBoundingClientRect()
-  const viewport = getViewportSize()
+  const rect = element.getBoundingClientRect();
+  const viewport = getViewportSize();
 
   return (
     rect.top >= 0 &&
     rect.left >= 0 &&
     rect.bottom <= viewport.height &&
     rect.right <= viewport.width
-  )
+  );
 }

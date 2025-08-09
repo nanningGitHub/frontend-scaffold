@@ -1,30 +1,30 @@
-import { create } from 'zustand'
+import { create } from 'zustand';
 
 /**
  * UI 状态接口
  */
 interface UIState {
   // 侧边栏状态
-  sidebarOpen: boolean
-  
+  sidebarOpen: boolean;
+
   // 主题设置
-  theme: 'light' | 'dark'
-  
+  theme: 'light' | 'dark';
+
   // 通知系统
   notifications: Array<{
-    id: string
-    type: 'success' | 'error' | 'warning' | 'info'
-    message: string
-    duration?: number
-  }>
-  
+    id: string;
+    type: 'success' | 'error' | 'warning' | 'info';
+    message: string;
+    duration?: number;
+  }>;
+
   // 加载状态
-  globalLoading: boolean
-  
+  globalLoading: boolean;
+
   // 模态框状态
   modals: {
-    [key: string]: boolean
-  }
+    [key: string]: boolean;
+  };
 }
 
 /**
@@ -32,31 +32,33 @@ interface UIState {
  */
 interface UIActions {
   // 侧边栏控制
-  toggleSidebar: () => void
-  setSidebarOpen: (open: boolean) => void
-  
+  toggleSidebar: () => void;
+  setSidebarOpen: (open: boolean) => void;
+
   // 主题控制
-  toggleTheme: () => void
-  setTheme: (theme: 'light' | 'dark') => void
-  
+  toggleTheme: () => void;
+  setTheme: (theme: 'light' | 'dark') => void;
+
   // 通知系统
-  addNotification: (notification: Omit<UIState['notifications'][0], 'id'>) => void
-  removeNotification: (id: string) => void
-  clearNotifications: () => void
-  
+  addNotification: (
+    notification: Omit<UIState['notifications'][0], 'id'>
+  ) => void;
+  removeNotification: (id: string) => void;
+  clearNotifications: () => void;
+
   // 全局加载状态
-  setGlobalLoading: (loading: boolean) => void
-  
+  setGlobalLoading: (loading: boolean) => void;
+
   // 模态框控制
-  openModal: (modalId: string) => void
-  closeModal: (modalId: string) => void
-  closeAllModals: () => void
+  openModal: (modalId: string) => void;
+  closeModal: (modalId: string) => void;
+  closeAllModals: () => void;
 }
 
 /**
  * UI Store 类型
  */
-type UIStore = UIState & UIActions
+type UIStore = UIState & UIActions;
 
 /**
  * 创建 UI Store
@@ -74,45 +76,49 @@ export const useUIStore = create<UIStore>((set, get) => ({
   setSidebarOpen: (_open) => set({ sidebarOpen: _open }),
 
   // 主题控制
-  toggleTheme: () => set((state) => ({ 
-    theme: state.theme === 'light' ? 'dark' : 'light' 
-  })),
+  toggleTheme: () =>
+    set((state) => ({
+      theme: state.theme === 'light' ? 'dark' : 'light',
+    })),
   setTheme: (_theme) => set({ theme: _theme }),
 
   // 通知系统
   addNotification: (_notification) => {
-    const id = Date.now().toString()
-    const newNotification = { ..._notification, id }
-    
+    const id = Date.now().toString();
+    const newNotification = { ..._notification, id };
+
     set((state) => ({
-      notifications: [...state.notifications, newNotification]
-    }))
+      notifications: [...state.notifications, newNotification],
+    }));
 
     // 自动移除通知（如果设置了持续时间）
     if (_notification.duration) {
       setTimeout(() => {
-        get().removeNotification(id)
-      }, _notification.duration)
+        get().removeNotification(id);
+      }, _notification.duration);
     }
   },
-  
-  removeNotification: (_id) => set((state) => ({
-    notifications: state.notifications.filter(n => n.id !== _id)
-  })),
-  
+
+  removeNotification: (_id) =>
+    set((state) => ({
+      notifications: state.notifications.filter((n) => n.id !== _id),
+    })),
+
   clearNotifications: () => set({ notifications: [] }),
 
   // 全局加载状态
   setGlobalLoading: (_loading) => set({ globalLoading: _loading }),
 
   // 模态框控制
-  openModal: (_modalId) => set((state) => ({
-    modals: { ...state.modals, [_modalId]: true }
-  })),
-  
-  closeModal: (_modalId) => set((state) => ({
-    modals: { ...state.modals, [_modalId]: false }
-  })),
-  
+  openModal: (_modalId) =>
+    set((state) => ({
+      modals: { ...state.modals, [_modalId]: true },
+    })),
+
+  closeModal: (_modalId) =>
+    set((state) => ({
+      modals: { ...state.modals, [_modalId]: false },
+    })),
+
   closeAllModals: () => set({ modals: {} }),
-}))
+}));

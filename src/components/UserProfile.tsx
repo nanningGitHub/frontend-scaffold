@@ -1,15 +1,15 @@
-import { useAuthStore } from '../stores/authStore'
+import { useAuthStore } from '../stores/authStore';
 
 /**
  * 用户个人资料组件
- * 
+ *
  * 功能：
  * 1. 显示用户信息
  * 2. 提供编辑功能
  * 3. 显示账户状态
  */
 const UserProfile = () => {
-  const { user, isAuthenticated } = useAuthStore()
+  const { user, isAuthenticated } = useAuthStore();
 
   if (!isAuthenticated || !user) {
     return (
@@ -18,7 +18,7 @@ const UserProfile = () => {
           <p className="text-yellow-800">请先登录以查看个人资料</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -34,8 +34,10 @@ const UserProfile = () => {
           {/* 用户基本信息 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">基本信息</h2>
-              
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                基本信息
+              </h2>
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -60,7 +62,9 @@ const UserProfile = () => {
                     用户ID
                   </label>
                   <div className="bg-gray-50 px-3 py-2 rounded-md border border-gray-200">
-                    <span className="text-gray-900 font-mono text-sm">{user.id}</span>
+                    <span className="text-gray-900 font-mono text-sm">
+                      {user.id}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -68,8 +72,10 @@ const UserProfile = () => {
 
             {/* 账户状态 */}
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">账户状态</h2>
-              
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                账户状态
+              </h2>
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -87,7 +93,9 @@ const UserProfile = () => {
                   </label>
                   <div className="bg-gray-50 px-3 py-2 rounded-md border border-gray-200">
                     <span className="text-gray-900">
-                      {user.createdAt ? new Date(user.createdAt).toLocaleDateString('zh-CN') : '未知'}
+                      {user.createdAt
+                        ? new Date(user.createdAt).toLocaleDateString('zh-CN')
+                        : '未知'}
                     </span>
                   </div>
                 </div>
@@ -98,7 +106,9 @@ const UserProfile = () => {
                   </label>
                   <div className="bg-gray-50 px-3 py-2 rounded-md border border-gray-200">
                     <span className="text-gray-900">
-                      {user.updatedAt ? new Date(user.updatedAt).toLocaleDateString('zh-CN') : '未知'}
+                      {user.updatedAt
+                        ? new Date(user.updatedAt).toLocaleDateString('zh-CN')
+                        : '未知'}
                     </span>
                   </div>
                 </div>
@@ -123,7 +133,7 @@ const UserProfile = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default UserProfile
+export default UserProfile;

@@ -1,6 +1,6 @@
 /**
  * 应用常量配置
- * 
+ *
  * 集中管理所有常量，便于维护和修改
  */
 
@@ -8,28 +8,32 @@
 function readViteEnvSafe(): Record<string, any> | undefined {
   try {
     // 通过 eval 避免在非 ESM 环境下解析 import.meta 语法
-    return eval('import.meta && import.meta.env')
+    return eval('import.meta && import.meta.env');
   } catch {
-    return undefined
+    return undefined;
   }
 }
 
-const viteEnv = readViteEnvSafe()
+const viteEnv = readViteEnvSafe();
 
 // API 相关常量
 export const API_CONFIG = {
-  BASE_URL: (viteEnv && viteEnv.VITE_API_BASE_URL) || (globalThis as any).process?.env?.VITE_API_BASE_URL || '/api',
+  BASE_URL:
+    (viteEnv && viteEnv.VITE_API_BASE_URL) ||
+    (globalThis as any).process?.env?.VITE_API_BASE_URL ||
+    '/api',
   TIMEOUT: 10000,
   RETRY_TIMES: 3,
   RETRY_DELAY: 1000,
-} as const
+} as const;
 
 // 认证与 CSRF 配置
 export const AUTH_SECURITY = {
   USE_COOKIES: !!(viteEnv && viteEnv.VITE_AUTH_USE_COOKIES === 'true'),
-  CSRF_HEADER_NAME: (viteEnv && viteEnv.VITE_CSRF_HEADER_NAME) || 'X-CSRF-Token',
+  CSRF_HEADER_NAME:
+    (viteEnv && viteEnv.VITE_CSRF_HEADER_NAME) || 'X-CSRF-Token',
   CSRF_COOKIE_NAME: (viteEnv && viteEnv.VITE_CSRF_COOKIE_NAME) || 'XSRF-TOKEN',
-} as const
+} as const;
 
 // 认证相关常量
 export const AUTH_CONFIG = {
@@ -37,7 +41,7 @@ export const AUTH_CONFIG = {
   USER_KEY: 'auth-user',
   TOKEN_EXPIRY: 24 * 60 * 60 * 1000, // 24小时
   REFRESH_THRESHOLD: 5 * 60 * 1000, // 5分钟
-} as const
+} as const;
 
 // 表单验证规则
 export const VALIDATION_RULES = {
@@ -53,7 +57,7 @@ export const VALIDATION_RULES = {
     MIN_LENGTH: 2,
     MESSAGE: '姓名至少2个字符',
   },
-} as const
+} as const;
 
 // 通知配置
 export const NOTIFICATION_CONFIG = {
@@ -62,14 +66,14 @@ export const NOTIFICATION_CONFIG = {
   ERROR_DURATION: 5000,
   WARNING_DURATION: 4000,
   INFO_DURATION: 3000,
-} as const
+} as const;
 
 // 主题配置
 export const THEME_CONFIG = {
   LIGHT: 'light',
   DARK: 'dark',
   SYSTEM: 'system',
-} as const
+} as const;
 
 // 路由配置
 export const ROUTES = {
@@ -80,7 +84,7 @@ export const ROUTES = {
   PROFILE: '/profile',
   API_EXAMPLE: '/api-example',
   STATE_DEMO: '/state-demo',
-} as const
+} as const;
 
 // 本地存储键名
 export const STORAGE_KEYS = {
@@ -89,7 +93,7 @@ export const STORAGE_KEYS = {
   THEME: 'app-theme',
   SIDEBAR_STATE: 'sidebar-state',
   NOTIFICATIONS: 'notifications',
-} as const
+} as const;
 
 // 错误消息
 export const ERROR_MESSAGES = {
@@ -100,7 +104,7 @@ export const ERROR_MESSAGES = {
   NOT_FOUND: '请求的资源不存在',
   VALIDATION_ERROR: '输入数据格式不正确',
   UNKNOWN_ERROR: '发生未知错误，请稍后重试',
-} as const
+} as const;
 
 // 成功消息
 export const SUCCESS_MESSAGES = {
@@ -110,7 +114,7 @@ export const SUCCESS_MESSAGES = {
   UPDATE_SUCCESS: '更新成功',
   DELETE_SUCCESS: '删除成功',
   SAVE_SUCCESS: '保存成功',
-} as const
+} as const;
 
 // 加载状态文本
 export const LOADING_MESSAGES = {
@@ -120,24 +124,24 @@ export const LOADING_MESSAGES = {
   SAVING: '保存中...',
   DELETING: '删除中...',
   UPLOADING: '上传中...',
-} as const
+} as const;
 
 // 分页配置
 export const PAGINATION_CONFIG = {
   DEFAULT_PAGE_SIZE: 10,
   PAGE_SIZE_OPTIONS: [10, 20, 50, 100],
   MAX_PAGE_SIZE: 100,
-} as const
+} as const;
 
 // 文件上传配置
 export const UPLOAD_CONFIG = {
   MAX_FILE_SIZE: 5 * 1024 * 1024, // 5MB
   ALLOWED_TYPES: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
   MAX_FILES: 10,
-} as const
+} as const;
 
 // 性能监控配置
 export const PERFORMANCE_CONFIG = {
   SLOW_THRESHOLD: 3000, // 3秒
   VERY_SLOW_THRESHOLD: 10000, // 10秒
-} as const
+} as const;

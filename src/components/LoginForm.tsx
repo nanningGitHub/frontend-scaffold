@@ -1,11 +1,11 @@
-import { useAuthStore } from '../stores/authStore'
-import { useForm } from '../hooks/useForm'
-import { commonValidationRules } from '../utils/validation'
-import { logger } from '../utils/logger'
+import { useAuthStore } from '../stores/authStore';
+import { useForm } from '../hooks/useForm';
+import { commonValidationRules } from '../utils/validation';
+import { logger } from '../utils/logger';
 
 /**
  * 登录表单组件
- * 
+ *
  * 功能：
  * 1. 用户登录
  * 2. 表单验证
@@ -13,7 +13,7 @@ import { logger } from '../utils/logger'
  * 4. 加载状态
  */
 const LoginForm = () => {
-  const { login, error, clearError } = useAuthStore()
+  const { login, error, clearError } = useAuthStore();
 
   // 使用 useForm Hook
   const {
@@ -33,13 +33,13 @@ const LoginForm = () => {
       password: commonValidationRules.password,
     },
     onSubmit: async (values) => {
-      clearError()
-      await login(values.email, values.password)
+      clearError();
+      await login(values.email, values.password);
     },
     onError: (errors) => {
-      logger.warn('Login form validation failed', errors)
+      logger.warn('Login form validation failed', errors);
     },
-  })
+  });
 
   return (
     <div className="max-w-md mx-auto">
@@ -47,11 +47,14 @@ const LoginForm = () => {
         <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">
           用户登录
         </h2>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* 邮箱输入 */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               邮箱地址
             </label>
             <input
@@ -72,7 +75,10 @@ const LoginForm = () => {
 
           {/* 密码输入 */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               密码
             </label>
             <input
@@ -116,14 +122,17 @@ const LoginForm = () => {
         <div className="mt-4 text-center">
           <p className="text-sm text-gray-600">
             还没有账号？{' '}
-            <a href="/register" className="text-blue-600 hover:text-blue-800 font-medium">
+            <a
+              href="/register"
+              className="text-blue-600 hover:text-blue-800 font-medium"
+            >
               立即注册
             </a>
           </p>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default LoginForm
+export default LoginForm;

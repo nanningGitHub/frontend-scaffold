@@ -12,7 +12,7 @@
   html {
     font-family: 'Inter', system-ui, sans-serif;
   }
-  
+
   /* 设置页面背景和文字颜色 */
   body {
     @apply bg-gray-50 text-gray-900;
@@ -33,22 +33,22 @@
   .btn {
     @apply px-4 py-2 rounded-lg font-medium transition-colors duration-200;
   }
-  
+
   /* 主要按钮样式 */
   .btn-primary {
     @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
   }
-  
+
   /* 次要按钮样式 */
   .btn-secondary {
     @apply bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
   }
-  
+
   /* 卡片容器样式 */
   .card {
     @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
   }
-  
+
   /* 输入框样式 */
   .input {
     @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;

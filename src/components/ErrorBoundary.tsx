@@ -1,34 +1,34 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react'
-import { logger } from '../utils/logger'
+import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { logger } from '../utils/logger';
 
 /**
  * 错误边界状态接口
  */
 interface ErrorBoundaryState {
-  hasError: boolean
-  error: Error | null
-  errorInfo: ErrorInfo | null
+  hasError: boolean;
+  error: Error | null;
+  errorInfo: ErrorInfo | null;
 }
 
 /**
  * 错误边界属性接口
  */
 interface ErrorBoundaryProps {
-  children: ReactNode
-  fallback?: ReactNode | ((..._args: [Error, ErrorInfo]) => ReactNode)
-  onError?: (_error: Error, _errorInfo: ErrorInfo) => void
-  resetKeys?: any[]
+  children: ReactNode;
+  fallback?: ReactNode | ((..._args: [Error, ErrorInfo]) => ReactNode);
+  onError?: (_error: Error, _errorInfo: ErrorInfo) => void;
+  resetKeys?: any[];
 }
 
 /**
  * 错误边界组件
- * 
+ *
  * 功能：
  * 1. 捕获子组件中的 JavaScript 错误
  * 2. 记录错误信息
  * 3. 显示降级 UI
  * 4. 提供错误恢复机制
- * 
+ *
  * 使用方式：
  * <ErrorBoundary fallback={<ErrorPage />}>
  *   <MyComponent />
@@ -36,12 +36,12 @@ interface ErrorBoundaryProps {
  */
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
-    super(props)
+    super(props);
     this.state = {
       hasError: false,
       error: null,
       errorInfo: null,
-    }
+    };
   }
 
   static getDerivedStateFromError(_error: Error): ErrorBoundaryState {
@@ -50,7 +50,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       hasError: true,
       error: null,
       errorInfo: null,
-    }
+    };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
@@ -59,16 +59,16 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       error: error.message,
       stack: error.stack,
       componentStack: errorInfo.componentStack,
-    })
+    });
 
     // 更新状态
     this.setState({
       error,
       errorInfo,
-    })
+    });
 
     // 调用错误处理回调
-    this.props.onError?.(error, errorInfo)
+    this.props.onError?.(error, errorInfo);
   }
 
   componentDidUpdate(prevProps: ErrorBoundaryProps) {
@@ -78,7 +78,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
         hasError: false,
         error: null,
         errorInfo: null,
-      })
+      });
     }
   }
 
@@ -87,20 +87,20 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       hasError: false,
       error: null,
       errorInfo: null,
-    })
-  }
+    });
+  };
 
   render() {
-    const { hasError, error, errorInfo } = this.state
-    const { children, fallback } = this.props
+    const { hasError, error, errorInfo } = this.state;
+    const { children, fallback } = this.props;
 
     if (hasError) {
       // 如果有自定义的 fallback，使用它
       if (fallback) {
         if (typeof fallback === 'function') {
-          return fallback(error!, errorInfo!)
+          return fallback(error!, errorInfo!);
         }
-        return fallback
+        return fallback;
       }
 
       // 默认的错误 UI
@@ -155,7 +155,9 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                     {errorInfo && (
                       <div>
                         <strong>组件堆栈：</strong>
-                        <pre className="whitespace-pre-wrap">{errorInfo.componentStack}</pre>
+                        <pre className="whitespace-pre-wrap">
+                          {errorInfo.componentStack}
+                        </pre>
                       </div>
                     )}
                   </div>
@@ -180,11 +182,11 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
             </div>
           </div>
         </div>
-      )
+      );
     }
 
-    return children
+    return children;
   }
 }
 
-export default ErrorBoundary
+export default ErrorBoundary;
