@@ -16,7 +16,7 @@ const NotificationSystem = () => {
   }
 
   return (
-    <div className="fixed top-4 right-4 z-50 space-y-2">
+    <div className="fixed top-4 right-4 z-50 space-y-2" role="region" aria-live="polite" aria-atomic="true">
       {notifications.map((notification) => (
         <div
           key={notification.id}

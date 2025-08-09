@@ -7,6 +7,7 @@ import './i18n'
 import i18n from './i18n'
 import * as Sentry from '@sentry/react'
 import { onCLS, onFID, onLCP } from 'web-vitals'
+import { registerSW } from 'virtual:pwa-register'
 
 /**
  * 应用入口文件
@@ -67,6 +68,13 @@ if (shouldReportVitals && (import.meta as any).env?.PROD) {
   onCLS(report)
   onFID(report)
   onLCP(report)
+}
+
+// 注册 PWA Service Worker（由 vite-plugin-pwa 生成）
+if ((import.meta as any).env?.PROD) {
+  try {
+    registerSW({ immediate: true })
+  } catch {}
 }
 
 // 渲染应用

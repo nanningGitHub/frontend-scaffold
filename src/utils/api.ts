@@ -50,9 +50,7 @@ function getAuthToken(): string | null {
       if (parsed?.token) return parsed.token
     }
 
-    // 向后兼容旧键名
-    const legacy = localStorage.getItem('token')
-    return legacy
+    return null
   } catch (e) {
     logger.warn('Read token from storage failed', e)
     return null

@@ -1,6 +1,7 @@
 import React from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
+import { PageLoading } from './LoadingSpinner'
 
 /**
  * 受保护的路由组件
@@ -15,8 +16,12 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, loading } = useAuthStore()
   const location = useLocation()
+
+  if (loading) {
+    return <PageLoading />
+  }
 
   // 如果用户未认证，重定向到登录页
   if (!isAuthenticated) {
