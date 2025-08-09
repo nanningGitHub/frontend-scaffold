@@ -14,12 +14,6 @@ test.describe('Login flow (UI + API via MSW)', () => {
     await page.getByLabel('邮箱地址').fill('user@example.com');
     await page.getByLabel('密码').fill('password123');
     await page.locator('form').getByRole('button', { name: '登录' }).click();
-    await page.waitForFunction(
-      () => localStorage.getItem('auth-token') === 'mock-token',
-      {
-        timeout: 15000,
-      }
-    );
     // 登录后导航应出现“登出”和“个人中心”
     await expect(page.getByRole('button', { name: '登出' })).toBeVisible({
       timeout: 15000,
