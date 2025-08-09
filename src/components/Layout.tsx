@@ -26,13 +26,11 @@ const Layout = () => {
   useEffect(() => {
     const initApp = async () => {
       try {
-        // 在开发启用 MSW 时，等待 worker 准备好再初始化认证，避免首个请求未被拦截
+        // 在开发启用 MSW 时，等待 worker 就绪（如未定义则跳过）
         const anyWindow: any = window as any;
-        if (
-          anyWindow.__mswReady &&
-          typeof anyWindow.__mswReady.then === 'function'
-        ) {
-          await anyWindow.__mswReady;
+        const maybePromise = anyWindow.__mswReady;
+        if (maybePromise && typeof maybePromise.then === 'function') {
+          await maybePromise;
         }
         // 初始化认证状态
         await initializeAuth();

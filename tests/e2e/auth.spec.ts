@@ -1,5 +1,21 @@
 import { test, expect } from '@playwright/test';
 
+// 确保每个用例开始前清理持久化状态，避免跨用例的 localStorage 残留导致已登录态
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    try {
+      window.localStorage.clear();
+      window.sessionStorage.clear();
+    } catch (e) {
+      /* noop */
+    }
+  });
+  await page.goto('/');
+  await page.evaluate(
+    () => (window as unknown as { __mswReady?: Promise<unknown> }).__mswReady
+  );
+});
+
 test.describe('Auth Flow (public pages)', () => {
   test('login/register links visible on navigation', async ({ page }) => {
     await page.goto('/');

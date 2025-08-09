@@ -1,5 +1,22 @@
 import { test, expect } from '@playwright/test';
 
+// 保证每个用例环境干净，避免上一个用例的登录态或 token 影响本用例
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    try {
+      window.localStorage.clear();
+      window.sessionStorage.clear();
+    } catch (e) {
+      /* noop */
+    }
+  });
+  // 确保 MSW 已就绪并控制页面
+  await page.goto('/');
+  await page.evaluate(
+    () => (window as unknown as { __mswReady?: Promise<unknown> }).__mswReady
+  );
+});
+
 test.describe('Login flow (UI + API via MSW)', () => {
   test('navigates to login and shows form', async ({ page }) => {
     await page.goto('/');

@@ -8,11 +8,11 @@ import i18n from './i18n';
 import * as Sentry from '@sentry/react';
 import { onCLS, onFID, onLCP } from 'web-vitals';
 // MSW（仅在开发环境并且开启 MOCK 时启动）
+// 动态导入并暴露就绪 Promise，避免阻塞初始渲染
 if (
   (import.meta as any).env?.DEV &&
   (import.meta as any).env?.VITE_ENABLE_MSW === 'true'
 ) {
-  // 动态导入，避免生产打包，同时暴露一个就绪 Promise 给 E2E 等待
   (window as any).__mswReady = import('./mocks/browser').then(({ worker }) =>
     worker.start({ onUnhandledRequest: 'bypass' })
   );

@@ -155,7 +155,7 @@ api.interceptors.response.use(
         try {
           const currentToken = getAuthToken();
           if (currentToken) {
-            const refreshResp = await api.post('/auth/refresh', undefined, {
+            const refreshResp = await api.post('auth/refresh', undefined, {
               headers: { Authorization: `Bearer ${currentToken}` },
             });
             const newToken = (refreshResp as any)?.token;
