@@ -1,9 +1,7 @@
-const CACHE_NAME = 'frontend-scaffold-v1'
+const CACHE_NAME = 'frontend-scaffold-vite-v1'
 const urlsToCache = [
   '/',
   '/index.html',
-  '/static/js/bundle.js',
-  '/static/css/main.css',
   '/manifest.json'
 ]
 
@@ -31,7 +29,7 @@ self.addEventListener('fetch', event => {
         // 否则发起网络请求
         return fetch(event.request).then(response => {
           // 检查是否收到有效响应
-          if (!response || response.status !== 200 || response.type !== 'basic') {
+          if (!response || response.status !== 200 || (response.type !== 'basic' && response.type !== 'cors')) {
             return response
           }
           

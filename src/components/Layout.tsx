@@ -29,12 +29,15 @@ const Layout = () => {
         // 初始化认证状态
         await initializeAuth()
         
-        // 显示欢迎通知
-        addNotification({
-          type: 'success',
-          message: '欢迎使用前端脚手架！',
-          duration: 3000,
-        })
+        // 显示欢迎通知（测试环境不显示，避免 act 警告）
+        // 测试环境下不显示欢迎通知
+        if (!('JEST_WORKER_ID' in globalThis)) {
+          addNotification({
+            type: 'success',
+            message: '欢迎使用前端脚手架！',
+            duration: 3000,
+          })
+        }
       } catch (error) {
         logger.error('App initialization failed', error)
         addNotification({
@@ -58,6 +61,14 @@ const Layout = () => {
         <Outlet />
       </main>
       
+      {/* 页脚 */}
+      <footer role="contentinfo" className="border-t border-gray-200">
+        <div className="container mx-auto px-4 py-6 text-sm text-gray-500 flex items-center justify-between">
+          <span>© {new Date().getFullYear()} 前端脚手架</span>
+          <a href="/about" className="hover:text-gray-700">关于</a>
+        </div>
+      </footer>
+
       {/* 通知系统 */}
       <NotificationSystem />
     </div>

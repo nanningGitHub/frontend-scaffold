@@ -40,12 +40,12 @@ export function deepClone<T>(obj: T): T {
 /**
  * 防抖函数
  */
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (..._args: any[]) => any>(
   func: T,
   wait: number,
   immediate = false
 ): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout | null = null
+  let timeout: ReturnType<typeof setTimeout> | null = null
 
   return function executedFunction(...args: Parameters<T>) {
     const later = () => {
@@ -65,7 +65,7 @@ export function debounce<T extends (...args: any[]) => any>(
 /**
  * 节流函数
  */
-export function throttle<T extends (...args: any[]) => any>(
+export function throttle<T extends (..._args: any[]) => any>(
   func: T,
   limit: number
 ): (...args: Parameters<T>) => void {
@@ -282,7 +282,7 @@ export async function retry<T>(
 /**
  * 缓存函数结果
  */
-export function memoize<T extends (...args: any[]) => any>(
+export function memoize<T extends (..._args: any[]) => any>(
   fn: T,
   getKey?: (...args: Parameters<T>) => string
 ): T {

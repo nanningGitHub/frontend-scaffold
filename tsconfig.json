@@ -30,12 +30,21 @@
     /* 代码质量检查 */
     // 严格模式
     "strict": true,
+    // 更严格的空值检查
+    "strictNullChecks": true,
+    // 强制函数返回类型（避免隐式 any）
+    "noImplicitAny": true,
     // 检查未使用的局部变量
     "noUnusedLocals": true,
     // 检查未使用的参数
     "noUnusedParameters": true,
     // 检查 switch 语句的 fallthrough
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    // 路径别名，保持与 Vite 一致
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
   
   // 包含的文件

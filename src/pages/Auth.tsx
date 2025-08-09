@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useAuth } from '../contexts/AuthContext'
+import { useAuthStore } from '../stores/authStore'
 import LoginForm from '../components/LoginForm'
 import RegisterForm from '../components/RegisterForm'
 
@@ -14,7 +14,7 @@ import RegisterForm from '../components/RegisterForm'
  */
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true)
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated } = useAuthStore()
 
   // 如果已经登录，显示用户资料
   if (isAuthenticated) {

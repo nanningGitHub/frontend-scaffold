@@ -17,6 +17,11 @@
   body {
     @apply bg-gray-50 text-gray-900;
   }
+
+  /* 根据 html[dir] 支持 RTL 方向（i18n） */
+  html[dir='rtl'] body {
+    direction: rtl;
+  }
 }
 
 /**

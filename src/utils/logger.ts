@@ -22,8 +22,19 @@ const LOG_LEVELS: LogLevel = {
   ERROR: 3,
 }
 
+// 兼容 Vite 与 Jest/Node 环境的 DEV 检测
+function readViteEnvDevFlag(): boolean | undefined {
+  try {
+    // 避免在非 ESM 环境解析 import.meta 语法
+    const env = eval('import.meta && import.meta.env') as any
+    return env?.DEV
+  } catch {
+    return undefined
+  }
+}
+
 class Logger {
-  private isDevelopment = import.meta.env.DEV
+  private isDevelopment = readViteEnvDevFlag() ?? ((globalThis as any).process?.env?.NODE_ENV !== 'production')
   private currentLevel = this.isDevelopment ? LOG_LEVELS.DEBUG : LOG_LEVELS.ERROR
 
   private shouldLog(level: number): boolean {
@@ -34,34 +45,46 @@ class Logger {
     const timestamp = new Date().toISOString()
     const prefix = `[${timestamp}] [${level}]`
     
-    if (data) {
-      return `${prefix} ${message}`, data
-    }
-    
     return `${prefix} ${message}`
   }
 
   debug(message: string, data?: any): void {
     if (this.shouldLog(LOG_LEVELS.DEBUG)) {
-      console.debug(this.formatMessage('DEBUG', message, data))
+      if (data !== undefined) {
+        console.debug(this.formatMessage('DEBUG', message), data)
+      } else {
+        console.debug(this.formatMessage('DEBUG', message))
+      }
     }
   }
 
   info(message: string, data?: any): void {
     if (this.shouldLog(LOG_LEVELS.INFO)) {
-      console.info(this.formatMessage('INFO', message, data))
+      if (data !== undefined) {
+        console.info(this.formatMessage('INFO', message), data)
+      } else {
+        console.info(this.formatMessage('INFO', message))
+      }
     }
   }
 
   warn(message: string, data?: any): void {
     if (this.shouldLog(LOG_LEVELS.WARN)) {
-      console.warn(this.formatMessage('WARN', message, data))
+      if (data !== undefined) {
+        console.warn(this.formatMessage('WARN', message), data)
+      } else {
+        console.warn(this.formatMessage('WARN', message))
+      }
     }
   }
 
   error(message: string, error?: Error | any): void {
     if (this.shouldLog(LOG_LEVELS.ERROR)) {
-      console.error(this.formatMessage('ERROR', message, error))
+      if (error !== undefined) {
+        console.error(this.formatMessage('ERROR', message), error)
+      } else {
+        console.error(this.formatMessage('ERROR', message))
+      }
       
       // 在生产环境中，可以发送错误到监控服务
       if (!this.isDevelopment && error) {

@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import './index.css'
 import './i18n'
+import i18n from './i18n'
 
 /**
  * 应用入口文件
@@ -25,6 +26,12 @@ if (!rootElement) {
 
 // 创建 React 根节点
 const root = ReactDOM.createRoot(rootElement)
+
+// 根据语言方向设置 html[dir]
+document.documentElement.setAttribute('dir', i18n.dir())
+i18n.on('languageChanged', () => {
+  document.documentElement.setAttribute('dir', i18n.dir())
+})
 
 // 渲染应用
 root.render(

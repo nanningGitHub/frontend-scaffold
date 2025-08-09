@@ -32,7 +32,8 @@ export interface ValidationRules {
 export function validateField(
   value: any,
   fieldName: string,
-  rules: ValidationRule
+  rules: ValidationRule,
+  formData?: Record<string, any>
 ): string | null {
   // 必填验证
   if (rules.required && (!value || value.toString().trim() === '')) {
@@ -63,7 +64,7 @@ export function validateField(
 
   // 自定义验证
   if (rules.custom) {
-    return rules.custom(value)
+    return rules.custom(value, formData)
   }
 
   return null
@@ -80,7 +81,7 @@ export function validateForm(
   let isValid = true
 
   for (const [fieldName, rules] of Object.entries(validationRules)) {
-    const error = validateField(formData[fieldName], fieldName, rules)
+    const error = validateField(formData[fieldName], fieldName, rules, formData)
     if (error) {
       errors[fieldName] = error
       isValid = false

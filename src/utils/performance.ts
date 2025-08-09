@@ -124,7 +124,7 @@ class PerformanceMonitor {
    * 移除性能观察者
    */
   removeObserver(observer: (metric: PerformanceMetric) => void): void {
-    this.observers.add(observer)
+    this.observers.delete(observer)
   }
 
   /**

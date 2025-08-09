@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios'
-import { API_CONFIG } from '../constants'
+import { API_CONFIG, STORAGE_KEYS } from '../constants'
 import { logger } from './logger'
 
 /**
@@ -35,6 +35,29 @@ const api: AxiosInstance = axios.create({
  * 请求拦截器
  * 在请求发送前自动执行
  */
+function getAuthToken(): string | null {
+  try {
+    // 优先从统一键读取
+    const tokenFromKey = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)
+    if (tokenFromKey) return tokenFromKey
+
+    // 兼容 Zustand 持久化的 auth-storage
+    const persisted = localStorage.getItem('auth-storage')
+    if (persisted) {
+      const parsed = JSON.parse(persisted)
+      if (parsed?.state?.token) return parsed.state.token
+      if (parsed?.token) return parsed.token
+    }
+
+    // 向后兼容旧键名
+    const legacy = localStorage.getItem('token')
+    return legacy
+  } catch (e) {
+    logger.warn('Read token from storage failed', e)
+    return null
+  }
+}
+
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     // 记录请求开始时间
@@ -42,7 +65,7 @@ api.interceptors.request.use(
     ;(config as any).startTime = startTime
     
     // 从 localStorage 获取认证 token
-    const token = localStorage.getItem('token')
+    const token = getAuthToken()
     
     // 如果存在 token，自动添加到请求头
     if (token) {
@@ -105,11 +128,28 @@ api.interceptors.response.use(
       error: error.message,
     })
     
-    // 统一错误处理
+    // 401 未授权：清除本地凭据
     if (error.response?.status === 401) {
-      // 401 未授权：清除 token 并跳转到登录页
-      localStorage.removeItem('token')
-      window.location.href = '/login'
+      try {
+        localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN)
+        localStorage.removeItem('auth-storage')
+        localStorage.removeItem('token')
+      } catch {}
+      // 使用替换避免堆栈膨胀
+      window.location.replace('/login')
+    }
+
+    // 简单重试：网络错误/超时/5xx，最多 RETRY_TIMES（指数退避）
+    const config: any = error.config || {}
+    const shouldRetry = !error.response || error.code === 'ECONNABORTED' || (error.response && error.response.status >= 500)
+    if (shouldRetry && API_CONFIG.RETRY_TIMES > 0) {
+      config.__retryCount = config.__retryCount || 0
+      if (config.__retryCount < API_CONFIG.RETRY_TIMES) {
+        config.__retryCount += 1
+        const delay = API_CONFIG.RETRY_DELAY * config.__retryCount
+        logger.warn('Retrying API request', { url: config.url, attempt: config.__retryCount, delay })
+        return new Promise((resolve) => setTimeout(() => resolve(api(config)), delay))
+      }
     }
     
     // 其他错误直接抛出

@@ -4,9 +4,21 @@
  * 集中管理所有常量，便于维护和修改
  */
 
+// 兼容测试环境与非 Vite 场景的环境变量读取
+function readViteEnvSafe(): Record<string, any> | undefined {
+  try {
+    // 通过 eval 避免在非 ESM 环境下解析 import.meta 语法
+    return eval('import.meta && import.meta.env')
+  } catch {
+    return undefined
+  }
+}
+
+const viteEnv = readViteEnvSafe()
+
 // API 相关常量
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_BASE_URL || '/api',
+  BASE_URL: (viteEnv && viteEnv.VITE_API_BASE_URL) || (globalThis as any).process?.env?.VITE_API_BASE_URL || '/api',
   TIMEOUT: 10000,
   RETRY_TIMES: 3,
   RETRY_DELAY: 1000,

@@ -6,6 +6,16 @@ import LanguageDetector from 'i18next-browser-languagedetector'
 import enTranslations from './locales/en.json'
 import zhTranslations from './locales/zh.json'
 
+function readViteEnvDevFlag(): boolean {
+  try {
+    // eslint-disable-next-line no-eval
+    const env = eval('import.meta && import.meta.env') as any
+    return !!env?.DEV
+  } catch {
+    return process.env.NODE_ENV !== 'production'
+  }
+}
+
 /**
  * i18n 国际化配置
  * 
@@ -29,12 +39,11 @@ i18n
       },
     },
     
-    // 默认语言
-    lng: 'zh',
+    // 默认语言由浏览器/本地缓存自动探测
     fallbackLng: 'en',
     
-    // 调试模式
-    debug: import.meta.env.DEV,
+    // 调试模式（兼容 Jest/Node）
+    debug: readViteEnvDevFlag(),
     
     // 插值配置
     interpolation: {

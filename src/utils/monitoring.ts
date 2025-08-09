@@ -56,21 +56,29 @@ export class ErrorMonitor {
     })
   }
 
-  private reportError(errorInfo: any) {
+  public reportError(errorInfo: any) {
     // 开发环境打印错误
-    if (process.env.NODE_ENV === 'development') {
+    if (((globalThis as any).process?.env?.NODE_ENV) === 'development') {
       console.error('Error Monitor:', errorInfo)
     }
 
     // 生产环境发送到监控服务
-    if (process.env.NODE_ENV === 'production') {
+    if (((globalThis as any).process?.env?.NODE_ENV) === 'production') {
       this.sendToMonitoringService(errorInfo)
     }
   }
 
   private sendToMonitoringService(errorInfo: any) {
     // 这里可以集成 Sentry、LogRocket 等监控服务
-    const monitoringUrl = process.env.VITE_SENTRY_DSN
+    const monitoringUrl = ((): string | undefined => {
+      try {
+        // eslint-disable-next-line no-eval
+        const env = eval('import.meta && import.meta.env') as any
+        return env?.VITE_SENTRY_DSN || (globalThis as any).process?.env?.VITE_SENTRY_DSN
+      } catch {
+        return (globalThis as any).process?.env?.VITE_SENTRY_DSN
+      }
+    })()
     
     if (monitoringUrl) {
       fetch(monitoringUrl, {
@@ -167,18 +175,26 @@ export class PerformanceMonitor {
 
   private reportPerformance(type: string, data: any) {
     // 开发环境打印性能数据
-    if (process.env.NODE_ENV === 'development') {
+    if (((globalThis as any).process?.env?.NODE_ENV) === 'development') {
       console.log('Performance Monitor:', { type, data })
     }
 
     // 生产环境发送到分析服务
-    if (process.env.NODE_ENV === 'production') {
+    if (((globalThis as any).process?.env?.NODE_ENV) === 'production') {
       this.sendToAnalyticsService(type, data)
     }
   }
 
   private sendToAnalyticsService(type: string, data: any) {
-    const analyticsUrl = process.env.VITE_GA_TRACKING_ID
+    const analyticsUrl = ((): string | undefined => {
+      try {
+        // eslint-disable-next-line no-eval
+        const env = eval('import.meta && import.meta.env') as any
+        return env?.VITE_GA_TRACKING_ID || (globalThis as any).process?.env?.VITE_GA_TRACKING_ID
+      } catch {
+        return (globalThis as any).process?.env?.VITE_GA_TRACKING_ID
+      }
+    })()
     
     if (analyticsUrl) {
       // 这里可以集成 Google Analytics 或其他分析服务
@@ -258,7 +274,7 @@ export class UserTracker {
   }
 
   private sendToAnalyticsService(eventName: string, data?: any) {
-    const analyticsUrl = process.env.VITE_GA_TRACKING_ID
+    const analyticsUrl = (globalThis as any).process?.env?.VITE_GA_TRACKING_ID
     
     if (analyticsUrl && window.gtag) {
       window.gtag('event', eventName, data)
