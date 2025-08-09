@@ -36,7 +36,9 @@ jobs:
       - name: Set CSP headers check placeholder
         run: echo "TODO: add CSP check step (e.g., curl -I and grep Content-Security-Policy)"
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
-      - name: Run E2E Tests
-        run: npm run test:e2e
+        run: npx playwright install --with-deps | cat
+      - name: Run E2E Tests (MSW enabled)
+        env:
+          VITE_ENABLE_MSW: 'true'
+        run: npm run test:e2e | cat
 

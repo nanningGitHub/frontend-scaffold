@@ -139,16 +139,41 @@ api.interceptors.response.use(
       error: error.message,
     })
     
-    // 401 未授权：清除本地凭据
+    // 401 未授权：尝试刷新令牌（非 Cookie 模式且未重试过刷新）
     if (error.response?.status === 401) {
+      const originalConfig: any = error.config || {}
+      const isCookieMode = AUTH_SECURITY.USE_COOKIES
+      const hasTriedRefresh = originalConfig.__triedRefresh === true
+
+      if (!isCookieMode && !hasTriedRefresh) {
+        originalConfig.__triedRefresh = true
+        try {
+          const currentToken = getAuthToken()
+          if (currentToken) {
+            const refreshResp = await api.post('/auth/refresh', undefined, {
+              headers: { Authorization: `Bearer ${currentToken}` },
+            })
+            const newToken = (refreshResp as any)?.token
+            if (newToken) {
+              try {
+                localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, newToken)
+              } catch {}
+              originalConfig.headers = originalConfig.headers || {}
+              originalConfig.headers.Authorization = `Bearer ${newToken}`
+              return api(originalConfig)
+            }
+          }
+        } catch {
+          // fallthrough to cleanup below
+        }
+      }
+
+      // 刷新失败或 Cookie 模式：清理并跳登录
       try {
         localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN)
         localStorage.removeItem('auth-storage')
         localStorage.removeItem('token')
-      } catch {
-        // ignore
-      }
-      // 使用替换避免堆栈膨胀
+      } catch {}
       window.location.replace('/login')
     }
 
