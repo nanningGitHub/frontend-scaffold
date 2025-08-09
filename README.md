@@ -51,7 +51,7 @@ npm run deploy
 
 ## 🚀 开发
 
-```bash
+````bash
 # 启动开发服务器
 npm run dev
 
@@ -67,11 +67,11 @@ npm run preview
 ```bash
 echo "VITE_ENABLE_MSW=true" >> .env
 npm run dev
-```
+````
 
 MSW handlers 位置：`src/mocks/handlers.ts`
 
-```
+````
 
 ## 🧪 测试
 
@@ -88,11 +88,12 @@ npm run test:coverage
 
 ```bash
 npm run test:e2e
-```
+````
 
 Playwright 将自动启动开发服务器。可在 `playwright.config.ts` 中配置。
 
-```
+````
+E2E 注意：已将 `public/mockServiceWorker.js` 入库；测试会等待 `window.__mswReady`，并在开发服注入 `VITE_ENABLE_MSW=true`。
 
 ## 📚 文档
 
@@ -108,7 +109,16 @@ npm run storybook
 
 # 构建 Storybook
 npm run build-storybook
-```
+````
+
+### 关键文档
+
+- 架构总览: docs/ARCHITECTURE.md
+- 测试策略: docs/TESTING.md
+- 环境与配置: docs/ENVIRONMENT.md
+- 部署指南: docs/DEPLOYMENT.md
+- CI/CD 指南: docs/CI_CD.md
+- 故障排查: docs/TROUBLESHOOTING.md
 
 ## 🔐 认证与安全
 
@@ -138,7 +148,6 @@ VITE_CSRF_COOKIE_NAME=XHRF-TOKEN
 ## 📈 性能与构建分析
 
 - 运行 `npm run analyze` 生成 bundle 可视化（rollup-plugin-visualizer）
-
 
 ## 📝 代码质量
 
@@ -176,31 +185,38 @@ src/
 ## 🛠️ 技术栈
 
 ### 核心框架
+
 - **React 18** - 用户界面库
 - **TypeScript** - 类型安全
 - **Vite** - 构建工具
 
-### 样式和UI
+### 样式和 UI
+
 - **Tailwind CSS** - CSS 框架
 - **PostCSS** - CSS 处理
 - **Autoprefixer** - CSS 前缀
 
 ### 路由和状态管理
+
 - **React Router** - 客户端路由
 
 ### 网络请求
+
 - **Axios** - HTTP 客户端
 
 ### 测试
+
 - **Jest** - 测试框架
 - **Testing Library** - React 测试工具
 - **jsdom** - DOM 环境
 
 ### 文档
+
 - **Storybook** - 组件文档和交互式示例
 - **自动文档生成** - 基于代码注释生成文档
 
 ### 代码质量
+
 - **ESLint** - 代码检查
 - **Prettier** - 代码格式化
 - **Husky** - Git hooks
