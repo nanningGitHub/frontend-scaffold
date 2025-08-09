@@ -12,8 +12,8 @@ if (
   (import.meta as any).env?.DEV &&
   (import.meta as any).env?.VITE_ENABLE_MSW === 'true'
 ) {
-  // 动态导入，避免生产打包
-  import('./mocks/browser').then(({ worker }) =>
+  // 动态导入，避免生产打包，同时暴露一个就绪 Promise 给 E2E 等待
+  (window as any).__mswReady = import('./mocks/browser').then(({ worker }) =>
     worker.start({ onUnhandledRequest: 'bypass' })
   );
 }

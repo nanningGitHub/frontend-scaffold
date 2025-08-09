@@ -11,6 +11,7 @@ test.describe('Login flow (UI + API via MSW)', () => {
 
   test('successful login redirects to profile', async ({ page }) => {
     await page.goto('/login');
+    await page.waitForFunction(() => (window as any).__mswReady !== undefined);
     await page.getByLabel('邮箱地址').fill('user@example.com');
     await page.getByLabel('密码').fill('password123');
     await page.locator('form').getByRole('button', { name: '登录' }).click();
