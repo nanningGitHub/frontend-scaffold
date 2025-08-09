@@ -43,6 +43,9 @@ test.describe('Auth API status handling (401/403/refresh)', () => {
     await page.waitForTimeout(200); // 等待 worker 注册与首次请求
     // 初始化时会访问 /auth/me -> 401 -> /auth/refresh -> 获得新 token -> 重试成功
     // 之后打开受保护页面应可访问：导航出现“个人中心”
+    await expect(page.getByRole('link', { name: '个人中心' })).toBeVisible({
+      timeout: 15000,
+    });
     await page.getByRole('link', { name: '个人中心' }).click();
     await expect(page).toHaveURL(/\/profile$/);
   });
