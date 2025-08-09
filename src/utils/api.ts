@@ -145,7 +145,9 @@ api.interceptors.response.use(
         localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN)
         localStorage.removeItem('auth-storage')
         localStorage.removeItem('token')
-      } catch {}
+      } catch {
+        // ignore
+      }
       // 使用替换避免堆栈膨胀
       window.location.replace('/login')
     }

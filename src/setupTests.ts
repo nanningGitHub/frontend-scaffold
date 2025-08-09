@@ -1,3 +1,4 @@
+/* eslint-env jest */
 import '@testing-library/jest-dom'
 // Mock react-i18next to avoid ESM i18next init in tests
 jest.mock('react-i18next', () => ({
@@ -14,7 +15,6 @@ jest.mock('react-i18next', () => ({
 }))
 
 // 全局测试设置
-// @ts-ignore
 beforeEach(() => {
   // 清理 localStorage
   localStorage.clear()
@@ -23,24 +23,21 @@ beforeEach(() => {
   sessionStorage.clear()
   
   // 重置所有模拟
-  // @ts-ignore
   jest.clearAllMocks()
 })
 
-// 模拟 IntersectionObserver
-// @ts-ignore
-global.IntersectionObserver = class IntersectionObserver {
+// 模拟 IntersectionObserver / ResizeObserver（最小实现）
+class MockObserver {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   constructor() {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   disconnect() {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   observe() {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   unobserve() {}
 }
-
-// 模拟 ResizeObserver
-// @ts-ignore
-global.ResizeObserver = class ResizeObserver {
-  constructor() {}
-  disconnect() {}
-  observe() {}
-  unobserve() {}
-}
+// @ts-expect-error 注入 jsdom 缺失的 API
+globalThis.IntersectionObserver = MockObserver
+// @ts-expect-error 注入 jsdom 缺失的 API
+globalThis.ResizeObserver = MockObserver

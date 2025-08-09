@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { userService, User } from '../services/userService'
 import { logger } from '../utils/logger'
-import { ERROR_MESSAGES } from '../constants'
+import { ERROR_MESSAGES, AUTH_SECURITY } from '../constants'
 
 /**
  * 认证状态接口
@@ -52,21 +52,21 @@ export const useAuthStore = create<AuthStore>()(
       error: null,
 
       // 状态更新方法
-      setLoading: (loading) => set({ loading }),
-      setError: (error) => set({ error }),
+      setLoading: (_loading) => set({ loading: _loading }),
+      setError: (_error) => set({ error: _error }),
       clearError: () => set({ error: null }),
 
       // 用户登录
-      login: async (email: string, password: string) => {
+      login: async (_email: string, _password: string) => {
         set({ loading: true, error: null })
 
         try {
-          logger.info('User login attempt', { email })
-          const { user, token } = await userService.login(email, password)
+          logger.info('User login attempt', { email: _email })
+          const { user, token } = await userService.login(_email, _password)
           
           set({
             user,
-            token,
+            token: AUTH_SECURITY.USE_COOKIES ? null : token,
             isAuthenticated: true,
             loading: false,
             error: null,
@@ -89,16 +89,16 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       // 用户注册
-      register: async (userData: { name: string; email: string; password: string }) => {
+      register: async (_userData: { name: string; email: string; password: string }) => {
         set({ loading: true, error: null })
 
         try {
-          logger.info('User registration attempt', { email: userData.email })
-          const { user, token } = await userService.register(userData)
+          logger.info('User registration attempt', { email: _userData.email })
+          const { user, token } = await userService.register(_userData)
           
           set({
             user,
-            token,
+            token: AUTH_SECURITY.USE_COOKIES ? null : token,
             isAuthenticated: true,
             loading: false,
             error: null,
@@ -141,24 +141,22 @@ export const useAuthStore = create<AuthStore>()(
 
       // 初始化认证状态
       initializeAuth: async () => {
-        const { token, user } = get()
-        
-        if (token && user) {
-          try {
-            // 验证 token 是否有效
+        set({ loading: true })
+        try {
+          if (AUTH_SECURITY.USE_COOKIES) {
             const currentUser = await userService.getCurrentUser()
-            set({
-              user: currentUser,
-              isAuthenticated: true,
-            })
-          } catch (error) {
-            // token 无效，清除状态
-            set({
-              user: null,
-              token: null,
-              isAuthenticated: false,
-            })
+            set({ user: currentUser, isAuthenticated: true })
+            return
           }
+          const { token } = get()
+          if (token) {
+            const currentUser = await userService.getCurrentUser()
+            set({ user: currentUser, isAuthenticated: true })
+          }
+        } catch {
+          set({ user: null, token: null, isAuthenticated: false })
+        } finally {
+          set({ loading: false })
         }
       },
     }),
@@ -166,8 +164,8 @@ export const useAuthStore = create<AuthStore>()(
       name: 'auth-storage', // localStorage 的键名
       partialize: (state) => ({
         user: state.user,
-        token: state.token,
-      }), // 只持久化用户和 token 信息
+        token: AUTH_SECURITY.USE_COOKIES ? null : state.token,
+      }), // Cookie 模式不持久化 token
     }
   )
 )

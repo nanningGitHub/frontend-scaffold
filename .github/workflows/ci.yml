@@ -33,6 +33,8 @@ jobs:
           node-version: 18
           cache: 'npm'
       - run: npm ci
+      - name: Set CSP headers check placeholder
+        run: echo "TODO: add CSP check step (e.g., curl -I and grep Content-Security-Policy)"
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Run E2E Tests

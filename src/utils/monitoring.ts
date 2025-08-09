@@ -261,12 +261,12 @@ export class UserTracker {
 
   trackEvent(eventName: string, data?: any) {
     // 开发环境打印事件
-    if (process.env.NODE_ENV === 'development') {
+    if (((globalThis as any).process?.env?.NODE_ENV) === 'development') {
       console.log('User Tracker:', { eventName, data })
     }
 
     // 生产环境发送到分析服务
-    if (process.env.NODE_ENV === 'production') {
+    if (((globalThis as any).process?.env?.NODE_ENV) === 'production') {
       this.sendToAnalyticsService(eventName, data)
     }
   }
@@ -292,7 +292,7 @@ export const trackEvent = (eventName: string, data?: any) => {
   UserTracker.getInstance().trackEvent(eventName, data)
 }
 
-export const reportError = (error: Error, context?: any) => {
+export const reportAppError = (error: Error, context?: any) => {
   ErrorMonitor.getInstance().reportError({
     type: 'manual',
     message: error.message,

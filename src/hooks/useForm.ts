@@ -102,7 +102,7 @@ export function useForm<T extends Record<string, any>>(config: FormConfig<T>) {
       const newTouched = { ...prev.touched, [name]: true }
       
       // 实时验证（如果字段已被触摸）
-      let newErrors = { ...prev.errors }
+      const newErrors = { ...prev.errors }
       if (validationRules && newTouched[name]) {
         const fieldValidation = validateForm(
           { [name]: value },

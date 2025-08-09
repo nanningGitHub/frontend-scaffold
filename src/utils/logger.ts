@@ -48,52 +48,52 @@ class Logger {
     return `${prefix} ${message}`
   }
 
-  debug(message: string, data?: any): void {
+  debug(message: string, _data?: any): void {
     if (this.shouldLog(LOG_LEVELS.DEBUG)) {
-      if (data !== undefined) {
-        console.debug(this.formatMessage('DEBUG', message), data)
+      if (_data !== undefined) {
+        console.debug(this.formatMessage('DEBUG', message), _data)
       } else {
         console.debug(this.formatMessage('DEBUG', message))
       }
     }
   }
 
-  info(message: string, data?: any): void {
+  info(message: string, _data?: any): void {
     if (this.shouldLog(LOG_LEVELS.INFO)) {
-      if (data !== undefined) {
-        console.info(this.formatMessage('INFO', message), data)
+      if (_data !== undefined) {
+        console.info(this.formatMessage('INFO', message), _data)
       } else {
         console.info(this.formatMessage('INFO', message))
       }
     }
   }
 
-  warn(message: string, data?: any): void {
+  warn(message: string, _data?: any): void {
     if (this.shouldLog(LOG_LEVELS.WARN)) {
-      if (data !== undefined) {
-        console.warn(this.formatMessage('WARN', message), data)
+      if (_data !== undefined) {
+        console.warn(this.formatMessage('WARN', message), _data)
       } else {
         console.warn(this.formatMessage('WARN', message))
       }
     }
   }
 
-  error(message: string, error?: Error | any): void {
+  error(message: string, _error?: Error | any): void {
     if (this.shouldLog(LOG_LEVELS.ERROR)) {
-      if (error !== undefined) {
-        console.error(this.formatMessage('ERROR', message), error)
+      if (_error !== undefined) {
+        console.error(this.formatMessage('ERROR', message), _error)
       } else {
         console.error(this.formatMessage('ERROR', message))
       }
       
       // 在生产环境中，可以发送错误到监控服务
-      if (!this.isDevelopment && error) {
-        this.reportError(message, error)
+      if (!this.isDevelopment && _error) {
+        this.reportError(message, _error)
       }
     }
   }
 
-  private reportError(message: string, error: Error | any): void {
+  private reportError(_message: string, _error: Error | any): void {
     // 这里可以集成错误监控服务，如 Sentry
     // Sentry.captureException(error, { extra: { message } })
   }

@@ -8,7 +8,6 @@ import zhTranslations from './locales/zh.json'
 
 function readViteEnvDevFlag(): boolean {
   try {
-    // eslint-disable-next-line no-eval
     const env = eval('import.meta && import.meta.env') as any
     return !!env?.DEV
   } catch {

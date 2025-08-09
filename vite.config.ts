@@ -1,7 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import { visualizer } from 'rollup-plugin-visualizer'
 import { resolve } from 'path'
+/* eslint-env node */
 
 /**
  * Vite 配置文件
@@ -23,9 +25,10 @@ export default defineConfig({
   plugins: [
     // React 插件，支持 JSX 和热重载
     react(),
+    (process.env.ANALYZE ? (visualizer({ open: false }) as any) : undefined),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['vite.svg'],
+      includeAssets: ['vite.svg', 'icon-192.png', 'icon-512.png'],
       manifest: {
         name: '前端脚手架',
         short_name: '脚手架',

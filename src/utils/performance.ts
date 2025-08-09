@@ -116,14 +116,14 @@ class PerformanceMonitor {
   /**
    * 添加性能观察者
    */
-  addObserver(observer: (metric: PerformanceMetric) => void): void {
+  addObserver(observer: (_metric: PerformanceMetric) => void): void {
     this.observers.add(observer)
   }
 
   /**
    * 移除性能观察者
    */
-  removeObserver(observer: (metric: PerformanceMetric) => void): void {
+  removeObserver(observer: (_metric: PerformanceMetric) => void): void {
     this.observers.delete(observer)
   }
 

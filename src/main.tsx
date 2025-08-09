@@ -8,6 +8,11 @@ import i18n from './i18n'
 import * as Sentry from '@sentry/react'
 import { onCLS, onFID, onLCP } from 'web-vitals'
 import { registerSW } from 'virtual:pwa-register'
+// MSW（仅在开发环境并且开启 MOCK 时启动）
+if ((import.meta as any).env?.DEV && (import.meta as any).env?.VITE_ENABLE_MSW === 'true') {
+  // 动态导入，避免生产打包
+  import('./mocks/browser').then(({ worker }) => worker.start({ onUnhandledRequest: 'bypass' }))
+}
 
 /**
  * 应用入口文件
@@ -72,9 +77,7 @@ if (shouldReportVitals && (import.meta as any).env?.PROD) {
 
 // 注册 PWA Service Worker（由 vite-plugin-pwa 生成）
 if ((import.meta as any).env?.PROD) {
-  try {
-    registerSW({ immediate: true })
-  } catch {}
+  registerSW({ immediate: true })
 }
 
 // 渲染应用

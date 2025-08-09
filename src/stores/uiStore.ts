@@ -71,47 +71,47 @@ export const useUIStore = create<UIStore>((set, get) => ({
 
   // 侧边栏控制
   toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
-  setSidebarOpen: (open) => set({ sidebarOpen: open }),
+  setSidebarOpen: (_open) => set({ sidebarOpen: _open }),
 
   // 主题控制
   toggleTheme: () => set((state) => ({ 
     theme: state.theme === 'light' ? 'dark' : 'light' 
   })),
-  setTheme: (theme) => set({ theme }),
+  setTheme: (_theme) => set({ theme: _theme }),
 
   // 通知系统
-  addNotification: (notification) => {
+  addNotification: (_notification) => {
     const id = Date.now().toString()
-    const newNotification = { ...notification, id }
+    const newNotification = { ..._notification, id }
     
     set((state) => ({
       notifications: [...state.notifications, newNotification]
     }))
 
     // 自动移除通知（如果设置了持续时间）
-    if (notification.duration) {
+    if (_notification.duration) {
       setTimeout(() => {
         get().removeNotification(id)
-      }, notification.duration)
+      }, _notification.duration)
     }
   },
   
-  removeNotification: (id) => set((state) => ({
-    notifications: state.notifications.filter(n => n.id !== id)
+  removeNotification: (_id) => set((state) => ({
+    notifications: state.notifications.filter(n => n.id !== _id)
   })),
   
   clearNotifications: () => set({ notifications: [] }),
 
   // 全局加载状态
-  setGlobalLoading: (loading) => set({ globalLoading: loading }),
+  setGlobalLoading: (_loading) => set({ globalLoading: _loading }),
 
   // 模态框控制
-  openModal: (modalId) => set((state) => ({
-    modals: { ...state.modals, [modalId]: true }
+  openModal: (_modalId) => set((state) => ({
+    modals: { ...state.modals, [_modalId]: true }
   })),
   
-  closeModal: (modalId) => set((state) => ({
-    modals: { ...state.modals, [modalId]: false }
+  closeModal: (_modalId) => set((state) => ({
+    modals: { ...state.modals, [_modalId]: false }
   })),
   
   closeAllModals: () => set({ modals: {} }),

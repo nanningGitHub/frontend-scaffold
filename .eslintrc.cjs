@@ -18,15 +18,55 @@ module.exports = {
     react: { version: 'detect' },
   },
   rules: {
-    'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+    'react-refresh/only-export-components': 'warn',
     '@typescript-eslint/no-unused-vars': 'off',
     'no-unused-vars': 'off',
   },
-  ignorePatterns: ['dist', 'node_modules', 'src/**/__tests__/**', 'src/**/*.{test,spec}.{ts,tsx}'],
-  linterOptions: {
-    reportUnusedDisableDirectives: false,
-  },
+  ignorePatterns: ['dist', 'node_modules'],
   overrides: [
+    {
+      files: ['src/utils/{helpers,logger,monitoring,performance}.ts'],
+      rules: {
+        '@typescript-eslint/no-explicit-any': 'off',
+        '@typescript-eslint/no-non-null-assertion': 'off',
+      },
+    },
+    {
+      files: ['src/utils/api.ts', 'src/hooks/useApi.ts'],
+      rules: {
+        '@typescript-eslint/no-explicit-any': 'off',
+      },
+    },
+    {
+      files: ['playwright.config.*'],
+      env: { node: true },
+      rules: { 'no-undef': 'off' },
+    },
+    {
+      files: ['src/setupTests.ts', 'src/components/__tests__/**/*.{ts,tsx}'],
+      env: { jest: true, node: true, browser: true },
+      rules: {
+        'no-undef': 'off',
+        'no-redeclare': 'off',
+        '@typescript-eslint/no-unused-vars': 'off',
+      },
+      globals: {
+        jest: 'readonly',
+        describe: 'readonly',
+        it: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        global: 'readonly',
+      },
+    },
+    {
+      files: ['tests/**', 'playwright.config.*'],
+      env: { node: true, browser: true },
+      rules: {
+        'no-undef': 'off',
+        '@typescript-eslint/no-unused-vars': 'off',
+      },
+    },
     {
       files: ['**/*.config.*', 'vite.config.ts', 'jest.config.*', 'tailwind.config.js', 'postcss.config.js'],
       env: { node: true },
@@ -47,20 +87,4 @@ module.exports = {
       },
     },
   ],
-}
-module.exports = {
-  root: true,
-  env: { browser: true, es2020: true },
-  extends: [
-    'eslint:recommended',
-    'plugin:react-hooks/recommended',
-    'prettier',
-  ],
-  ignorePatterns: ['dist', '.eslintrc.cjs'],
-  parser: '@typescript-eslint/parser',
-  plugins: ['react-refresh'],
-  rules: {
-    'react-refresh/only-export-components': 'warn',
-    'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-  },
 }

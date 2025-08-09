@@ -19,7 +19,7 @@ export interface ValidationRule {
   minLength?: number
   maxLength?: number
   pattern?: RegExp
-  custom?: (value: any) => string | null
+  custom?: (_value: any, _formData?: Record<string, any>) => string | null
 }
 
 export interface ValidationRules {

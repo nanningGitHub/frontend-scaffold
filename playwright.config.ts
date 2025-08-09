@@ -1,9 +1,12 @@
+/* eslint-env node */
 import { defineConfig, devices } from '@playwright/test'
+
+const isCI = typeof process !== 'undefined' && !!process.env.CI
 
 export default defineConfig({
   testDir: './tests/e2e',
   timeout: 60_000,
-  retries: process.env.CI ? 2 : 0,
+  retries: isCI ? 2 : 0,
   use: {
     baseURL: process.env.E2E_BASE_URL || 'http://localhost:3000',
     headless: true,
@@ -12,7 +15,7 @@ export default defineConfig({
   webServer: {
     command: 'npm run dev',
     url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: !isCI,
     timeout: 60_000,
   },
   projects: [

@@ -34,7 +34,7 @@ export function useDebounce<T>(value: T, delay: number): T {
 /**
  * 防抖回调 Hook
  */
-export function useDebounceCallback<T extends (...args: any[]) => any>(
+export function useDebounceCallback<T extends (..._args: any[]) => any>(
   callback: T,
   delay: number,
   options: {
@@ -101,7 +101,7 @@ export function useDebounceCallback<T extends (...args: any[]) => any>(
 /**
  * 节流 Hook
  */
-export function useThrottle<T extends (...args: any[]) => any>(
+export function useThrottle<T extends (..._args: any[]) => any>(
   callback: T,
   delay: number,
   options: {
@@ -164,7 +164,7 @@ export function useThrottle<T extends (...args: any[]) => any>(
 export function useDebounceState<T>(
   initialValue: T,
   delay: number
-): [T, T, (value: T) => void] {
+): [T, T, (_value: T) => void] {
   const [value, setValue] = useState<T>(initialValue)
   const [debouncedValue, setDebouncedValue] = useState<T>(initialValue)
 

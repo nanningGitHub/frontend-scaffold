@@ -7,7 +7,6 @@
  * 使用方式：
  * import.meta.env.VITE_API_BASE_URL
  */
-// eslint-disable-next-line no-unused-vars
 interface ImportMetaEnv {
   /** API 基础URL，用于配置 axios 实例 */
   readonly VITE_API_BASE_URL: string

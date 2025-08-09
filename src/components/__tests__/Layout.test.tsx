@@ -1,4 +1,6 @@
-import { render, screen } from '@testing-library/react'
+/* eslint-env jest */
+import React from 'react'
+import { render, screen as rtlScreen } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import Layout from '../Layout'
 
@@ -14,16 +16,16 @@ const renderWithRouter = (component: React.ReactElement) => {
 describe('Layout Component', () => {
   it('renders navigation', () => {
     renderWithRouter(<Layout />)
-    expect(screen.getByRole('navigation')).toBeInTheDocument()
+    expect(rtlScreen.getByRole('navigation')).toBeInTheDocument()
   })
 
   it('renders main content area', () => {
     renderWithRouter(<Layout />)
-    expect(screen.getByRole('main')).toBeInTheDocument()
+    expect(rtlScreen.getByRole('main')).toBeInTheDocument()
   })
 
   it('renders footer', () => {
     renderWithRouter(<Layout />)
-    expect(screen.getByRole('contentinfo')).toBeInTheDocument()
+    expect(rtlScreen.getByRole('contentinfo')).toBeInTheDocument()
   })
 })

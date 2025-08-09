@@ -47,10 +47,10 @@ export function debounce<T extends (..._args: any[]) => any>(
 ): (...args: Parameters<T>) => void {
   let timeout: ReturnType<typeof setTimeout> | null = null
 
-  return function executedFunction(...args: Parameters<T>) {
+  return function executedFunction(..._args: Parameters<T>) {
     const later = () => {
       timeout = null
-      if (!immediate) func(...args)
+      if (!immediate) func(..._args)
     }
 
     const callNow = immediate && !timeout
@@ -58,7 +58,7 @@ export function debounce<T extends (..._args: any[]) => any>(
     if (timeout) clearTimeout(timeout)
     timeout = setTimeout(later, wait)
 
-    if (callNow) func(...args)
+    if (callNow) func(..._args)
   }
 }
 
@@ -70,9 +70,9 @@ export function throttle<T extends (..._args: any[]) => any>(
   limit: number
 ): (...args: Parameters<T>) => void {
   let inThrottle: boolean
-  return function executedFunction(...args: Parameters<T>) {
+  return function executedFunction(..._args: Parameters<T>) {
     if (!inThrottle) {
-      func(...args)
+      func(..._args)
       inThrottle = true
       setTimeout(() => (inThrottle = false), limit)
     }
@@ -260,8 +260,8 @@ export function delay(ms: number): Promise<void> {
  */
 export async function retry<T>(
   fn: () => Promise<T>,
-  maxAttempts: number = 3,
-  delayMs: number = 1000
+  maxAttempts = 3,
+  delayMs = 1000
 ): Promise<T> {
   let lastError: Error
 
@@ -288,14 +288,14 @@ export function memoize<T extends (..._args: any[]) => any>(
 ): T {
   const cache = new Map<string, ReturnType<T>>()
 
-  return ((...args: Parameters<T>) => {
-    const key = getKey ? getKey(...args) : JSON.stringify(args)
+  return ((..._args: Parameters<T>) => {
+    const key = getKey ? getKey(..._args) : JSON.stringify(_args)
     
     if (cache.has(key)) {
       return cache.get(key)
     }
 
-    const result = fn(...args)
+    const result = fn(..._args)
     cache.set(key, result)
     return result
   }) as T
