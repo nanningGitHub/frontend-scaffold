@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { userService, User } from '../services/userService'
 import { logger } from '../utils/logger'
-import { ERROR_MESSAGES, AUTH_SECURITY } from '../constants'
+import { ERROR_MESSAGES, AUTH_SECURITY, STORAGE_KEYS } from '../constants'
 
 /**
  * 认证状态接口
@@ -148,7 +148,29 @@ export const useAuthStore = create<AuthStore>()(
             set({ user: currentUser, isAuthenticated: true })
             return
           }
-          const { token } = get()
+          // 非 Cookie 模式：尝试从状态或本地存储恢复 token
+          let { token } = get()
+          if (!token) {
+            try {
+              const stored = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)
+              if (stored) {
+                token = stored
+                set({ token })
+              } else {
+                const persisted = localStorage.getItem('auth-storage')
+                if (persisted) {
+                  const parsed = JSON.parse(persisted)
+                  const persistedToken = parsed?.state?.token || parsed?.token
+                  if (persistedToken) {
+                    token = persistedToken
+                    set({ token })
+                  }
+                }
+              }
+            } catch {
+              // ignore storage errors
+            }
+          }
           if (token) {
             const currentUser = await userService.getCurrentUser()
             set({ user: currentUser, isAuthenticated: true })

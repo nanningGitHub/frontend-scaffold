@@ -14,8 +14,9 @@ test.describe('Login flow (UI + API via MSW)', () => {
     await page.getByLabel('邮箱地址').fill('user@example.com')
     await page.getByLabel('密码').fill('password123')
     await page.getByRole('button', { name: '登录' }).click()
-    // 登录成功后 Layout 初始化会访问 /auth/me，MSW 返回用户
-    await expect(page).toHaveURL(/profile|\//)
+    // 登录后跳转到首页，随后可进入受保护页面
+    await page.goto('/profile')
+    await expect(page.getByText('个人资料')).toBeVisible()
   })
 })
 

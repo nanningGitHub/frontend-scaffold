@@ -17,6 +17,9 @@ export default defineConfig({
     url: 'http://localhost:3000',
     reuseExistingServer: !isCI,
     timeout: 60_000,
+    env: {
+      VITE_ENABLE_MSW: 'true',
+    },
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
