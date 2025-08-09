@@ -84,7 +84,8 @@ if (shouldReportVitals && (import.meta as any).env?.PROD) {
 
 // 注册 PWA Service Worker（由 vite-plugin-pwa 生成，避免在开发环境静态导入虚拟模块）
 if ((import.meta as any).env?.PROD) {
-  import('virtual:pwa-register').then(({ registerSW }) => {
+  const pwaModuleId: any = 'virtual:pwa-register';
+  import(/* @vite-ignore */ pwaModuleId).then(({ registerSW }) => {
     registerSW({ immediate: true });
   });
 }
