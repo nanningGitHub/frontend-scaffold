@@ -26,7 +26,10 @@ const LOG_LEVELS: LogLevel = {
 function readViteEnvDevFlag(): boolean | undefined {
   try {
     // 避免在非 ESM 环境解析 import.meta 语法
-    if (typeof (globalThis as any).import !== 'undefined' && (globalThis as any).import?.meta?.env) {
+    if (
+      typeof (globalThis as any).import !== 'undefined' &&
+      (globalThis as any).import?.meta?.env
+    ) {
       return (globalThis as any).import.meta.env.DEV;
     }
     // 在测试环境中提供默认值
@@ -51,7 +54,7 @@ class Logger {
     return level >= this.currentLevel;
   }
 
-  private formatMessage(level: string, message: string, data?: any): string {
+  private formatMessage(level: string, message: string): string {
     const timestamp = new Date().toISOString();
     const prefix = `[${timestamp}] [${level}]`;
 
@@ -70,63 +73,61 @@ class Logger {
     }
   }
 
-  info(message: string, _data?: any): void {
+  info(message: string, data?: any): void {
     if (this.shouldLog(LOG_LEVELS.INFO)) {
-      if (_data !== undefined) {
-        // eslint-disable-next-line no-console
-        console.info(this.formatMessage('INFO', message), _data);
+      if (data !== undefined) {
+        console.info(this.formatMessage('INFO', message), data);
       } else {
-        // eslint-disable-next-line no-console
         console.info(this.formatMessage('INFO', message));
       }
     }
   }
 
-  warn(message: string, _data?: any): void {
+  warn(message: string, data?: any): void {
     if (this.shouldLog(LOG_LEVELS.WARN)) {
-      if (_data !== undefined) {
-        // eslint-disable-next-line no-console
-        console.warn(this.formatMessage('WARN', message), _data);
+      if (data !== undefined) {
+        console.warn(this.formatMessage('WARN', message), data);
       } else {
-        // eslint-disable-next-line no-console
         console.warn(this.formatMessage('WARN', message));
       }
     }
   }
 
-  error(message: string, _error?: Error | any): void {
+  error(message: string, error?: Error | any): void {
     if (this.shouldLog(LOG_LEVELS.ERROR)) {
-      if (_error !== undefined) {
-        // eslint-disable-next-line no-console
-        console.error(this.formatMessage('ERROR', message), _error);
+      if (error !== undefined) {
+        console.error(this.formatMessage('ERROR', message), error);
       } else {
-        // eslint-disable-next-line no-console
         console.error(this.formatMessage('ERROR', message));
       }
 
       // 在生产环境中，可以发送错误到监控服务
-      if (!this.isDevelopment && _error) {
-        this.reportError(message, _error);
+      if (!this.isDevelopment && error) {
+        this.reportError(message, error);
       }
     }
   }
 
-  private reportError(message: string, _error: Error | any): void {
+  private reportError(_message: string, _error: Error | any): void {
     // 这里可以集成错误监控服务，如 Sentry
-    // Sentry.captureException(_error, { extra: { message } })
+    // 暂时注释掉，避免未使用参数警告
+    // Sentry.captureException(_error, { extra: { message: _message } })
+
+    // 开发环境下可以记录到控制台
+    if (this.isDevelopment) {
+      console.warn('Error reported:', _message, _error);
+    }
   }
 
   // 性能监控
   time(label: string): void {
     if (this.isDevelopment) {
-      // eslint-disable-next-line no-console
       console.time(label);
     }
   }
 
   timeEnd(label: string): void {
     if (this.isDevelopment) {
-      // eslint-disable-next-line no-console
       console.timeEnd(label);
     }
   }
@@ -134,14 +135,12 @@ class Logger {
   // 分组日志
   group(label: string): void {
     if (this.isDevelopment) {
-      // eslint-disable-next-line no-console
       console.group(label);
     }
   }
 
   groupEnd(): void {
     if (this.isDevelopment) {
-      // eslint-disable-next-line no-console
       console.groupEnd();
     }
   }

@@ -197,23 +197,22 @@ export const MicroAppContainer: React.FC<MicroAppContainerProps> = ({
 
   // 渲染微应用容器
   return (
-          <ErrorBoundary
-        fallback={(error, _errorInfo) => (
-          <div
-            className={`micro-app-container error-boundary ${className}`}
-            style={style}
-          >
-            <div className="error-content">
-              <h3>Error Boundary caught error in {appId}</h3>
-              <p>{error.message}</p>
-              <button onClick={handleRetry} className="retry-button">
-                Retry
-              </button>
-            </div>
+    <ErrorBoundary
+      fallback={(error) => (
+        <div
+          className={`micro-app-container error-boundary ${className}`}
+          style={style}
+        >
+          <div className="error-content">
+            <h3>Error Boundary caught error in {appId}</h3>
+            <p>{error.message}</p>
+            <button onClick={handleRetry} className="retry-button">
+              Retry
+            </button>
           </div>
-        )}
+        </div>
+      )}
       onError={(error) => {
-        // eslint-disable-next-line no-console
         console.error(
           `Error boundary caught error in micro app ${appId}:`,
           error

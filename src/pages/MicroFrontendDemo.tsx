@@ -17,12 +17,14 @@ export const MicroFrontendDemo: React.FC = () => {
   const [appStates, setAppStates] = useState<Map<string, MicroAppState>>(
     new Map()
   );
-  const [messages, setMessages] = useState<Array<{
-    id: string;
-    payload: any;
-    source: string;
-    timestamp: number;
-  }>>([]);
+  const [messages, setMessages] = useState<
+    Array<{
+      id: string;
+      payload: any;
+      source: string;
+      timestamp: number;
+    }>
+  >([]);
 
   // 消息 ID 计数器，确保唯一性
   const messageIdCounter = useRef(0);
@@ -39,20 +41,17 @@ export const MicroFrontendDemo: React.FC = () => {
     setAppStates(initialStates);
 
     // 订阅全局通信事件
-    const unsubscribe = globalCommunication.onMessage(
-      '*',
-      (message) => {
-        setMessages((prev) => [
-          ...prev,
-          { 
-            id: `msg_${++messageIdCounter.current}_${Date.now()}`,
-            payload: message.payload, 
-            source: message.source, 
-            timestamp: message.timestamp 
-          },
-        ]);
-      }
-    );
+    const unsubscribe = globalCommunication.onMessage('*', (message) => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `msg_${++messageIdCounter.current}_${Date.now()}`,
+          payload: message.payload,
+          source: message.source,
+          timestamp: message.timestamp,
+        },
+      ]);
+    });
 
     return () => unsubscribe();
   }, []);
@@ -88,7 +87,11 @@ export const MicroFrontendDemo: React.FC = () => {
 
   // 广播消息
   const broadcastMessage = (eventType: string, payload: any) => {
-    globalCommunication.broadcastMessage({ type: eventType, payload, source: 'host' });
+    globalCommunication.broadcastMessage({
+      type: eventType,
+      payload,
+      source: 'host',
+    });
   };
 
   // 清空消息
@@ -235,7 +238,7 @@ export const MicroFrontendDemo: React.FC = () => {
               messages
                 .slice(-10)
                 .reverse()
-                .map((message, index) => (
+                .map((message) => (
                   <div key={message.id} className="log-item">
                     <span className="timestamp">
                       {new Date(message.timestamp).toLocaleTimeString()}
