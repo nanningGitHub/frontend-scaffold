@@ -1,9 +1,11 @@
 import { useAuthStore } from '../stores/authStore';
 import { useUIStore } from '../stores/uiStore';
+import { useThemeStore } from '../stores/themeStore';
 
 const StateManagementDemo = () => {
   const { user, isAuthenticated } = useAuthStore();
-  const { theme, toggleTheme, addNotification } = useUIStore();
+  const { addNotification } = useUIStore();
+  const { theme, toggleTheme } = useThemeStore();
 
   const showNotification = (type: 'success' | 'error' | 'warning' | 'info') => {
     const messages = {
@@ -23,17 +25,17 @@ const StateManagementDemo = () => {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
           Zustand 状态管理演示
         </h1>
-        <p className="text-lg text-gray-600">
+        <p className="text-lg text-gray-600 dark:text-gray-300">
           展示前沿状态管理工具的功能和特性
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
             认证状态管理
           </h2>
 

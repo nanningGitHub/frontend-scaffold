@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { useUIStore } from '../stores/uiStore';
+import { useThemeStore } from '../stores/themeStore';
 import { logger } from '../utils/logger';
 import LanguageSwitcher from './LanguageSwitcher';
 
@@ -15,7 +16,8 @@ import LanguageSwitcher from './LanguageSwitcher';
  */
 const Navigation = () => {
   const { user, isAuthenticated, logout } = useAuthStore();
-  const { sidebarOpen, toggleSidebar, theme, toggleTheme } = useUIStore();
+  const { sidebarOpen, toggleSidebar } = useUIStore();
+  const { theme: currentTheme, toggleTheme: toggleAppTheme } = useThemeStore();
   const location = useLocation();
 
   /**
@@ -36,16 +38,23 @@ const Navigation = () => {
     return location.pathname === path;
   };
 
+  /**
+   * 处理主题切换
+   */
+  const handleThemeToggle = () => {
+    toggleAppTheme();
+  };
+
   return (
-    <nav className="bg-white shadow-lg border-b border-gray-200">
+    <nav className="bg-white dark:bg-gray-800 shadow-lg border-b border-gray-200 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          {/* 左侧 Logo 和导航链接 */}
+          {/* 左侧：Logo 和导航链接 */}
           <div className="flex items-center">
             {/* 移动端菜单按钮 */}
             <button
               onClick={toggleSidebar}
-              className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="md:hidden p-2 rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <svg
                 className="h-6 w-6"
@@ -63,11 +72,12 @@ const Navigation = () => {
             </button>
 
             {/* Logo */}
-            <div className="flex-shrink-0 flex items-center">
-              <Link to="/" className="text-xl font-bold text-gray-900">
-                前端脚手架
-              </Link>
-            </div>
+            <Link
+              to="/"
+              className="text-xl font-bold text-gray-900 dark:text-white"
+            >
+              前端脚手架
+            </Link>
 
             {/* 桌面端导航链接 */}
             <div className="hidden md:ml-6 md:flex md:space-x-8">
@@ -75,8 +85,8 @@ const Navigation = () => {
                 to="/"
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   isActive('/')
-                    ? 'text-blue-600 bg-blue-50'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
               >
                 首页
@@ -85,18 +95,18 @@ const Navigation = () => {
                 to="/about"
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   isActive('/about')
-                    ? 'text-blue-600 bg-blue-50'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
               >
                 关于
               </Link>
               <Link
-                to="/state-demo"
+                to="/state-management"
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive('/state-demo')
-                    ? 'text-blue-600 bg-blue-50'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  isActive('/state-management')
+                    ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
               >
                 状态管理
@@ -105,8 +115,8 @@ const Navigation = () => {
                 to="/i18n-demo"
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   isActive('/i18n-demo')
-                    ? 'text-blue-600 bg-blue-50'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
               >
                 国际化
@@ -115,19 +125,29 @@ const Navigation = () => {
                 to="/micro-frontend"
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   isActive('/micro-frontend')
-                    ? 'text-blue-600 bg-blue-50'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
               >
                 微前端
+              </Link>
+              <Link
+                to="/theme-test"
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isActive('/theme-test')
+                    ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
+                }`}
+              >
+                主题测试
               </Link>
               {isAuthenticated && (
                 <Link
                   to="/profile"
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     isActive('/profile')
-                      ? 'text-blue-600 bg-blue-50'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                      ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
                   }`}
                 >
                   个人中心
@@ -136,18 +156,18 @@ const Navigation = () => {
             </div>
           </div>
 
-          {/* 右侧用户菜单、主题切换和语言切换 */}
+          {/* 右侧：主题切换和用户菜单 */}
           <div className="flex items-center space-x-4">
             {/* 语言切换器 */}
             <LanguageSwitcher showLabel={false} />
 
             {/* 主题切换按钮 */}
             <button
-              onClick={toggleTheme}
-              className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              title={`切换到${theme === 'light' ? '深色' : '浅色'}主题`}
+              onClick={handleThemeToggle}
+              className="p-2 rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+              title={`切换到${currentTheme === 'light' ? '深色' : '浅色'}主题`}
             >
-              {theme === 'light' ? (
+              {currentTheme === 'light' ? (
                 <svg
                   className="h-5 w-5"
                   fill="currentColor"
@@ -174,12 +194,12 @@ const Navigation = () => {
             {isAuthenticated ? (
               <div className="relative">
                 <div className="flex items-center space-x-3">
-                  <span className="text-sm text-gray-700">
+                  <span className="text-sm text-gray-700 dark:text-gray-300">
                     欢迎，{user?.name || '用户'}
                   </span>
                   <button
                     onClick={handleLogout}
-                    className="px-3 py-1 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-colors"
+                    className="px-3 py-1 text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
                   >
                     登出
                   </button>
@@ -189,13 +209,13 @@ const Navigation = () => {
               <div className="flex items-center space-x-2">
                 <Link
                   to="/login"
-                  className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-md transition-colors"
+                  className="px-3 py-1 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition-colors"
                 >
                   登录
                 </Link>
                 <Link
                   to="/register"
-                  className="px-3 py-1 text-sm bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors"
+                  className="px-3 py-1 text-sm bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-600 rounded-md transition-colors"
                 >
                   注册
                 </Link>
@@ -208,13 +228,13 @@ const Navigation = () => {
       {/* 移动端侧边栏 */}
       {sidebarOpen && (
         <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200">
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
             <Link
               to="/"
               className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
                 isActive('/')
-                  ? 'text-blue-600 bg-blue-50'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
               }`}
             >
               首页
@@ -223,18 +243,18 @@ const Navigation = () => {
               to="/about"
               className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
                 isActive('/about')
-                  ? 'text-blue-600 bg-blue-50'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
               }`}
             >
               关于
             </Link>
             <Link
-              to="/state-demo"
+              to="/state-management"
               className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                isActive('/state-demo')
-                  ? 'text-blue-600 bg-blue-50'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                isActive('/state-management')
+                  ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
               }`}
             >
               状态管理
@@ -243,8 +263,8 @@ const Navigation = () => {
               to="/i18n-demo"
               className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
                 isActive('/i18n-demo')
-                  ? 'text-blue-600 bg-blue-50'
-                  : 'text-gray-900 hover:text-gray-900 hover:bg-gray-50'
+                  ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
               }`}
             >
               国际化
@@ -253,19 +273,29 @@ const Navigation = () => {
               to="/micro-frontend"
               className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
                 isActive('/micro-frontend')
-                  ? 'text-blue-600 bg-blue-50'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
               }`}
             >
               微前端
+            </Link>
+            <Link
+              to="/theme-test"
+              className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                isActive('/theme-test')
+                  ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
+              }`}
+            >
+              主题测试
             </Link>
             {isAuthenticated && (
               <Link
                 to="/profile"
                 className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
                   isActive('/profile')
-                    ? 'text-blue-600 bg-blue-50'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
               >
                 个人中心

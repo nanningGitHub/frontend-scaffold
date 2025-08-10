@@ -24,6 +24,7 @@ const UserProfile = lazy(() => import('./components/UserProfile'));
 const StateManagementDemo = lazy(() => import('./pages/StateManagementDemo'));
 const I18nDemo = lazy(() => import('./pages/I18nDemo'));
 const MicroFrontendDemo = lazy(() => import('./pages/MicroFrontendDemo'));
+const ThemeTest = lazy(() => import('./pages/ThemeTest'));
 
 // 加载组件
 const LoadingSpinner = () => (
@@ -73,7 +74,7 @@ const errorBoundaryConfig = {
 };
 
 function App() {
-  const { theme } = useThemeStore();
+  const { theme, getCurrentTheme } = useThemeStore();
   const { locale } = useI18nStore();
 
   // 初始化企业级系统
@@ -115,22 +116,20 @@ function App() {
     };
   }, [theme, locale]);
 
-  // 应用主题
-  useEffect(() => {
-    document.documentElement.className = theme;
-  }, [theme]);
-
   // 应用语言
   useEffect(() => {
     document.documentElement.lang = locale;
   }, [locale]);
+
+  // 获取当前实际应用的主题
+  const currentTheme = getCurrentTheme();
 
   return (
     <EnterpriseErrorBoundary {...errorBoundaryConfig}>
       <Router>
         <div
           className={`min-h-screen transition-colors duration-300 ${
-            theme === 'dark'
+            currentTheme === 'dark'
               ? 'bg-gray-900 text-white'
               : 'bg-white text-gray-900'
           }`}
@@ -155,6 +154,7 @@ function App() {
               <Route path="/i18n" element={<I18nDemo />} />
               <Route path="/micro-frontend" element={<MicroFrontendDemo />} />
               <Route path="/api-example" element={<ApiExample />} />
+              <Route path="/theme-test" element={<ThemeTest />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
