@@ -136,22 +136,57 @@ export class EnterpriseLogger {
     if (typeof window !== 'undefined') {
       // 监听未捕获的错误
       window.addEventListener('error', (event) => {
-        this.error('Uncaught error', {
+        // 提供更详细的错误信息
+        const errorContext = {
           message: event.message,
           filename: event.filename,
           lineno: event.lineno,
           colno: event.colno,
           error: event.error,
-        });
+          stack: event.error?.stack,
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          timestamp: new Date().toISOString(),
+          errorType: 'uncaught_error',
+        };
+
+        this.error('Uncaught error', errorContext);
+        
+        // 在控制台中也显示详细错误信息
+        console.error('🔴 Uncaught Error Details:', errorContext);
       });
 
       // 监听未处理的 Promise 拒绝
       window.addEventListener('unhandledrejection', (event) => {
-        this.error('Unhandled promise rejection', {
+        const rejectionContext = {
           reason: event.reason,
           promise: event.promise,
-        });
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          timestamp: new Date().toISOString(),
+          errorType: 'unhandled_promise_rejection',
+        };
+
+        this.error('Unhandled promise rejection', rejectionContext);
+        
+        // 在控制台中也显示详细错误信息
+        console.error('🔴 Unhandled Promise Rejection Details:', rejectionContext);
       });
+
+      // 监听资源加载错误
+      window.addEventListener('error', (event) => {
+        if (event.target && event.target !== window) {
+          const resourceContext = {
+            target: event.target,
+            type: event.type,
+            url: (event.target as any).src || (event.target as any).href,
+            errorType: 'resource_load_error',
+            timestamp: new Date().toISOString(),
+          };
+
+          this.warn('Resource load error', resourceContext);
+        }
+      }, true);
     }
   }
 
@@ -250,8 +285,8 @@ export class EnterpriseLogger {
       tags.push(...tagMatches.map((tag) => tag.substring(1)));
     }
 
-    // 从上下文中提取标签
-    if (context.tags) {
+    // 从上下文中提取标签 - 确保 tags 是数组
+    if (context.tags && Array.isArray(context.tags)) {
       tags.push(...context.tags);
     }
 
@@ -280,32 +315,59 @@ export class EnterpriseLogger {
    * 控制台输出
    */
   private outputToConsole(logEntry: LogEntry): void {
-    const { level, message, context, timestamp, tags } = logEntry;
-    const levelName = LOG_LEVEL_NAMES[level];
+    const { level, message, context, timestamp, tags, error, stack } = logEntry;
+    const levelName = LOG_LEVEL_NAMES[level] || 'UNKNOWN';
     const timeStr = new Date(timestamp).toISOString();
 
+    // 为不同级别添加颜色和图标
+    const levelConfig = {
+      [LogLevel.TRACE]: { icon: '🔍', color: 'color: #6B7280' },
+      [LogLevel.DEBUG]: { icon: '🐛', color: 'color: #3B82F6' },
+      [LogLevel.INFO]: { icon: 'ℹ️', color: 'color: #10B981' },
+      [LogLevel.WARN]: { icon: '⚠️', color: 'color: #F59E0B' },
+      [LogLevel.ERROR]: { icon: '🔴', color: 'color: #EF4444' },
+      [LogLevel.FATAL]: { icon: '💀', color: 'color: #7C2D12' },
+    };
+
+    const config = levelConfig[level] || { icon: '❓', color: 'color: #6B7280' };
     const logData = {
       level: levelName,
       message,
       context,
       tags,
       timestamp: timeStr,
+      ...(error && { error: error.message }),
+      ...(stack && { stack }),
     };
+
+    // 创建格式化的日志消息
+    const formattedMessage = `%c${config.icon} [${levelName.toUpperCase()}] ${message}`;
+    const style = `font-weight: bold; ${config.color}`;
 
     switch (level) {
       case LogLevel.TRACE:
       case LogLevel.DEBUG:
-        console.debug(`[${levelName}] ${message}`, logData);
+        console.debug(formattedMessage, style, logData);
         break;
       case LogLevel.INFO:
-        console.info(`[${levelName}] ${message}`, logData);
+        console.info(formattedMessage, style, logData);
         break;
       case LogLevel.WARN:
-        console.warn(`[${levelName}] ${message}`, logData);
+        console.warn(formattedMessage, style, logData);
         break;
       case LogLevel.ERROR:
       case LogLevel.FATAL:
-        console.error(`[${levelName}] ${message}`, logData);
+        console.error(formattedMessage, style, logData);
+        
+        // 对于错误级别，额外显示错误详情
+        if (error && error.stack) {
+          console.group('📋 Error Details');
+          console.error('Message:', error.message);
+          console.error('Stack:', error.stack);
+          if (context.component) console.error('Component:', context.component);
+          if (context.method) console.error('Method:', context.method);
+          console.groupEnd();
+        }
         break;
     }
   }
@@ -382,15 +444,15 @@ export class EnterpriseLogger {
     if (logEntry.level >= LogLevel.ERROR) {
       monitoring.recordError(new Error(logEntry.message), {
         logEntry,
-        level: LOG_LEVEL_NAMES[logEntry.level],
+        level: LOG_LEVEL_NAMES[logEntry.level] || 'UNKNOWN',
       });
     }
 
     // 记录性能指标
     if (logEntry.duration) {
       monitoring.recordMetric('log_duration', logEntry.duration, {
-        level: LOG_LEVEL_NAMES[logEntry.level],
-        component: logEntry.component,
+        level: LOG_LEVEL_NAMES[logEntry.level] || 'UNKNOWN',
+        component: logEntry.component || 'unknown',
       });
     }
   }
@@ -577,7 +639,7 @@ export class EnterpriseLogger {
     ];
     const rows = this.logs.map((log) => [
       new Date(log.timestamp).toISOString(),
-      LOG_LEVEL_NAMES[log.level],
+      LOG_LEVEL_NAMES[log.level] || 'UNKNOWN',
       log.message,
       log.component || '',
       log.method || '',

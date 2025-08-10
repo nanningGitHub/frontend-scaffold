@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 /**
  * API 请求示例组件
@@ -9,6 +9,9 @@ const ApiExample = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // 用户 ID 计数器，确保唯一性
+  const userIdCounter = useRef(0);
 
   /**
    * 获取用户列表示例
@@ -54,8 +57,8 @@ const ApiExample = () => {
       // 模拟 API 调用
       await new Promise((resolve) => setTimeout(resolve, 800));
 
-      // 模拟成功响应
-      const createdUser = { id: Date.now(), ...newUser };
+      // 模拟成功响应 - 使用递增计数器确保唯一性
+      const createdUser = { id: ++userIdCounter.current, ...newUser };
       setUsers((prev) => [...prev, createdUser]);
 
       alert('用户创建成功！');

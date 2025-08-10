@@ -1,127 +1,32 @@
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import React from 'react';
 
-/**
- * 首页组件
- *
- * 功能：
- * 1. 展示项目介绍和特性
- * 2. 提供交互式计数器示例
- * 3. 展示技术栈信息
- *
- * 特性：
- * - 响应式网格布局
- * - 状态管理示例
- * - 自定义样式组件
- * - 国际化支持
- */
 const Home = () => {
-  const { t } = useTranslation();
-  // 计数器状态 - 用于演示 React 状态管理
-  const [count, setCount] = useState(0);
-
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* 页面标题区域 */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-          {t('home.title')}
+    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
+      <div className="max-w-4xl mx-auto p-6">
+        <h1 className="text-4xl font-bold mb-8 text-center">
+          前端脚手架
         </h1>
-        <p className="text-xl text-gray-600 dark:text-gray-300">
-          {t('home.subtitle')}
-        </p>
-      </div>
-
-      {/* 技术特性展示区域 */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-        {/* React 18 特性卡片 */}
-        <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-            React 18
-          </h3>
-          <p className="text-gray-600 dark:text-gray-300">
-            使用最新的 React 18 特性，包括并发渲染和自动批处理
+        
+        <div className="text-center">
+          <p className="text-lg text-gray-600 dark:text-gray-400 mb-4">
+            欢迎使用前端脚手架项目
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-500">
+            这是一个现代化的前端开发框架，支持主题切换、国际化、状态管理等功能
           </p>
         </div>
-
-        {/* TypeScript 特性卡片 */}
-        <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-            TypeScript
-          </h3>
-          <p className="text-gray-600 dark:text-gray-300">
-            完整的 TypeScript 支持，提供类型安全和更好的开发体验
-          </p>
-        </div>
-
-        {/* Vite 特性卡片 */}
-        <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-            Vite
-          </h3>
-          <p className="text-gray-600 dark:text-gray-300">
-            极速的开发服务器和构建工具，提供快速的开发体验
-          </p>
-        </div>
-
-        {/* Tailwind CSS 特性卡片 */}
-        <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-            Tailwind CSS
-          </h3>
-          <p className="text-gray-600 dark:text-gray-300">
-            实用优先的 CSS 框架，快速构建现代化的用户界面
-          </p>
-        </div>
-
-        {/* React Router 特性卡片 */}
-        <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-            React Router
-          </h3>
-          <p className="text-gray-600 dark:text-gray-300">
-            声明式路由，轻松管理应用导航和页面状态
-          </p>
-        </div>
-
-        {/* 测试支持特性卡片 */}
-        <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-            测试支持
-          </h3>
-          <p className="text-gray-600 dark:text-gray-300">
-            集成 Jest 和 Testing Library，确保代码质量和可靠性
-          </p>
-        </div>
-      </div>
-
-      {/* 交互式计数器示例 */}
-      <div className="text-center">
-        <div className="card inline-block">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            计数器示例
-          </h3>
-          <div className="flex items-center justify-center space-x-4">
-            {/* 减少按钮 */}
-            <button
-              onClick={() => setCount(count - 1)}
-              className="btn btn-secondary"
-            >
-              -
-            </button>
-
-            {/* 计数器显示 */}
-            <span className="text-2xl font-bold text-gray-900 dark:text-white min-w-[3rem]">
-              {count}
-            </span>
-
-            {/* 增加按钮 */}
-            <button
-              onClick={() => setCount(count + 1)}
-              className="btn btn-primary"
-            >
-              +
-            </button>
+        
+        {/* 简单的主题测试 */}
+        <div className="mt-8 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+          <h2 className="text-xl font-semibold mb-4 text-center">主题状态</h2>
+          <div className="text-center">
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              HTML class: {document.documentElement.className}
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
+              当前背景: {document.documentElement.classList.contains('dark') ? '深色' : '浅色'}
+            </p>
           </div>
         </div>
       </div>

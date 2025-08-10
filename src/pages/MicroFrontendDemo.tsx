@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MicroAppContainer } from '../components/MicroAppContainer';
 import { globalCommunication } from '../utils/microAppCommunication';
 import {
@@ -17,7 +17,15 @@ export const MicroFrontendDemo: React.FC = () => {
   const [appStates, setAppStates] = useState<Map<string, MicroAppState>>(
     new Map()
   );
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<Array<{
+    id: string;
+    payload: any;
+    source: string;
+    timestamp: number;
+  }>>([]);
+
+  // 消息 ID 计数器，确保唯一性
+  const messageIdCounter = useRef(0);
 
   useEffect(() => {
     // 初始化应用状态
@@ -36,7 +44,12 @@ export const MicroFrontendDemo: React.FC = () => {
       (message) => {
         setMessages((prev) => [
           ...prev,
-          { payload: message.payload, source: message.source, timestamp: message.timestamp },
+          { 
+            id: `msg_${++messageIdCounter.current}_${Date.now()}`,
+            payload: message.payload, 
+            source: message.source, 
+            timestamp: message.timestamp 
+          },
         ]);
       }
     );
@@ -223,7 +236,7 @@ export const MicroFrontendDemo: React.FC = () => {
                 .slice(-10)
                 .reverse()
                 .map((message, index) => (
-                  <div key={index} className="log-item">
+                  <div key={message.id} className="log-item">
                     <span className="timestamp">
                       {new Date(message.timestamp).toLocaleTimeString()}
                     </span>

@@ -33,7 +33,8 @@ export class EnterpriseMonitoring {
       type: 'performance',
     };
 
-    this.metrics.set(`${name}_${Date.now()}`, metric);
+    const metricId = `${name}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    this.metrics.set(metricId, metric);
 
     // 检查告警阈值
     this.checkAlertThresholds(metric);
@@ -61,7 +62,8 @@ export class EnterpriseMonitoring {
       type: 'business',
     };
 
-    this.metrics.set(`${name}_${Date.now()}`, metric);
+    const metricId = `${name}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    this.metrics.set(metricId, metric);
     this.notifyObservers('business', metric);
   }
 
@@ -75,14 +77,15 @@ export class EnterpriseMonitoring {
       tags: {
         type: 'error',
         message: error.message,
-        stack: error.stack,
+        stack: error.stack || 'No stack trace',
         ...context,
       },
       timestamp: Date.now(),
       type: 'error',
     };
 
-    this.metrics.set(`error_${Date.now()}`, errorMetric);
+    const errorId = `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    this.metrics.set(errorId, errorMetric);
 
     // 错误告警
     this.createAlert(
@@ -117,7 +120,8 @@ export class EnterpriseMonitoring {
       type: 'user_action',
     };
 
-    this.metrics.set(`user_action_${Date.now()}`, actionMetric);
+    const actionId = `user_action_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    this.metrics.set(actionId, actionMetric);
   }
 
   /**

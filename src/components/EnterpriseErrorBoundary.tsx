@@ -35,11 +35,14 @@ interface ErrorHandlingStrategy {
   retry: boolean;
   maxRetries: number;
   retryDelay: number;
-  fallback?: ReactNode;
+  fallback?:
+    | ReactNode
+    | ((error: Error, errorInfo: ErrorInfo, retry: () => void) => ReactNode);
   logLevel: 'info' | 'warn' | 'error';
 }
 
 interface ErrorRecord {
+  id: string;
   error: Error;
   timestamp: number;
   retryCount: number;
@@ -171,6 +174,7 @@ export class EnterpriseErrorBoundary extends Component<Props, State> {
       errorHistory: [
         ...prevState.errorHistory,
         {
+          id: `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
           error,
           timestamp: Date.now(),
           retryCount: prevState.retryCount,
@@ -266,18 +270,15 @@ export class EnterpriseErrorBoundary extends Component<Props, State> {
   renderErrorUI(): ReactNode {
     const { fallback } = this.props;
     const { error, errorInfo, retryCount, isRetrying } = this.state;
-
-    if (!error) return null;
-
-    const errorType = this.classifyError(error);
+    const errorType = this.classifyError(error!);
     const strategy = this.getErrorStrategy(errorType);
 
     // 自定义错误UI
     if (typeof fallback === 'function' && errorInfo) {
-      return fallback(error, errorInfo, this.retry);
+      return fallback(error!, errorInfo, this.retry);
     }
 
-    if (fallback) {
+    if (fallback && typeof fallback !== 'function') {
       return fallback;
     }
 
@@ -294,7 +295,7 @@ export class EnterpriseErrorBoundary extends Component<Props, State> {
         <div className="error-details">
           <details>
             <summary>错误详情</summary>
-            <div className="error-message">{error.message}</div>
+            <div className="error-message">{error!.message}</div>
             {errorInfo && (
               <div className="error-stack">
                 <pre>{errorInfo.componentStack}</pre>
@@ -348,8 +349,8 @@ export class EnterpriseErrorBoundary extends Component<Props, State> {
       <div className="error-history">
         <h4>错误历史</h4>
         <div className="error-list">
-          {errorHistory.slice(-5).map((record, index) => (
-            <div key={index} className="error-record">
+          {errorHistory.slice(-5).map((record) => (
+            <div key={record.id} className="error-record">
               <span className="error-time">
                 {new Date(record.timestamp).toLocaleTimeString()}
               </span>

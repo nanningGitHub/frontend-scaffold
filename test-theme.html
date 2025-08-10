@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>主题切换测试</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+    <style>
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-200">
+    <div class="theme-toggle">
+        <button id="themeBtn" class="p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            🌙
+        </button>
+    </div>
+
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold text-center mb-8">主题切换功能测试</h1>
+        
+        <div class="max-w-2xl mx-auto space-y-6">
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-semibold mb-4">当前状态</h2>
+                <p>HTML class: <span id="htmlClass" class="font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded"></span></p>
+                <p>主题模式: <span id="themeMode" class="font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded"></span></p>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-semibold mb-4">样式预览</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600">
+                        <p class="text-gray-900 dark:text-white">浅色背景</p>
+                    </div>
+                    <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded border border-blue-200 dark:border-blue-700">
+                        <p class="text-blue-900 dark:text-blue-100">蓝色背景</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-semibold mb-4">按钮测试</h2>
+                <div class="space-x-4">
+                    <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+                        主要按钮
+                    </button>
+                    <button class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                        次要按钮
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 主题切换逻辑
+        const themeBtn = document.getElementById('themeBtn');
+        const htmlClass = document.getElementById('htmlClass');
+        const themeMode = document.getElementById('themeMode');
+
+        // 获取当前主题
+        function getCurrentTheme() {
+            return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        }
+
+        // 更新显示
+        function updateDisplay() {
+            const currentTheme = getCurrentTheme();
+            htmlClass.textContent = document.documentElement.className;
+            themeMode.textContent = currentTheme;
+            themeBtn.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // 切换主题
+        function toggleTheme() {
+            const currentTheme = getCurrentTheme();
+            if (currentTheme === 'dark') {
+                document.documentElement.classList.remove('dark');
+            } else {
+                document.documentElement.classList.add('dark');
+            }
+            updateDisplay();
+            
+            // 保存到 localStorage
+            localStorage.setItem('theme', getCurrentTheme());
+        }
+
+        // 初始化主题
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else if (savedTheme === 'light') {
+                document.documentElement.classList.remove('dark');
+            } else {
+                // 检查系统偏好
+                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                }
+            }
+            updateDisplay();
+        }
+
+        // 事件监听
+        themeBtn.addEventListener('click', toggleTheme);
+
+        // 监听系统主题变化
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                if (e.matches) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+                updateDisplay();
+            }
+        });
+
+        // 初始化
+        initTheme();
+    </script>
+</body>
+</html>

@@ -1,6 +1,5 @@
 import React, { lazy, Suspense, useEffect } from 'react';
 import {
-  BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
@@ -12,7 +11,7 @@ import {
 } from './components/EnterpriseErrorBoundary';
 import { monitoring } from './utils/monitoring';
 import { logger } from './utils/enterpriseLogger';
-import { securityManager } from './utils/securityManager';
+// import { securityManager } from './utils/securityManager';
 
 // 懒加载页面组件
 const Home = lazy(() => import('./pages/Home'));
@@ -54,7 +53,7 @@ const errorBoundaryConfig = {
       retry: true,
       maxRetries: 5,
       retryDelay: 2000,
-      logLevel: 'warn',
+      logLevel: 'warn' as const,
     },
   },
   onError: (error: Error, errorInfo: React.ErrorInfo) => {
@@ -98,8 +97,8 @@ function App() {
       locale,
     });
 
-    // 设置安全上下文
-    securityManager.addContext({
+    // 设置日志上下文
+    logger.addContext({
       app: 'main',
       version: '1.0.0',
       environment: process.env.NODE_ENV,
@@ -126,40 +125,38 @@ function App() {
 
   return (
     <EnterpriseErrorBoundary {...errorBoundaryConfig}>
-      <Router>
-        <div
-          className={`min-h-screen transition-colors duration-300 ${
-            currentTheme === 'dark'
-              ? 'bg-gray-900 text-white'
-              : 'bg-white text-gray-900'
-          }`}
-        >
-          <Suspense fallback={<LoadingSpinner />}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route
-                path="/profile"
-                element={
-                  <ProtectedRoute>
-                    <UserProfile />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/state-management"
-                element={<StateManagementDemo />}
-              />
-              <Route path="/i18n" element={<I18nDemo />} />
-              <Route path="/micro-frontend" element={<MicroFrontendDemo />} />
-              <Route path="/api-example" element={<ApiExample />} />
-              <Route path="/theme-test" element={<ThemeTest />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </div>
-      </Router>
+      <div
+        className={`min-h-screen transition-colors duration-300 ${
+          currentTheme === 'dark'
+            ? 'bg-gray-900 text-white'
+            : 'bg-white text-gray-900'
+        }`}
+      >
+        <Suspense fallback={<LoadingSpinner />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <UserProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/state-management"
+              element={<StateManagementDemo />}
+            />
+            <Route path="/i18n" element={<I18nDemo />} />
+            <Route path="/micro-frontend" element={<MicroFrontendDemo />} />
+            <Route path="/api-example" element={<ApiExample />} />
+            <Route path="/theme-test" element={<ThemeTest />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </div>
     </EnterpriseErrorBoundary>
   );
 }

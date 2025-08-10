@@ -7,7 +7,6 @@ import './i18n';
 import i18n from './i18n';
 import * as Sentry from '@sentry/react';
 import { onCLS, onFID, onLCP } from 'web-vitals';
-import { useThemeStore } from './stores/themeStore';
 
 // MSW（仅在开发环境并且开启 MOCK 时启动）
 // 动态导入并暴露就绪 Promise，避免阻塞初始渲染
@@ -21,30 +20,32 @@ if (import.meta.env?.DEV && import.meta.env?.VITE_ENABLE_MSW === 'true') {
  * 初始化主题系统
  */
 const initializeTheme = () => {
-  // 确保DOM已准备好
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      const themeStore = useThemeStore.getState();
-      // 检测系统主题
-      themeStore.detectSystemTheme();
-      // 应用保存的主题
-      const currentTheme = themeStore.getCurrentTheme();
-      if (currentTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
+  try {
+    // 简单的主题初始化，避免复杂逻辑
+    const savedTheme = localStorage.getItem('theme-storage');
+    if (savedTheme) {
+      try {
+        const themeData = JSON.parse(savedTheme);
+        if (themeData.state && themeData.state.theme) {
+          if (themeData.state.theme === 'dark') {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to parse theme from localStorage:', e);
       }
-    });
-  } else {
-    // DOM已准备好，直接初始化
-    const themeStore = useThemeStore.getState();
-    themeStore.detectSystemTheme();
-    const currentTheme = themeStore.getCurrentTheme();
-    if (currentTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
     }
+    
+    // 检测系统主题偏好
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      if (!document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.add('dark');
+      }
+    }
+  } catch (error) {
+    console.warn('Theme initialization failed:', error);
   }
 };
 

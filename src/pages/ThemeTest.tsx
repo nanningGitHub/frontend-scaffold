@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useThemeStore } from '../stores/themeStore';
 
 /**
@@ -9,10 +9,11 @@ const ThemeTest = () => {
   const { theme, toggleTheme, getCurrentTheme, setTheme, detectSystemTheme } =
     useThemeStore();
   const currentTheme = getCurrentTheme();
+  const [debugInfo, setDebugInfo] = useState<string>('');
 
   // 检测系统主题变化
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-sme: dark)');
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = () => {
       detectSystemTheme();
     };
@@ -20,6 +21,39 @@ const ThemeTest = () => {
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, [detectSystemTheme]);
+
+  // 更新调试信息
+  useEffect(() => {
+    const updateDebugInfo = () => {
+      const htmlElement = document.documentElement;
+      const hasDarkClass = htmlElement.classList.contains('dark');
+      const computedStyle = window.getComputedStyle(htmlElement);
+      const backgroundColor = computedStyle.backgroundColor;
+      
+      setDebugInfo(`
+        HTML class: ${htmlElement.className}
+        hasDarkClass: ${hasDarkClass}
+        backgroundColor: ${backgroundColor}
+        localStorage theme: ${localStorage.getItem('theme-storage')}
+      `);
+    };
+
+    updateDebugInfo();
+    const interval = setInterval(updateDebugInfo, 1000);
+    return () => clearInterval(interval);
+  }, [theme, currentTheme]);
+
+  const handleToggleTheme = () => {
+    console.log('切换主题前:', { theme, currentTheme });
+    toggleTheme();
+    console.log('切换主题后:', { theme: useThemeStore.getState().theme });
+  };
+
+  const handleSetTheme = (newTheme: 'light' | 'dark' | 'system') => {
+    console.log('设置主题前:', { theme, currentTheme });
+    setTheme(newTheme);
+    console.log('设置主题后:', { theme: useThemeStore.getState().theme });
+  };
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -38,31 +72,50 @@ const ThemeTest = () => {
         </p>
       </div>
 
+      {/* 调试信息 */}
+      <div className="mb-8 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          调试信息
+        </h3>
+        <pre className="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+          {debugInfo}
+        </pre>
+        
+        {/* 主题存储状态 */}
+        <div className="mt-4 p-3 bg-gray-200 dark:bg-gray-700 rounded">
+          <h4 className="font-semibold mb-2">主题存储状态:</h4>
+          <p>theme: {theme}</p>
+          <p>currentTheme: {currentTheme}</p>
+          <p>systemTheme: {useThemeStore.getState().systemTheme}</p>
+          <p>localStorage: {localStorage.getItem('theme-storage')}</p>
+        </div>
+      </div>
+
       {/* 主题控制按钮 */}
       <div className="text-center mb-8 space-x-4">
         <button
-          onClick={toggleTheme}
+          onClick={handleToggleTheme}
           className="px-6 py-3 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors text-lg font-medium"
         >
           切换主题
         </button>
 
         <button
-          onClick={() => setTheme('light')}
+          onClick={() => handleSetTheme('light')}
           className="px-6 py-3 bg-gray-600 dark:bg-gray-500 text-white rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors text-lg font-medium"
         >
           设置为浅色
         </button>
 
         <button
-          onClick={() => setTheme('dark')}
+          onClick={() => handleSetTheme('dark')}
           className="px-6 py-3 bg-gray-800 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-900 dark:hover:bg-gray-800 transition-colors text-lg font-medium"
         >
           设置为深色
         </button>
 
         <button
-          onClick={() => setTheme('system')}
+          onClick={() => handleSetTheme('system')}
           className="px-6 py-3 bg-green-600 dark:bg-green-500 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition-colors text-lg font-medium"
         >
           跟随系统

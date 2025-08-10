@@ -83,14 +83,16 @@ export class SecurityManager {
   private setupCSP(): void {
     if (!this.securityConfig.enableCSP) return;
 
+    // 生成唯一的 nonce 值
+    const nonce = this.generateNonce();
+
     const cspDirectives = [
       "default-src 'self'",
-      "script-src 'self' 'nonce-${nonce}' 'strict-dynamic'",
+      `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https:",
       "font-src 'self' data:",
       "connect-src 'self' https:",
-      "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",
       'upgrade-insecure-requests',
@@ -102,7 +104,22 @@ export class SecurityManager {
     meta.content = cspDirectives;
     document.head.appendChild(meta);
 
-    logger.info('Content Security Policy configured', { csp: cspDirectives });
+    // 将 nonce 存储到全局，供其他脚本使用
+    (window as any).__CSP_NONCE__ = nonce;
+
+    logger.info('Content Security Policy configured', { csp: cspDirectives, nonce });
+    
+    // 注意：frame-ancestors 指令只能通过 HTTP 响应头设置，不能通过 meta 标签设置
+    // 建议在服务器端设置：X-Frame-Options: DENY 或 Content-Security-Policy: frame-ancestors 'none'
+  }
+
+  /**
+   * 生成唯一的 nonce 值
+   */
+  private generateNonce(): string {
+    const array = new Uint8Array(16);
+    crypto.getRandomValues(array);
+    return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
   }
 
   /**
@@ -118,8 +135,14 @@ export class SecurityManager {
       'Strict-Transport-Security',
     ];
 
+    // 注意：frame-ancestors 指令只能通过服务器端 HTTP 响应头设置
+    // 建议在服务器端添加以下响应头：
+    // X-Frame-Options: DENY (防止页面被嵌入 iframe)
+    // 或者 Content-Security-Policy: frame-ancestors 'none'
+
     logger.info('Security headers check configured', {
       headers: requiredHeaders,
+      note: 'frame-ancestors 需要通过服务器端 HTTP 响应头设置'
     });
   }
 
@@ -127,7 +150,7 @@ export class SecurityManager {
    * 设置输入验证
    */
   private setupInputValidation(): void {
-    if (!this.securityConfig.enableInputValidation) return;
+    if (!this.securityConfig.enableRequestValidation) return;
 
     // 监听所有输入事件
     document.addEventListener('input', this.validateInput.bind(this), true);
@@ -446,7 +469,8 @@ export class SecurityManager {
         }
       }
 
-      return originalFetch(input, init);
+      // 使用类型断言来确保类型兼容性
+      return originalFetch(input as RequestInfo, init);
     };
   }
 
