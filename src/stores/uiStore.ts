@@ -7,9 +7,6 @@ interface UIState {
   // 侧边栏状态
   sidebarOpen: boolean;
 
-  // 主题设置
-  theme: 'light' | 'dark';
-
   // 通知系统
   notifications: Array<{
     id: string;
@@ -34,10 +31,6 @@ interface UIActions {
   // 侧边栏控制
   toggleSidebar: () => void;
   setSidebarOpen: (open: boolean) => void;
-
-  // 主题控制
-  toggleTheme: () => void;
-  setTheme: (theme: 'light' | 'dark') => void;
 
   // 通知系统
   addNotification: (
@@ -66,7 +59,6 @@ export type UIStore = UIState & UIActions;
 export const useUIStore = create<UIStore>((set, get) => ({
   // 初始状态
   sidebarOpen: false,
-  theme: 'light',
   notifications: [],
   globalLoading: false,
   modals: {},
@@ -74,13 +66,6 @@ export const useUIStore = create<UIStore>((set, get) => ({
   // 侧边栏控制
   toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
   setSidebarOpen: (_open) => set({ sidebarOpen: _open }),
-
-  // 主题控制
-  toggleTheme: () =>
-    set((state) => ({
-      theme: state.theme === 'light' ? 'dark' : 'light',
-    })),
-  setTheme: (_theme) => set({ theme: _theme }),
 
   // 通知系统
   addNotification: (_notification) => {
