@@ -1,6 +1,6 @@
 # 前端脚手架
 
-一个现代化的 React + TypeScript + Vite 项目模板，集成了最新的前端开发工具和最佳实践。
+一个现代化的 React + TypeScript + Vite 企业级项目模板，集成了最新的前端开发工具和最佳实践。
 
 ## 🚀 特性
 
@@ -15,9 +15,15 @@
 - 📦 **Axios** - HTTP 客户端
 - 🌐 **i18next** - 国际化支持
 - 📚 **Storybook** - 组件文档和交互式示例
-- 📱 **PWA** - 渐进式 Web 应用支持（vite-plugin-pwa 自动注册）
-- 📊 **可观测性** - Sentry 初始化、Web Vitals 上报（可选）
-- 🧪 **E2E** - Playwright 集成（可选启用 MSW 模拟后端）
+- 📱 **PWA** - 渐进式 Web 应用支持
+- 📊 **可观测性** - Sentry 集成、Web Vitals 监控
+- 🧪 **E2E** - Playwright 集成
+- 🏗️ **微前端架构** - 支持模块联邦和微应用
+- 🎯 **Zustand** - 轻量级状态管理
+- 🐳 **Docker** - 容器化部署支持
+- 🔒 **安全增强** - CSP、CSRF 保护、安全审计
+- 📈 **性能监控** - Lighthouse、Bundle 分析
+- 🚀 **CI/CD** - GitHub Actions 自动化部署
 
 ## 📦 安装
 
@@ -28,38 +34,27 @@ npm install
 ## 🌐 在线演示
 
 - **本地开发**: `http://localhost:3000`
-
-## 🚀 部署
-
-### GitHub Pages 自动部署
-
-本项目配置了 GitHub Actions 工作流，会自动部署到 GitHub Pages：
-
-1. 推送代码到 `main` 分支
-2. GitHub Actions 自动构建项目
-3. 部署到 GitHub Pages
-
-### 手动部署
-
-```bash
-# 构建项目
-npm run build
-
-# 部署到 GitHub Pages
-npm run deploy
-```
+- **微前端模式**: `http://localhost:3000` (使用 `npm run dev:micro`)
 
 ## 🚀 开发
 
-````bash
+```bash
 # 启动开发服务器
 npm run dev
+
+# 启动微前端开发模式
+npm run dev:micro
 
 # 构建生产版本
 npm run build
 
+# 构建微前端版本
+npm run build:micro
+
 # 预览生产构建
 npm run preview
+```
+
 ### 开启 Mock（MSW）
 
 开发环境可开启 MSW 模拟后端接口：
@@ -67,11 +62,9 @@ npm run preview
 ```bash
 echo "VITE_ENABLE_MSW=true" >> .env
 npm run dev
-````
+```
 
 MSW handlers 位置：`src/mocks/handlers.ts`
-
-````
 
 ## 🧪 测试
 
@@ -84,16 +77,18 @@ npm run test:watch
 
 # 测试覆盖率
 npm run test:coverage
+
+# CI 测试
+npm run test:ci
+```
+
 ### 端到端测试（E2E）
 
 ```bash
 npm run test:e2e
-````
+```
 
 Playwright 将自动启动开发服务器。可在 `playwright.config.ts` 中配置。
-
-````
-E2E 注意：已将 `public/mockServiceWorker.js` 入库；测试会等待 `window.__mswReady`，并在开发服注入 `VITE_ENABLE_MSW=true`。
 
 ## 📚 文档
 
@@ -109,16 +104,21 @@ npm run storybook
 
 # 构建 Storybook
 npm run build-storybook
-````
+```
 
 ### 关键文档
 
-- 架构总览: docs/ARCHITECTURE.md
-- 测试策略: docs/TESTING.md
-- 环境与配置: docs/ENVIRONMENT.md
-- 部署指南: docs/DEPLOYMENT.md
-- CI/CD 指南: docs/CI_CD.md
-- 故障排查: docs/TROUBLESHOOTING.md
+- **架构总览**: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- **企业架构**: [docs/ENTERPRISE_ARCHITECTURE.md](docs/ENTERPRISE_ARCHITECTURE.md)
+- **微前端指南**: [docs/MICRO_FRONTEND.md](docs/MICRO_FRONTEND.md)
+- **状态管理**: [docs/ZUSTAND_GUIDE.md](docs/ZUSTAND_GUIDE.md)
+- **国际化**: [docs/INTERNATIONALIZATION.md](docs/INTERNATIONALIZATION.md)
+- **测试策略**: [docs/TESTING.md](docs/TESTING.md)
+- **安全指南**: [docs/SECURITY.md](docs/SECURITY.md)
+- **部署指南**: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
+- **CI/CD 指南**: [docs/CI_CD.md](docs/CI_CD.md)
+- **故障排查**: [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
+- **代码优化**: [docs/CODE_OPTIMIZATION.md](docs/CODE_OPTIMIZATION.md)
 
 ## 🔐 认证与安全
 
@@ -135,19 +135,43 @@ VITE_CSRF_HEADER_NAME=X-CSRF-Token
 VITE_CSRF_COOKIE_NAME=XHRF-TOKEN
 ```
 
+## 🏗️ 微前端架构
+
+项目支持微前端架构，使用 Module Federation 实现：
+
+```bash
+# 启动微前端开发模式
+npm run dev:micro
+
+# 构建微前端版本
+npm run build:micro
+```
+
+详细配置请参考 [微前端指南](docs/MICRO_FRONTEND.md)。
+
 ## 📱 PWA
 
 - 已启用 `vite-plugin-pwa`：生产环境将自动注册 Service Worker
 - 需提供应用图标：`public/icon-192.png`、`public/icon-512.png`
 
-## 🛡️ 安全与 CSP（建议）
+## 🛡️ 安全与 CSP
 
 - 在生产环境入口中添加严格 CSP/SRI；在 CI 中做响应头检查
 - 启用 Dependabot/CodeQL 进行依赖与代码安全扫描
+- 定期运行安全审计：`npm run security:audit`
 
 ## 📈 性能与构建分析
 
-- 运行 `npm run analyze` 生成 bundle 可视化（rollup-plugin-visualizer）
+```bash
+# Bundle 分析
+npm run bundle:analyze
+
+# Lighthouse 性能测试
+npm run performance:lighthouse
+
+# 健康检查
+npm run health:check
+```
 
 ## 📝 代码质量
 
@@ -162,21 +186,79 @@ npm run lint:fix
 npm run format
 ```
 
+## 🐳 Docker 支持
+
+```bash
+# 构建 Docker 镜像
+npm run docker:build
+
+# 运行 Docker 容器
+npm run docker:run
+
+# 使用 Docker Compose
+npm run docker:compose
+```
+
 ## 📁 项目结构
 
 ```
 src/
 ├── components/          # 可复用组件
 │   ├── Layout.tsx      # 布局组件
-│   └── Navigation.tsx  # 导航组件
+│   ├── Navigation.tsx  # 导航组件
+│   ├── ErrorBoundary.tsx # 错误边界
+│   ├── LoadingSpinner.tsx # 加载状态
+│   ├── LoginForm.tsx   # 登录表单
+│   ├── RegisterForm.tsx # 注册表单
+│   ├── UserProfile.tsx # 用户资料
+│   ├── NotificationSystem.tsx # 通知系统
+│   ├── ProtectedRoute.tsx # 受保护路由
+│   ├── ApiExample.tsx  # API 示例
+│   ├── LanguageSwitcher.tsx # 语言切换器
+│   ├── MicroAppContainer.tsx # 微应用容器
+│   └── EnterpriseErrorBoundary.tsx # 企业级错误边界
 ├── pages/              # 页面组件
 │   ├── Home.tsx        # 首页
 │   ├── About.tsx       # 关于页面
+│   ├── Auth.tsx        # 认证页面
+│   ├── I18nDemo.tsx    # 国际化演示
+│   ├── MicroFrontendDemo.tsx # 微前端演示
+│   ├── StateManagementDemo.tsx # 状态管理演示
 │   └── NotFound.tsx    # 404页面
 ├── hooks/              # 自定义 Hooks
-│   └── useLocalStorage.ts
+│   ├── useApi.ts       # API 相关 Hook
+│   ├── useDebounce.ts  # 防抖 Hook
+│   ├── useForm.ts      # 表单 Hook
+│   ├── useI18n.ts      # 国际化 Hook
+│   └── useLocalStorage.ts # 本地存储 Hook
+├── stores/             # 状态管理
+│   ├── authStore.ts    # 认证状态
+│   ├── i18nStore.ts    # 国际化状态
+│   ├── themeStore.ts   # 主题状态
+│   ├── uiStore.ts      # UI 状态
+│   └── index.ts        # 状态导出
 ├── utils/              # 工具函数
-│   └── api.ts          # API 工具
+│   ├── api.ts          # API 工具
+│   ├── enterpriseLogger.ts # 企业级日志
+│   ├── helpers.ts      # 辅助函数
+│   ├── logger.ts       # 日志工具
+│   ├── microAppCommunication.ts # 微应用通信
+│   ├── microFrontendManager.ts # 微前端管理
+│   ├── monitoring.ts   # 监控工具
+│   ├── performance.ts  # 性能工具
+│   ├── securityManager.ts # 安全管理
+│   └── validation.ts  # 验证工具
+├── i18n/               # 国际化
+│   ├── index.ts        # 国际化配置
+│   └── locales/        # 语言包
+│       ├── en.json     # 英文
+│       └── zh.json     # 中文
+├── config/             # 配置文件
+│   ├── microFrontend.ts # 微前端配置
+│   └── performance.ts  # 性能配置
+├── types/              # 类型定义
+│   ├── common.ts       # 通用类型
+│   └── microfrontend.ts # 微前端类型
 ├── App.tsx             # 主应用组件
 ├── main.tsx            # 应用入口
 └── index.css           # 全局样式
@@ -199,6 +281,7 @@ src/
 ### 路由和状态管理
 
 - **React Router** - 客户端路由
+- **Zustand** - 轻量级状态管理
 
 ### 网络请求
 
@@ -208,6 +291,7 @@ src/
 
 - **Jest** - 测试框架
 - **Testing Library** - React 测试工具
+- **Playwright** - 端到端测试
 - **jsdom** - DOM 环境
 
 ### 文档
@@ -221,6 +305,17 @@ src/
 - **Prettier** - 代码格式化
 - **Husky** - Git hooks
 - **lint-staged** - 暂存文件检查
+
+### 微前端
+
+- **Module Federation** - 模块联邦
+- **微应用通信** - 跨应用状态共享
+
+### 监控和性能
+
+- **Sentry** - 错误监控
+- **Web Vitals** - 性能指标
+- **Lighthouse** - 性能审计
 
 ## 🎨 自定义
 
@@ -246,6 +341,8 @@ theme: {
 
 ```bash
 VITE_API_BASE_URL=http://localhost:3000/api
+VITE_ENABLE_MSW=true
+VITE_AUTH_USE_COOKIES=false
 ```
 
 ## 📚 学习资源
@@ -255,6 +352,8 @@ VITE_API_BASE_URL=http://localhost:3000/api
 - [Vite 官方文档](https://vitejs.dev/)
 - [Tailwind CSS 官方文档](https://tailwindcss.com/)
 - [React Router 官方文档](https://reactrouter.com/)
+- [Zustand 官方文档](https://zustand-demo.pmnd.rs/)
+- [微前端架构指南](docs/MICRO_FRONTEND.md)
 
 ## 🤝 贡献
 
@@ -267,3 +366,8 @@ VITE_API_BASE_URL=http://localhost:3000/api
 ## 📄 许可证
 
 本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+
+---
+
+*最后更新: 2024年12月*
+*项目版本: v1.0.0*

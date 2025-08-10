@@ -26,8 +26,14 @@ const LOG_LEVELS: LogLevel = {
 function readViteEnvDevFlag(): boolean | undefined {
   try {
     // 避免在非 ESM 环境解析 import.meta 语法
-    const env = eval('import.meta && import.meta.env') as any;
-    return env?.DEV;
+    if (typeof (globalThis as any).import !== 'undefined' && (globalThis as any).import?.meta?.env) {
+      return (globalThis as any).import.meta.env.DEV;
+    }
+    // 在测试环境中提供默认值
+    if (process.env.NODE_ENV === 'test') {
+      return true;
+    }
+    return undefined;
   } catch {
     return undefined;
   }
@@ -52,10 +58,10 @@ class Logger {
     return `${prefix} ${message}`;
   }
 
-  debug(message: string, _data?: any): void {
+  debug(message: string, data?: any): void {
     if (this.shouldLog(LOG_LEVELS.DEBUG)) {
-      if (_data !== undefined) {
-        console.debug(this.formatMessage('DEBUG', message), _data);
+      if (data !== undefined) {
+        console.debug(this.formatMessage('DEBUG', message), data);
       } else {
         console.debug(this.formatMessage('DEBUG', message));
       }
@@ -97,7 +103,7 @@ class Logger {
     }
   }
 
-  private reportError(_message: string, _error: Error | any): void {
+  private reportError(message: string, error: Error | any): void {
     // 这里可以集成错误监控服务，如 Sentry
     // Sentry.captureException(error, { extra: { message } })
   }

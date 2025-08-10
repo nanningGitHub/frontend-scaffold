@@ -41,7 +41,7 @@ interface FormConfig<T> {
  *   onSubmit: async (values) => { // 处理提交逻辑 }
  * })
  */
-export function useForm<T extends Record<string, any>>(config: FormConfig<T>) {
+export function useForm<T extends Record<string, unknown>>(config: FormConfig<T>) {
   const { initialValues, validationRules, onSubmit, onError } = config;
 
   // 表单状态

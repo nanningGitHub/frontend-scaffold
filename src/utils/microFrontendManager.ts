@@ -15,7 +15,7 @@ export class MicroFrontendManager {
   private lifecycle?: MicroAppLifecycle;
   private sandbox: boolean;
   private singular: boolean;
-  private sandboxContexts: Map<string, any> = new Map();
+  private sandboxContexts: Map<string, Record<string, unknown>> = new Map();
 
   constructor(config: MicroFrontendConfig) {
     this.sandbox = config.sandbox ?? true;
@@ -193,8 +193,8 @@ export class MicroFrontendManager {
    * 使用 React 18 createRoot API 渲染组件
    */
   private async renderReactComponent(
-    Component: React.ComponentType<any>,
-    props: any,
+    Component: ComponentType<Record<string, unknown>>,
+    props: Record<string, unknown>,
     container: HTMLElement
   ): Promise<void> {
     try {
@@ -205,7 +205,7 @@ export class MicroFrontendManager {
       const root = ReactDOM.createRoot(container);
 
       // 将 root 实例存储在容器上，以便后续清理
-      (container as any).__reactRoot = root;
+      (container as Record<string, unknown>).__reactRoot = root;
 
       root.render(React.createElement(Component, props));
     } catch (error) {
@@ -280,9 +280,9 @@ export class MicroFrontendManager {
       }
 
       // 清理 React 根节点
-      if (appState.container && (appState.container as any).__reactRoot) {
+      if (appState.container && (appState.container as Record<string, unknown>).__reactRoot) {
         try {
-          (appState.container as any).__reactRoot.unmount();
+          (appState.container as Record<string, unknown>).__reactRoot.unmount();
         } catch (error) {
           console.warn('Failed to unmount React root:', error);
         }

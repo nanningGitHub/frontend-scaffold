@@ -137,16 +137,24 @@ function MyPage() {
 import { globalCommunication } from '../utils/microAppCommunication';
 
 // 发送消息到特定微应用
-globalCommunication.sendToApp('user-module', 'user:login', { userId: 123 });
+globalCommunication.sendMessage('user-module', { 
+  type: 'user:login', 
+  payload: { userId: 123 }, 
+  source: 'host' 
+});
 
 // 广播消息到所有微应用
-globalCommunication.broadcast('theme:change', { theme: 'dark' });
+globalCommunication.broadcastMessage({ 
+  type: 'theme:change', 
+  payload: { theme: 'dark' }, 
+  source: 'host' 
+});
 
 // 订阅消息
-const unsubscribe = globalCommunication.subscribe(
+const unsubscribe = globalCommunication.onMessage(
   'user:logout',
-  (payload, source) => {
-    console.log('用户登出:', payload, '来自:', source);
+  (message) => {
+    console.log('用户登出:', message.payload, '来自:', message.source);
   }
 );
 
@@ -293,8 +301,12 @@ localStorage.setItem('debug', 'micro-frontend:*');
 console.log(manager.getAllAppStates());
 
 // 监控通信消息
-globalCommunication.subscribe('*', (payload, source) => {
-  console.log('Message:', { payload, source, timestamp: Date.now() });
+globalCommunication.onMessage('*', (message) => {
+  console.log('Message:', { 
+    payload: message.payload, 
+    source: message.source, 
+    timestamp: message.timestamp 
+  });
 });
 ```
 

@@ -40,14 +40,14 @@ export function deepClone<T>(obj: T): T {
 /**
  * 防抖函数
  */
-export function debounce<T extends (..._args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number,
   immediate = false
 ): (...args: Parameters<T>) => void {
   let timeout: ReturnType<typeof setTimeout> | null = null;
 
-  return function executedFunction(..._args: Parameters<T>) {
+  return function executedFunction(...args: Parameters<T>) {
     const later = () => {
       timeout = null;
       if (!immediate) func(..._args);
@@ -58,21 +58,21 @@ export function debounce<T extends (..._args: any[]) => any>(
     if (timeout) clearTimeout(timeout);
     timeout = setTimeout(later, wait);
 
-    if (callNow) func(..._args);
+    if (callNow) func(...args);
   };
 }
 
 /**
  * 节流函数
  */
-export function throttle<T extends (..._args: any[]) => any>(
+export function throttle<T extends (...args: unknown[]) => unknown>(
   func: T,
   limit: number
 ): (...args: Parameters<T>) => void {
   let inThrottle: boolean;
-  return function executedFunction(..._args: Parameters<T>) {
+  return function executedFunction(...args: Parameters<T>) {
     if (!inThrottle) {
-      func(..._args);
+      func(...args);
       inThrottle = true;
       setTimeout(() => (inThrottle = false), limit);
     }
@@ -159,7 +159,7 @@ export function generateId(length = 8): string {
 /**
  * 检查对象是否为空
  */
-export function isEmpty(value: any): boolean {
+export function isEmpty(value: unknown): boolean {
   if (value == null) return true;
   if (typeof value === 'string') return value.trim().length === 0;
   if (Array.isArray(value)) return value.length === 0;
@@ -170,7 +170,7 @@ export function isEmpty(value: any): boolean {
 /**
  * 安全获取嵌套对象属性
  */
-export function get(obj: any, path: string, defaultValue?: any): any {
+export function get(obj: unknown, path: string, defaultValue?: unknown): unknown {
   const keys = path.split('.');
   let result = obj;
 
@@ -187,7 +187,7 @@ export function get(obj: any, path: string, defaultValue?: any): any {
 /**
  * 设置嵌套对象属性
  */
-export function set(obj: any, path: string, value: any): any {
+export function set(obj: Record<string, unknown>, path: string, value: unknown): Record<string, unknown> {
   const keys = path.split('.');
   const result = { ...obj };
   let current = result;
@@ -287,7 +287,7 @@ export async function retry<T>(
 /**
  * 缓存函数结果
  */
-export function memoize<T extends (..._args: any[]) => any>(
+export function memoize<T extends (...args: unknown[]) => unknown>(
   fn: T,
   getKey?: (...args: Parameters<T>) => string
 ): T {

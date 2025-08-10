@@ -7,8 +7,20 @@
 // 兼容测试环境与非 Vite 场景的环境变量读取
 function readViteEnvSafe(): Record<string, any> | undefined {
   try {
-    // 通过 eval 避免在非 ESM 环境下解析 import.meta 语法
-    return eval('import.meta && import.meta.env');
+    // 通过类型检查避免在非 ESM 环境下解析 import.meta 语法
+    if (typeof (globalThis as any).import !== 'undefined' && (globalThis as any).import?.meta?.env) {
+      return (globalThis as any).import.meta.env;
+    }
+    // 在测试环境中提供默认值
+    if (process.env.NODE_ENV === 'test') {
+      return {
+        VITE_API_BASE_URL: '/api',
+        VITE_AUTH_USE_COOKIES: 'false',
+        VITE_CSRF_HEADER_NAME: 'X-CSRF-Token',
+        VITE_CSRF_COOKIE_NAME: 'XSRF-TOKEN',
+      };
+    }
+    return undefined;
   } catch {
     return undefined;
   }

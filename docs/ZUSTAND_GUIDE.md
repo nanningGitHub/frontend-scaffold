@@ -69,11 +69,18 @@ interface UIState {
 
 ## 使用方法
 
-### 在组件中使用 Store
+### 导入 Store（推荐方式）
 
 ```typescript
+// ✅ 推荐：通过 barrel 文件统一导入
+import { useAuthStore, useUIStore, useThemeStore, useI18nStore } from '../stores'
+
+// ❌ 不推荐：直接导入单个文件
 import { useAuthStore } from '../stores/authStore'
 import { useUIStore } from '../stores/uiStore'
+```
+
+### 在组件中使用 Store
 
 const MyComponent = () => {
   // 认证状态
@@ -244,6 +251,29 @@ const useAuthStore = create<AuthStore>()(
   )
 )
 ```
+
+## 重要注意事项
+
+### 类型导出要求
+
+为了确保 TypeScript 类型系统正常工作，每个 store 文件都必须正确导出其类型：
+
+```typescript
+// ✅ 正确：导出类型定义
+export type AuthStore = AuthState & AuthActions
+export type ThemeStore = ThemeState & ThemeActions
+export type I18nStore = I18nState & I18nActions
+export type UIStore = UIState & UIActions
+
+// ❌ 错误：类型未导出
+type AuthStore = AuthState & AuthActions
+```
+
+### 导入最佳实践
+
+1. **统一导入**: 始终通过 `../stores` 导入，而不是直接导入单个文件
+2. **类型安全**: 确保所有 store 类型都被正确导出
+3. **错误处理**: 如果遇到类型导入错误，检查 store 文件是否正确导出了类型
 
 ## 总结
 

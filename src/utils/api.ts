@@ -83,7 +83,7 @@ api.interceptors.request.use(
         .find((row) => row.startsWith(`${AUTH_SECURITY.CSRF_COOKIE_NAME}=`))
         ?.split('=')[1];
       if (csrfToken) {
-        (config.headers as any)[AUTH_SECURITY.CSRF_HEADER_NAME] =
+        (config.headers as Record<string, string>)[AUTH_SECURITY.CSRF_HEADER_NAME] =
           decodeURIComponent(csrfToken);
       }
     }
@@ -146,7 +146,7 @@ api.interceptors.response.use(
 
     // 401 未授权：尝试刷新令牌（非 Cookie 模式且未重试过刷新）
     if (error.response?.status === 401) {
-      const originalConfig: any = error.config || {};
+      const originalConfig: Record<string, any> = error.config || {};
       const isCookieMode = AUTH_SECURITY.USE_COOKIES;
       const hasTriedRefresh = originalConfig.__triedRefresh === true;
 

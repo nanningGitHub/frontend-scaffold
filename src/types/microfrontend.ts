@@ -1,6 +1,7 @@
 /**
  * 微前端相关类型定义
  */
+import type { ComponentType } from 'react';
 
 // 远程模块配置
 export interface RemoteModule {
@@ -18,9 +19,9 @@ export interface MicroApp {
   entry: string;
   container: string;
   activeRule: string | ((location: Location) => boolean);
-  props?: Record<string, any>;
-  loader?: () => Promise<any>;
-  errorBoundary?: React.ComponentType<any>;
+  props?: Record<string, unknown>;
+  loader?: () => Promise<unknown>;
+  errorBoundary?: ComponentType<Record<string, unknown>>;
 }
 
 // 微应用生命周期
@@ -55,13 +56,24 @@ export interface ModuleFederationConfig {
   name: string;
   remotes?: Record<string, string>;
   exposes?: Record<string, string>;
-  shared?: Record<string, any>;
+  shared?: Record<string, unknown>;
 }
 
 // 微应用通信消息
 export interface MicroAppMessage {
+  id: string;
   type: string;
-  payload: any;
+  payload: unknown;
+  source: string;
+  target?: string;
+  timestamp: number;
+}
+
+// 微应用事件
+export interface MicroAppEvent {
+  id: string;
+  type: string;
+  payload: unknown;
   source: string;
   target?: string;
   timestamp: number;

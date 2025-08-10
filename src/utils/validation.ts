@@ -19,7 +19,7 @@ export interface ValidationRule {
   minLength?: number;
   maxLength?: number;
   pattern?: RegExp;
-  custom?: (_value: any, _formData?: Record<string, any>) => string | null;
+  custom?: (value: unknown, formData?: Record<string, unknown>) => string | null;
 }
 
 export interface ValidationRules {
@@ -30,10 +30,10 @@ export interface ValidationRules {
  * 验证单个字段
  */
 export function validateField(
-  value: any,
+  value: unknown,
   fieldName: string,
   rules: ValidationRule,
-  formData?: Record<string, any>
+  formData?: Record<string, unknown>
 ): string | null {
   // 必填验证
   if (rules.required && (!value || value.toString().trim() === '')) {
@@ -74,7 +74,7 @@ export function validateField(
  * 验证整个表单
  */
 export function validateForm(
-  formData: Record<string, any>,
+  formData: Record<string, unknown>,
   validationRules: ValidationRules
 ): ValidationResult {
   const errors: Record<string, string> = {};
@@ -114,8 +114,8 @@ export const commonValidationRules = {
   },
   confirmPassword: {
     required: true,
-    custom: (value: string, formData?: Record<string, any>) => {
-      if (formData && value !== formData.password) {
+    custom: (value: string, formData?: Record<string, unknown>) => {
+      if (formData && value !== (formData.password as string)) {
         return '两次输入的密码不一致';
       }
       return null;

@@ -10,10 +10,10 @@ import { onCLS, onFID, onLCP } from 'web-vitals';
 // MSW（仅在开发环境并且开启 MOCK 时启动）
 // 动态导入并暴露就绪 Promise，避免阻塞初始渲染
 if (
-  (import.meta as any).env?.DEV &&
-  (import.meta as any).env?.VITE_ENABLE_MSW === 'true'
+  import.meta.env?.DEV &&
+  import.meta.env?.VITE_ENABLE_MSW === 'true'
 ) {
-  (window as any).__mswReady = import('./mocks/browser').then(({ worker }) =>
+  (window as { __mswReady?: Promise<unknown> }).__mswReady = import('./mocks/browser').then(({ worker }) =>
     worker.start({ onUnhandledRequest: 'bypass' })
   );
 }
@@ -46,7 +46,7 @@ i18n.on('languageChanged', () => {
 });
 
 // 初始化 Sentry（如果配置了 DSN）
-const sentryDsn = (import.meta as any).env?.VITE_SENTRY_DSN;
+const sentryDsn = import.meta.env?.VITE_SENTRY_DSN;
 if (sentryDsn) {
   Sentry.init({
     dsn: sentryDsn,
@@ -57,11 +57,11 @@ if (sentryDsn) {
 
 // Web Vitals 上报（仅生产或需要时启用）
 const shouldReportVitals =
-  (import.meta as any).env?.VITE_REPORT_WEB_VITALS === 'true';
-if (shouldReportVitals && (import.meta as any).env?.PROD) {
-  const report = (metric: any) => {
-    if ((window as any).gtag) {
-      (window as any).gtag('event', metric.name, {
+  import.meta.env?.VITE_REPORT_WEB_VITALS === 'true';
+if (shouldReportVitals && import.meta.env?.PROD) {
+  const report = (metric: { name: string; value: number; id: string }) => {
+    if ((window as { gtag?: Function }).gtag) {
+      (window as { gtag: Function }).gtag('event', metric.name, {
         value: Math.round(
           metric.name === 'CLS' ? metric.value * 1000 : metric.value
         ),
@@ -83,8 +83,8 @@ if (shouldReportVitals && (import.meta as any).env?.PROD) {
 }
 
 // 注册 PWA Service Worker（由 vite-plugin-pwa 生成，避免在开发环境静态导入虚拟模块）
-if ((import.meta as any).env?.PROD) {
-  const pwaModuleId: any = 'virtual:pwa-register';
+if (import.meta.env?.PROD) {
+  const pwaModuleId = 'virtual:pwa-register';
   import(/* @vite-ignore */ pwaModuleId).then(({ registerSW }) => {
     registerSW({ immediate: true });
   });

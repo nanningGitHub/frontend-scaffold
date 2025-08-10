@@ -15,9 +15,9 @@ interface ErrorBoundaryState {
  */
 interface ErrorBoundaryProps {
   children: ReactNode;
-  fallback?: ReactNode | ((..._args: [Error, ErrorInfo]) => ReactNode);
-  onError?: (_error: Error, _errorInfo: ErrorInfo) => void;
-  resetKeys?: any[];
+  fallback?: ReactNode | ((error: Error, errorInfo: ErrorInfo) => ReactNode);
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
+  resetKeys?: unknown[];
 }
 
 /**
@@ -53,7 +53,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  componentDidCatch(error: Error, _errorInfo: ErrorInfo) {
     // 记录错误信息
     logger.error('Error Boundary caught an error', {
       error: error.message,
@@ -97,8 +97,8 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     if (hasError) {
       // 如果有自定义的 fallback，使用它
       if (fallback) {
-        if (typeof fallback === 'function') {
-          return fallback(error!, errorInfo!);
+        if (typeof fallback === 'function' && error && errorInfo) {
+          return fallback(error, errorInfo);
         }
         return fallback;
       }

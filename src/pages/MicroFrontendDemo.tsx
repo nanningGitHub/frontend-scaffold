@@ -31,12 +31,12 @@ export const MicroFrontendDemo: React.FC = () => {
     setAppStates(initialStates);
 
     // 订阅全局通信事件
-    const unsubscribe = globalCommunication.subscribe(
+    const unsubscribe = globalCommunication.onMessage(
       '*',
-      (payload, source) => {
+      (message) => {
         setMessages((prev) => [
           ...prev,
-          { payload, source, timestamp: Date.now() },
+          { payload: message.payload, source: message.source, timestamp: message.timestamp },
         ]);
       }
     );
@@ -69,13 +69,13 @@ export const MicroFrontendDemo: React.FC = () => {
   };
 
   // 发送消息到微应用
-  const sendMessage = (appId: string, eventType: string, payload: any) => {
-    globalCommunication.sendToApp(appId, eventType, payload);
+  const _sendMessage = (appId: string, eventType: string, payload: any) => {
+    globalCommunication.sendMessage(appId, { type: eventType, payload, source: 'host' });
   };
 
   // 广播消息
   const broadcastMessage = (eventType: string, payload: any) => {
-    globalCommunication.broadcast(eventType, payload);
+    globalCommunication.broadcastMessage({ type: eventType, payload, source: 'host' });
   };
 
   // 清空消息

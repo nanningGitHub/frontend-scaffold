@@ -1,5 +1,4 @@
 import {
-  MicroAppConfig,
   MicroAppMessage,
   MicroAppEvent,
 } from '../types/microfrontend';
@@ -275,3 +274,6 @@ export class MicroAppCommunication {
 }
 
 export default MicroAppCommunication;
+
+// 导出全局通信实例
+export const globalCommunication = MicroAppCommunication.getInstance();

@@ -1,6 +1,29 @@
 import { logger } from './enterpriseLogger';
 import { monitoring } from './monitoring';
 
+// 类型定义
+type RequestInfo = string | URL;
+type RequestInit = {
+  method?: string;
+  headers?: Record<string, string> | Headers;
+  body?: string | FormData | URLSearchParams | ReadableStream;
+  mode?: RequestMode;
+  credentials?: RequestCredentials;
+  cache?: RequestCache;
+  redirect?: RequestRedirect;
+  referrer?: string;
+  referrerPolicy?: ReferrerPolicy;
+  integrity?: string;
+  keepalive?: boolean;
+  signal?: AbortSignal;
+};
+
+type RequestMode = 'navigate' | 'same-origin' | 'no-cors' | 'cors';
+type RequestCredentials = 'omit' | 'same-origin' | 'include';
+type RequestCache = 'default' | 'no-store' | 'reload' | 'no-cache' | 'force-cache' | 'only-if-cached';
+type RequestRedirect = 'follow' | 'error' | 'manual';
+type ReferrerPolicy = 'no-referrer' | 'no-referrer-when-downgrade' | 'origin' | 'origin-when-cross-origin' | 'same-origin' | 'strict-origin' | 'strict-origin-when-cross-origin' | 'unsafe-url';
+
 /**
  * 企业级安全管理器
  * 提供多层次的安全防护措施
@@ -191,7 +214,7 @@ export class SecurityManager {
     const formData = new FormData(form);
     let hasSecurityIssue = false;
 
-    for (const [key, value] of formData.entries()) {
+    for (const [, value] of formData.entries()) {
       if (typeof value === 'string') {
         if (
           this.detectXSS(value) ||

@@ -58,7 +58,7 @@ interface UIActions {
 /**
  * UI Store 类型
  */
-type UIStore = UIState & UIActions;
+export type UIStore = UIState & UIActions;
 
 /**
  * 创建 UI Store

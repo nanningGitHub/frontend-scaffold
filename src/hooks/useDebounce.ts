@@ -32,7 +32,7 @@ export function useDebounce<T>(value: T, delay: number): T {
 /**
  * 防抖回调 Hook
  */
-export function useDebounceCallback<T extends (..._args: any[]) => any>(
+export function useDebounceCallback<T extends (...args: unknown[]) => unknown>(
   callback: T,
   delay: number,
   options: {
@@ -101,7 +101,7 @@ export function useDebounceCallback<T extends (..._args: any[]) => any>(
 /**
  * 节流 Hook
  */
-export function useThrottle<T extends (..._args: any[]) => any>(
+export function useThrottle<T extends (...args: unknown[]) => unknown>(
   callback: T,
   delay: number,
   options: {
@@ -133,7 +133,9 @@ export function useThrottle<T extends (..._args: any[]) => any>(
           }
           timeoutRef.current = setTimeout(() => {
             lastCallTimeRef.current = Date.now();
-            callback(...lastCallArgsRef.current!);
+            if (lastCallArgsRef.current) {
+              callback(...lastCallArgsRef.current);
+            }
           }, delay - timeSinceLastCall);
         }
         return;

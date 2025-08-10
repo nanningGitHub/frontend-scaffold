@@ -5,9 +5,7 @@ import {
   Route,
   Navigate,
 } from 'react-router-dom';
-import { useAuthStore } from './stores/authStore';
-import { useThemeStore } from './stores/themeStore';
-import { useI18nStore } from './stores/i18nStore';
+import { useAuthStore, useThemeStore, useI18nStore } from './stores';
 import {
   EnterpriseErrorBoundary,
   defaultErrorTypes,

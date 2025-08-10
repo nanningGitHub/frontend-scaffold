@@ -1,90 +1,60 @@
 module.exports = {
   root: true,
-  parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'react-refresh', 'react-hooks'],
-  extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:react-hooks/recommended',
-    'prettier',
-  ],
   env: {
     browser: true,
     es2021: true,
-    jest: true,
     node: true,
   },
-  settings: {
-    react: { version: 'detect' },
+  extends: [
+    'eslint:recommended',
+    'prettier',
+  ],
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true,
+    },
+    ecmaVersion: 12,
+    sourceType: 'module',
   },
+  plugins: [
+    '@typescript-eslint',
+  ],
   rules: {
-    'react-refresh/only-export-components': 'warn',
-    '@typescript-eslint/no-unused-vars': 'off',
-    'no-unused-vars': 'off',
+    // TypeScript 规则
+    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-non-null-assertion': 'warn',
+    
+    // 通用规则
+    'no-console': ['warn', { allow: ['warn', 'error'] }],
+    'no-debugger': 'error',
+    'no-var': 'error',
+    'prefer-const': 'error',
+    'no-unused-expressions': 'error',
+    'no-unreachable': 'error',
+    'no-constant-condition': 'error',
+    'no-empty': 'error',
+    'no-extra-semi': 'error',
+    'semi': ['error', 'always'],
+    'quotes': ['error', 'single', { avoidEscape: true }],
   },
-  ignorePatterns: ['dist', 'node_modules'],
   overrides: [
     {
-      files: ['src/utils/{helpers,logger,monitoring,performance}.ts'],
-      rules: {
-        '@typescript-eslint/no-explicit-any': 'off',
-        '@typescript-eslint/no-non-null-assertion': 'off',
+      files: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx'],
+      env: {
+        jest: true,
       },
-    },
-    {
-      files: ['src/utils/api.ts', 'src/hooks/useApi.ts'],
       rules: {
+        'no-console': 'off',
         '@typescript-eslint/no-explicit-any': 'off',
       },
     },
     {
-      files: ['playwright.config.*'],
-      env: { node: true },
-      rules: { 'no-undef': 'off' },
-    },
-    {
-      files: ['src/setupTests.ts', 'src/components/__tests__/**/*.{ts,tsx}'],
-      env: { jest: true, node: true, browser: true },
+      files: ['**/*.config.js', '**/*.config.ts'],
       rules: {
-        'no-undef': 'off',
-        'no-redeclare': 'off',
-        '@typescript-eslint/no-unused-vars': 'off',
-      },
-      globals: {
-        jest: 'readonly',
-        describe: 'readonly',
-        it: 'readonly',
-        expect: 'readonly',
-        beforeEach: 'readonly',
-        global: 'readonly',
-      },
-    },
-    {
-      files: ['tests/**', 'playwright.config.*'],
-      env: { node: true, browser: true },
-      rules: {
-        'no-undef': 'off',
-        '@typescript-eslint/no-unused-vars': 'off',
-      },
-    },
-    {
-      files: ['**/*.config.*', 'vite.config.ts', 'jest.config.*', 'tailwind.config.js', 'postcss.config.js'],
-      env: { node: true },
-    },
-    {
-      files: ['src/**/*.{test,spec}.{ts,tsx}', 'src/**/__tests__/**/*.{ts,tsx}'],
-      env: { jest: true, node: true, browser: true },
-      rules: {
-        'no-redeclare': 'off',
-        'no-undef': 'off',
-      },
-      globals: {
-        jest: 'readonly',
-        describe: 'readonly',
-        it: 'readonly',
-        expect: 'readonly',
-        beforeEach: 'readonly',
+        'no-console': 'off',
       },
     },
   ],
-}
+};

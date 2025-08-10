@@ -8,6 +8,11 @@
 - [ApiExample](./ApiExample.md) - API 示例组件 ✅
 - [UserProfile](./UserProfile.md) - 用户资料组件 ✅
 
+### 📦 其他组件
+- [EnterpriseErrorBoundary](./EnterpriseErrorBoundary.md) - EnterpriseErrorBoundary 组件 ⏳
+- [LanguageSwitcher](./LanguageSwitcher.md) - LanguageSwitcher 组件 ⏳
+- [MicroAppContainer](./MicroAppContainer.md) - MicroAppContainer 组件 ⏳
+
 ### 🛠️ 功能组件
 - [ErrorBoundary](./ErrorBoundary.md) - 错误边界组件 ✅
 - [LoadingSpinner](./LoadingSpinner.md) - 加载状态组件 ✅
@@ -27,10 +32,11 @@
 | 分类 | 组件数量 | 文档完成度 |
 |------|----------|------------|
 | 用户组件 | 2 | 100% |
+| 其他组件 | 3 | 0% |
 | 功能组件 | 4 | 100% |
 | 布局组件 | 2 | 100% |
 | 表单组件 | 2 | 100% |
-| **总计** | **10** | **100%** |
+| **总计** | **13** | **77%** |
 
-> ✅ 已完成
+> ✅ 已完成 | ⏳ 待完成
 

@@ -1,5 +1,20 @@
 /* eslint-env jest */
 import '@testing-library/jest-dom';
+
+// Mock import.meta for Jest environment
+Object.defineProperty(globalThis, 'import', {
+  value: {
+    meta: {
+      env: {
+        VITE_API_BASE_URL: '/api',
+        VITE_AUTH_USE_COOKIES: 'false',
+        VITE_CSRF_HEADER_NAME: 'X-CSRF-Token',
+        VITE_CSRF_COOKIE_NAME: 'XSRF-TOKEN',
+      },
+    },
+  },
+  writable: true,
+});
 // Mock react-i18next to avoid ESM i18next init in tests
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -28,14 +43,18 @@ beforeEach(() => {
 
 // 模拟 IntersectionObserver / ResizeObserver（最小实现）
 class MockObserver {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  constructor() {}
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  disconnect() {}
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  observe() {}
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  unobserve() {}
+  constructor() {
+    // Mock constructor
+  }
+  disconnect() {
+    // Mock disconnect
+  }
+  observe() {
+    // Mock observe
+  }
+  unobserve() {
+    // Mock unobserve
+  }
 }
 // @ts-expect-error 注入 jsdom 缺失的 API
 globalThis.IntersectionObserver = MockObserver;

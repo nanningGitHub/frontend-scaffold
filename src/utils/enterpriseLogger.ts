@@ -67,7 +67,7 @@ export class EnterpriseLogger {
   private config: LoggerConfig;
   private logs: LogEntry[] = [];
   private batchQueue: LogEntry[] = [];
-  private batchTimer?: NodeJS.Timeout;
+  private batchTimer?: ReturnType<typeof setTimeout>;
   private sessionId: string;
   private requestId: string;
 

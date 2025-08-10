@@ -10,7 +10,7 @@ interface Props {
   retryCount?: number;
   maxRetries?: number;
   errorTypes?: ErrorTypeConfig;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
 }
 
 interface State {
@@ -51,8 +51,8 @@ interface ErrorRecord {
  * 提供智能错误分类、自动重试、错误恢复等高级功能
  */
 export class EnterpriseErrorBoundary extends Component<Props, State> {
-  private retryTimeout?: NodeJS.Timeout;
-  private errorRecoveryTimer?: NodeJS.Timeout;
+  private retryTimeout?: ReturnType<typeof setTimeout>;
+  private errorRecoveryTimer?: ReturnType<typeof setTimeout>;
 
   constructor(props: Props) {
     super(props);
@@ -103,7 +103,7 @@ export class EnterpriseErrorBoundary extends Component<Props, State> {
   private recordError(
     error: Error,
     errorInfo: ErrorInfo,
-    context?: Record<string, any>
+    context?: Record<string, unknown>
   ): void {
     const errorType = this.classifyError(error);
     const errorContext = {
@@ -118,10 +118,15 @@ export class EnterpriseErrorBoundary extends Component<Props, State> {
 
     // 开发环境打印详细信息
     if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
       console.group('🚨 Enterprise Error Boundary');
+      // eslint-disable-next-line no-console
       console.error('Error:', error);
+      // eslint-disable-next-line no-console
       console.error('Error Info:', errorInfo);
+      // eslint-disable-next-line no-console
       console.error('Context:', errorContext);
+      // eslint-disable-next-line no-console
       console.groupEnd();
     }
   }
@@ -264,7 +269,7 @@ export class EnterpriseErrorBoundary extends Component<Props, State> {
    * 渲染错误UI
    */
   renderErrorUI(): ReactNode {
-    const { fallback, errorTypes } = this.props;
+    const { fallback } = this.props;
     const { error, errorInfo, retryCount, isRetrying } = this.state;
 
     if (!error) return null;
@@ -273,8 +278,8 @@ export class EnterpriseErrorBoundary extends Component<Props, State> {
     const strategy = this.getErrorStrategy(errorType);
 
     // 自定义错误UI
-    if (typeof fallback === 'function') {
-      return fallback(error, errorInfo!, this.retry);
+    if (typeof fallback === 'function' && errorInfo) {
+      return fallback(error, errorInfo, this.retry);
     }
 
     if (fallback) {
@@ -395,7 +400,10 @@ export class EnterpriseErrorBoundary extends Component<Props, State> {
     navigator.clipboard
       .writeText(JSON.stringify(report, null, 2))
       .then(() => alert('错误报告已复制到剪贴板'))
-      .catch(() => console.log('错误报告:', report));
+      .catch(() => {
+        // eslint-disable-next-line no-console
+        console.log('错误报告:', report);
+      });
   }
 
   /**

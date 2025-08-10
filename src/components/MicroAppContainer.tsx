@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { MicroAppState } from '../types/microfrontend';
-import { globalCommunication } from '../utils/microAppCommunication';
+import { MicroAppCommunication } from '../utils/microAppCommunication';
 import ErrorBoundary from './ErrorBoundary';
 
 interface MicroAppContainerProps {
@@ -8,7 +8,7 @@ interface MicroAppContainerProps {
   containerId: string;
   entry: string;
   module: string;
-  props?: Record<string, any>;
+  props?: Record<string, unknown>;
   onLoad?: () => void;
   onError?: (error: Error) => void;
   onUnload?: () => void;
@@ -28,7 +28,6 @@ export const MicroAppContainer: React.FC<MicroAppContainerProps> = ({
   containerId,
   entry,
   module,
-  props = {},
   onLoad,
   onError,
   onUnload,
@@ -86,15 +85,12 @@ export const MicroAppContainer: React.FC<MicroAppContainerProps> = ({
       onLoad?.();
 
       // 订阅微应用消息
-      const unsubscribe = globalCommunication.subscribe(
-        'app:message',
-        (payload, source) => {
-          if (source === appId) {
-            // 处理来自微应用的消息
-            console.log(`Received message from ${appId}:`, payload);
-          }
-        }
-      );
+      const communication = MicroAppCommunication.getInstance();
+      const unsubscribe = communication.onMessage(appId, (message) => {
+        // 处理来自微应用的消息
+        // eslint-disable-next-line no-console
+        console.log(`Received message from ${appId}:`, message);
+      });
 
       // 清理函数
       return () => {
@@ -202,25 +198,24 @@ export const MicroAppContainer: React.FC<MicroAppContainerProps> = ({
   // 渲染微应用容器
   return (
     <ErrorBoundary
-      fallback={({ error: boundaryError }) => (
+      fallback={(error, errorInfo) => (
         <div
           className={`micro-app-container error-boundary ${className}`}
           style={style}
         >
           <div className="error-content">
             <h3>Error Boundary caught error in {appId}</h3>
-            <p>{boundaryError.message}</p>
+            <p>{error.message}</p>
             <button onClick={handleRetry} className="retry-button">
               Retry
             </button>
           </div>
         </div>
       )}
-      onError={(error, errorInfo) => {
+      onError={(error, _errorInfo) => {
         console.error(
           `Error boundary caught error in micro app ${appId}:`,
-          error,
-          errorInfo
+          error
         );
         onError?.(error);
       }}

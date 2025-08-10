@@ -1,4 +1,4 @@
-import { performanceMonitor } from './performance';
+
 
 /**
  * 企业级监控系统

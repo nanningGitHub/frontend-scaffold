@@ -40,7 +40,7 @@ interface AuthActions {
 /**
  * 认证 Store 类型
  */
-type AuthStore = AuthState & AuthActions;
+export type AuthStore = AuthState & AuthActions;
 
 /**
  * 创建认证 Store
