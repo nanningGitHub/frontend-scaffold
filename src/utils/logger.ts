@@ -82,11 +82,11 @@ class Logger {
     }
   }
 
-  warn(message: string, data?: any): void {
+  warn(message: string, _data?: any): void {
     if (this.shouldLog(LOG_LEVELS.WARN)) {
-      if (data !== undefined) {
+      if (_data !== undefined) {
         // eslint-disable-next-line no-console
-        console.warn(this.formatMessage('WARN', message), data);
+        console.warn(this.formatMessage('WARN', message), _data);
       } else {
         // eslint-disable-next-line no-console
         console.warn(this.formatMessage('WARN', message));

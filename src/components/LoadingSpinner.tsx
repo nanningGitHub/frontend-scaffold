@@ -84,7 +84,7 @@ BaseSpinner.displayName = 'BaseSpinner';
  * <LoadingSpinner fullScreen overlay />
  */
 const LoadingSpinner: React.FC<LoadingSpinnerProps> = memo(({
-  size = 'md',
+  size: _size = 'md',
   color = 'primary',
   text,
   fullScreen = false,

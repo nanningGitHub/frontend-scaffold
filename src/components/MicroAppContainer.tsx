@@ -198,7 +198,7 @@ export const MicroAppContainer: React.FC<MicroAppContainerProps> = ({
   // 渲染微应用容器
   return (
           <ErrorBoundary
-        fallback={(error, errorInfo) => (
+        fallback={(error, _errorInfo) => (
           <div
             className={`micro-app-container error-boundary ${className}`}
             style={style}

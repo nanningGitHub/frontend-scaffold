@@ -44,9 +44,8 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     };
   }
 
-  static getDerivedStateFromError(_error: Error): ErrorBoundaryState {
+  static getDerivedStateFromError(): ErrorBoundaryState {
     // 更新状态，下次渲染时显示降级 UI
-    // 注意：这个参数在静态方法中不能使用，但必须保留以符合 React 生命周期方法签名
     return {
       hasError: true,
       error: null,
