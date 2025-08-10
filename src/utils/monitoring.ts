@@ -1,324 +1,399 @@
+import { performanceMonitor } from './performance';
+
 /**
- * 监控工具
- * 提供错误监控、性能监控、用户行为追踪等功能
+ * 企业级监控系统
+ * 集成多种监控指标和告警机制
  */
+export class EnterpriseMonitoring {
+  private static instance: EnterpriseMonitoring;
+  private metrics: Map<string, MetricData> = new Map();
+  private alerts: Alert[] = [];
+  private observers: Set<MonitoringObserver> = new Set();
 
-// 错误监控
-export class ErrorMonitor {
-  private static instance: ErrorMonitor;
-
-  static getInstance(): ErrorMonitor {
-    if (!ErrorMonitor.instance) {
-      ErrorMonitor.instance = new ErrorMonitor();
+  static getInstance(): EnterpriseMonitoring {
+    if (!EnterpriseMonitoring.instance) {
+      EnterpriseMonitoring.instance = new EnterpriseMonitoring();
     }
-    return ErrorMonitor.instance;
+    return EnterpriseMonitoring.instance;
   }
 
-  init() {
-    // 监听全局错误
-    window.addEventListener('error', this.handleError.bind(this));
+  /**
+   * 记录性能指标
+   */
+  recordMetric(
+    name: string,
+    value: number,
+    tags?: Record<string, string>
+  ): void {
+    const metric: MetricData = {
+      name,
+      value,
+      tags: tags || {},
+      timestamp: Date.now(),
+      type: 'performance',
+    };
 
-    // 监听未处理的 Promise 拒绝
-    window.addEventListener(
-      'unhandledrejection',
-      this.handlePromiseRejection.bind(this)
-    );
+    this.metrics.set(`${name}_${Date.now()}`, metric);
 
-    // 监听 React 错误边界
-    window.addEventListener(
-      'react-error-boundary',
-      this.handleReactError.bind(this)
-    );
+    // 检查告警阈值
+    this.checkAlertThresholds(metric);
+
+    // 通知观察者
+    this.notifyObservers('metric', metric);
+
+    // 发送到外部监控系统
+    this.sendToExternalSystem(metric);
   }
 
-  private handleError(event: ErrorEvent) {
-    this.reportError({
+  /**
+   * 记录业务指标
+   */
+  recordBusinessMetric(
+    name: string,
+    value: number,
+    context?: Record<string, any>
+  ): void {
+    const metric: MetricData = {
+      name,
+      value,
+      tags: { type: 'business', ...context },
+      timestamp: Date.now(),
+      type: 'business',
+    };
+
+    this.metrics.set(`${name}_${Date.now()}`, metric);
+    this.notifyObservers('business', metric);
+  }
+
+  /**
+   * 记录错误
+   */
+  recordError(error: Error, context?: Record<string, any>): void {
+    const errorMetric: MetricData = {
+      name: 'error',
+      value: 1,
+      tags: {
+        type: 'error',
+        message: error.message,
+        stack: error.stack,
+        ...context,
+      },
+      timestamp: Date.now(),
       type: 'error',
-      message: event.message,
-      filename: event.filename,
-      lineno: event.lineno,
-      colno: event.colno,
-      error: event.error,
+    };
+
+    this.metrics.set(`error_${Date.now()}`, errorMetric);
+
+    // 错误告警
+    this.createAlert(
+      'error',
+      `Error occurred: ${error.message}`,
+      'high',
+      context
+    );
+
+    // 发送到错误追踪系统
+    this.sendToErrorTracking(error, context);
+  }
+
+  /**
+   * 记录用户行为
+   */
+  recordUserAction(
+    action: string,
+    userId?: string,
+    metadata?: Record<string, any>
+  ): void {
+    const actionMetric: MetricData = {
+      name: 'user_action',
+      value: 1,
+      tags: {
+        type: 'user_action',
+        action,
+        userId: userId || 'anonymous',
+        ...metadata,
+      },
       timestamp: Date.now(),
-    });
+      type: 'user_action',
+    };
+
+    this.metrics.set(`user_action_${Date.now()}`, actionMetric);
   }
 
-  private handlePromiseRejection(event: PromiseRejectionEvent) {
-    this.reportError({
-      type: 'promise-rejection',
-      message: event.reason?.message || 'Promise Rejection',
-      error: event.reason,
-      timestamp: Date.now(),
-    });
-  }
+  /**
+   * 检查告警阈值
+   */
+  private checkAlertThresholds(metric: MetricData): void {
+    const thresholds = this.getAlertThresholds(metric.name);
 
-  private handleReactError(event: CustomEvent) {
-    this.reportError({
-      type: 'react-error',
-      message: event.detail?.message || 'React Error',
-      error: event.detail?.error,
-      componentStack: event.detail?.componentStack,
-      timestamp: Date.now(),
-    });
-  }
-
-  public reportError(errorInfo: any) {
-    // 开发环境打印错误
-    if ((globalThis as any).process?.env?.NODE_ENV === 'development') {
-      console.error('Error Monitor:', errorInfo);
-    }
-
-    // 生产环境发送到监控服务
-    if ((globalThis as any).process?.env?.NODE_ENV === 'production') {
-      this.sendToMonitoringService(errorInfo);
-    }
-  }
-
-  private sendToMonitoringService(errorInfo: any) {
-    // 这里可以集成 Sentry、LogRocket 等监控服务
-    const monitoringUrl = ((): string | undefined => {
-      try {
-        const env = eval('import.meta && import.meta.env') as any;
-        return (
-          env?.VITE_SENTRY_DSN ||
-          (globalThis as any).process?.env?.VITE_SENTRY_DSN
-        );
-      } catch {
-        return (globalThis as any).process?.env?.VITE_SENTRY_DSN;
-      }
-    })();
-
-    if (monitoringUrl) {
-      fetch(monitoringUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(errorInfo),
-      }).catch(() => {
-        // 静默处理发送失败
-      });
-    }
-  }
-}
-
-// 性能监控
-export class PerformanceMonitor {
-  private static instance: PerformanceMonitor;
-
-  static getInstance(): PerformanceMonitor {
-    if (!PerformanceMonitor.instance) {
-      PerformanceMonitor.instance = new PerformanceMonitor();
-    }
-    return PerformanceMonitor.instance;
-  }
-
-  init() {
-    // 监听页面加载性能
-    this.measurePageLoad();
-
-    // 监听资源加载性能
-    this.measureResourceLoad();
-
-    // 监听用户交互性能
-    this.measureUserInteraction();
-  }
-
-  private measurePageLoad() {
-    window.addEventListener('load', () => {
-      const navigation = performance.getEntriesByType(
-        'navigation'
-      )[0] as PerformanceNavigationTiming;
-
-      if (navigation) {
-        const metrics = {
-          dns: navigation.domainLookupEnd - navigation.domainLookupStart,
-          tcp: navigation.connectEnd - navigation.connectStart,
-          ttfb: navigation.responseStart - navigation.requestStart,
-          domContentLoaded:
-            navigation.domContentLoadedEventEnd -
-            navigation.domContentLoadedEventStart,
-          load: navigation.loadEventEnd - navigation.loadEventStart,
-          total: navigation.loadEventEnd - navigation.fetchStart,
-        };
-
-        this.reportPerformance('page-load', metrics);
-      }
-    });
-  }
-
-  private measureResourceLoad() {
-    const observer = new PerformanceObserver((list) => {
-      list.getEntries().forEach((entry) => {
-        if (entry.entryType === 'resource') {
-          const resourceEntry = entry as PerformanceResourceTiming;
-          this.reportPerformance('resource-load', {
-            name: resourceEntry.name,
-            duration: resourceEntry.duration,
-            size: resourceEntry.transferSize,
-            type: resourceEntry.initiatorType,
-          });
-        }
-      });
-    });
-
-    observer.observe({ entryTypes: ['resource'] });
-  }
-
-  private measureUserInteraction() {
-    let lastInteraction = Date.now();
-
-    const events = ['click', 'input', 'scroll', 'mousemove'];
-    events.forEach((eventType) => {
-      document.addEventListener(
-        eventType,
-        () => {
-          const now = Date.now();
-          const timeSinceLastInteraction = now - lastInteraction;
-
-          if (timeSinceLastInteraction > 1000) {
-            // 1秒内的交互不重复记录
-            this.reportPerformance('user-interaction', {
-              type: eventType,
-              timestamp: now,
-            });
-            lastInteraction = now;
+    if (thresholds) {
+      if (metric.value > thresholds.warning) {
+        this.createAlert(
+          'warning',
+          `${metric.name} exceeded warning threshold`,
+          'medium',
+          {
+            metric: metric.name,
+            value: metric.value,
+            threshold: thresholds.warning,
           }
-        },
-        { passive: true }
-      );
-    });
-  }
-
-  private reportPerformance(type: string, data: any) {
-    // 开发环境打印性能数据
-    if ((globalThis as any).process?.env?.NODE_ENV === 'development') {
-      console.log('Performance Monitor:', { type, data });
-    }
-
-    // 生产环境发送到分析服务
-    if ((globalThis as any).process?.env?.NODE_ENV === 'production') {
-      this.sendToAnalyticsService(type, data);
-    }
-  }
-
-  private sendToAnalyticsService(type: string, data: any) {
-    const analyticsUrl = ((): string | undefined => {
-      try {
-        const env = eval('import.meta && import.meta.env') as any;
-        return (
-          env?.VITE_GA_TRACKING_ID ||
-          (globalThis as any).process?.env?.VITE_GA_TRACKING_ID
         );
-      } catch {
-        return (globalThis as any).process?.env?.VITE_GA_TRACKING_ID;
       }
-    })();
 
-    if (analyticsUrl) {
-      // 这里可以集成 Google Analytics 或其他分析服务
-      if (window.gtag) {
-        window.gtag('event', type, data);
+      if (metric.value > thresholds.critical) {
+        this.createAlert(
+          'critical',
+          `${metric.name} exceeded critical threshold`,
+          'high',
+          {
+            metric: metric.name,
+            value: metric.value,
+            threshold: thresholds.critical,
+          }
+        );
       }
     }
   }
-}
 
-// 用户行为追踪
-export class UserTracker {
-  private static instance: UserTracker;
+  /**
+   * 创建告警
+   */
+  private createAlert(
+    type: string,
+    message: string,
+    severity: 'low' | 'medium' | 'high',
+    context?: Record<string, any>
+  ): void {
+    const alert: Alert = {
+      id: `alert_${Date.now()}`,
+      type,
+      message,
+      severity,
+      context,
+      timestamp: Date.now(),
+      status: 'active',
+    };
 
-  static getInstance(): UserTracker {
-    if (!UserTracker.instance) {
-      UserTracker.instance = new UserTracker();
+    this.alerts.push(alert);
+
+    // 发送告警通知
+    this.sendAlertNotification(alert);
+
+    // 通知观察者
+    this.notifyObservers('alert', alert);
+  }
+
+  /**
+   * 获取告警阈值配置
+   */
+  private getAlertThresholds(metricName: string): AlertThresholds | null {
+    const thresholds: Record<string, AlertThresholds> = {
+      page_load_time: { warning: 3000, critical: 5000 },
+      api_response_time: { warning: 1000, critical: 3000 },
+      memory_usage: { warning: 80, critical: 95 },
+      error_rate: { warning: 5, critical: 10 },
+    };
+
+    return thresholds[metricName] || null;
+  }
+
+  /**
+   * 发送告警通知
+   */
+  private sendAlertNotification(alert: Alert): void {
+    // 集成外部通知系统 (Slack, 邮件, 短信等)
+    if (alert.severity === 'high') {
+      this.sendHighPriorityAlert(alert);
     }
-    return UserTracker.instance;
   }
 
-  init() {
-    this.trackPageViews();
-    this.trackUserActions();
-    this.trackCustomEvents();
+  /**
+   * 发送高优先级告警
+   */
+  private sendHighPriorityAlert(alert: Alert): void {
+    // 这里可以集成具体的通知渠道
+    console.error('🚨 HIGH PRIORITY ALERT:', alert);
+
+    // 示例：发送到 Slack
+    // this.sendToSlack(alert);
+
+    // 示例：发送邮件
+    // this.sendEmail(alert);
   }
 
-  private trackPageViews() {
-    // 监听路由变化
-    window.addEventListener('popstate', () => {
-      this.trackEvent('page-view', {
-        path: window.location.pathname,
-        title: document.title,
+  /**
+   * 发送到外部监控系统
+   */
+  private sendToExternalSystem(metric: MetricData): void {
+    // 集成 Prometheus, DataDog, New Relic 等
+    if (window.gtag) {
+      window.gtag('event', 'metric', {
+        metric_name: metric.name,
+        metric_value: metric.value,
+        ...metric.tags,
       });
-    });
+    }
   }
 
-  private trackUserActions() {
-    // 追踪按钮点击
-    document.addEventListener('click', (event) => {
-      const target = event.target as HTMLElement;
-      if (target.tagName === 'BUTTON' || target.closest('button')) {
-        this.trackEvent('button-click', {
-          text: target.textContent?.trim(),
-          className: target.className,
-        });
+  /**
+   * 发送到错误追踪系统
+   */
+  private sendToErrorTracking(
+    error: Error,
+    context?: Record<string, any>
+  ): void {
+    // 集成 Sentry 等错误追踪系统
+    if (window.Sentry) {
+      window.Sentry.captureException(error, {
+        contexts: {
+          monitoring: context,
+        },
+      });
+    }
+  }
+
+  /**
+   * 添加监控观察者
+   */
+  addObserver(observer: MonitoringObserver): void {
+    this.observers.add(observer);
+  }
+
+  /**
+   * 移除监控观察者
+   */
+  removeObserver(observer: MonitoringObserver): void {
+    this.observers.delete(observer);
+  }
+
+  /**
+   * 通知观察者
+   */
+  private notifyObservers(type: string, data: any): void {
+    this.observers.forEach((observer) => {
+      try {
+        observer(type, data);
+      } catch (error) {
+        console.error('Monitoring observer error:', error);
       }
     });
-
-    // 追踪表单提交
-    document.addEventListener('submit', (event) => {
-      const form = event.target as HTMLFormElement;
-      this.trackEvent('form-submit', {
-        action: form.action,
-        method: form.method,
-      });
-    });
   }
 
-  private trackCustomEvents() {
-    // 自定义事件追踪
-    window.addEventListener('custom-event', (event: CustomEvent) => {
-      this.trackEvent('custom', event.detail);
-    });
+  /**
+   * 获取监控报告
+   */
+  getMonitoringReport(): MonitoringReport {
+    const now = Date.now();
+    const oneHourAgo = now - 60 * 60 * 1000;
+
+    const recentMetrics = Array.from(this.metrics.values()).filter(
+      (metric) => metric.timestamp > oneHourAgo
+    );
+
+    const activeAlerts = this.alerts.filter(
+      (alert) => alert.status === 'active'
+    );
+
+    return {
+      metrics: recentMetrics,
+      alerts: activeAlerts,
+      summary: this.generateSummary(recentMetrics, activeAlerts),
+    };
   }
 
-  trackEvent(eventName: string, data?: any) {
-    // 开发环境打印事件
-    if ((globalThis as any).process?.env?.NODE_ENV === 'development') {
-      console.log('User Tracker:', { eventName, data });
-    }
+  /**
+   * 生成监控摘要
+   */
+  private generateSummary(
+    metrics: MetricData[],
+    alerts: Alert[]
+  ): MonitoringSummary {
+    const errorCount = metrics.filter((m) => m.type === 'error').length;
+    const avgResponseTime =
+      metrics
+        .filter((m) => m.name === 'api_response_time')
+        .reduce((sum, m) => sum + m.value, 0) / metrics.length || 0;
 
-    // 生产环境发送到分析服务
-    if ((globalThis as any).process?.env?.NODE_ENV === 'production') {
-      this.sendToAnalyticsService(eventName, data);
-    }
+    return {
+      totalMetrics: metrics.length,
+      errorCount,
+      activeAlerts: alerts.length,
+      avgResponseTime,
+      timestamp: Date.now(),
+    };
   }
 
-  private sendToAnalyticsService(eventName: string, data?: any) {
-    const analyticsUrl = (globalThis as any).process?.env?.VITE_GA_TRACKING_ID;
+  /**
+   * 清理旧数据
+   */
+  cleanup(): void {
+    const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
 
-    if (analyticsUrl && window.gtag) {
-      window.gtag('event', eventName, data);
+    // 清理旧指标
+    for (const [key, metric] of this.metrics.entries()) {
+      if (metric.timestamp < oneDayAgo) {
+        this.metrics.delete(key);
+      }
     }
+
+    // 清理已处理的告警
+    this.alerts = this.alerts.filter(
+      (alert) => alert.status === 'active' || alert.timestamp > oneDayAgo
+    );
   }
 }
 
-// 初始化所有监控
-export function initMonitoring() {
-  ErrorMonitor.getInstance().init();
-  PerformanceMonitor.getInstance().init();
-  UserTracker.getInstance().init();
+// 类型定义
+interface MetricData {
+  name: string;
+  value: number;
+  tags: Record<string, string>;
+  timestamp: number;
+  type: 'performance' | 'business' | 'error' | 'user_action';
 }
 
-// 导出便捷方法
-export const trackEvent = (eventName: string, data?: any) => {
-  UserTracker.getInstance().trackEvent(eventName, data);
-};
+interface Alert {
+  id: string;
+  type: string;
+  message: string;
+  severity: 'low' | 'medium' | 'high';
+  context?: Record<string, any>;
+  timestamp: number;
+  status: 'active' | 'resolved';
+}
 
-export const reportAppError = (error: Error, context?: any) => {
-  ErrorMonitor.getInstance().reportError({
-    type: 'manual',
-    message: error.message,
-    error,
-    context,
-    timestamp: Date.now(),
-  });
-};
+interface AlertThresholds {
+  warning: number;
+  critical: number;
+}
+
+interface MonitoringObserver {
+  (type: string, data: any): void;
+}
+
+interface MonitoringReport {
+  metrics: MetricData[];
+  alerts: Alert[];
+  summary: MonitoringSummary;
+}
+
+interface MonitoringSummary {
+  totalMetrics: number;
+  errorCount: number;
+  activeAlerts: number;
+  avgResponseTime: number;
+  timestamp: number;
+}
+
+// 导出单例
+export const monitoring = EnterpriseMonitoring.getInstance();
+
+// 全局类型声明
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void;
+    Sentry?: {
+      captureException: (error: Error, context?: any) => void;
+    };
+  }
+}

@@ -111,6 +111,16 @@ const Navigation = () => {
               >
                 国际化
               </Link>
+              <Link
+                to="/micro-frontend"
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isActive('/micro-frontend')
+                    ? 'text-blue-600 bg-blue-50'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+              >
+                微前端
+              </Link>
               {isAuthenticated && (
                 <Link
                   to="/profile"
@@ -238,6 +248,16 @@ const Navigation = () => {
               }`}
             >
               国际化
+            </Link>
+            <Link
+              to="/micro-frontend"
+              className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                isActive('/micro-frontend')
+                  ? 'text-blue-600 bg-blue-50'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              }`}
+            >
+              微前端
             </Link>
             {isAuthenticated && (
               <Link

@@ -1,71 +1,168 @@
-import { Routes, Route } from 'react-router-dom';
-import Layout from './components/Layout';
-import Home from './pages/Home';
-import About from './pages/About';
-import Auth from './pages/Auth';
-import NotFound from './pages/NotFound';
-import ApiExample from './components/ApiExample';
-import UserProfile from './components/UserProfile';
-import ProtectedRoute from './components/ProtectedRoute';
-import StateManagementDemo from './pages/StateManagementDemo';
-import I18nDemo from './pages/I18nDemo';
+import React, { lazy, Suspense, useEffect } from 'react';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from 'react-router-dom';
+import { useAuthStore } from './stores/authStore';
+import { useThemeStore } from './stores/themeStore';
+import { useI18nStore } from './stores/i18nStore';
+import {
+  EnterpriseErrorBoundary,
+  defaultErrorTypes,
+} from './components/EnterpriseErrorBoundary';
+import { monitoring } from './utils/monitoring';
+import { logger } from './utils/enterpriseLogger';
+import { securityManager } from './utils/securityManager';
 
-/**
- * 主应用组件
- *
- * 功能：
- * 1. 配置应用路由
- * 2. 定义页面结构
- * 3. 处理 404 页面
- * 4. 认证状态管理
- *
- * 路由结构：
- * / - 首页
- * /about - 关于页面
- * /login - 登录页面
- * /register - 注册页面
- * /profile - 个人中心（受保护）
- * /api-example - API 请求示例
- * /* - 404 页面
- */
+// 懒加载页面组件
+const Home = lazy(() => import('./pages/Home'));
+const About = lazy(() => import('./pages/About'));
+const Auth = lazy(() => import('./pages/Auth'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+const ApiExample = lazy(() => import('./components/ApiExample'));
+const UserProfile = lazy(() => import('./components/UserProfile'));
+const StateManagementDemo = lazy(() => import('./pages/StateManagementDemo'));
+const I18nDemo = lazy(() => import('./pages/I18nDemo'));
+const MicroFrontendDemo = lazy(() => import('./pages/MicroFrontendDemo'));
+
+// 加载组件
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+  </div>
+);
+
+// 受保护的路由组件
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const { isAuthenticated } = useAuthStore();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+// 企业级错误边界配置
+const errorBoundaryConfig = {
+  errorTypes: {
+    ...defaultErrorTypes,
+    network: {
+      retry: true,
+      maxRetries: 5,
+      retryDelay: 2000,
+      logLevel: 'warn',
+    },
+  },
+  onError: (error: Error, errorInfo: React.ErrorInfo) => {
+    // 记录到监控系统
+    monitoring.recordError(error, {
+      componentStack: errorInfo.componentStack,
+      location: window.location.href,
+    });
+
+    // 记录到日志系统
+    logger.error('React error boundary caught error', {
+      error: error.message,
+      stack: error.stack,
+      componentStack: errorInfo.componentStack,
+    });
+  },
+};
+
 function App() {
+  const { theme } = useThemeStore();
+  const { locale } = useI18nStore();
+
+  // 初始化企业级系统
+  useEffect(() => {
+    // 初始化监控系统
+    monitoring.addObserver((type, data) => {
+      logger.info(`Monitoring event: ${type}`, data);
+    });
+
+    // 记录应用启动
+    logger.info('Application started', {
+      theme,
+      locale,
+      userAgent: navigator.userAgent,
+      url: window.location.href,
+    });
+
+    // 记录性能指标
+    monitoring.recordMetric('app_startup_time', performance.now(), {
+      theme,
+      locale,
+    });
+
+    // 设置安全上下文
+    securityManager.addContext({
+      app: 'main',
+      version: '1.0.0',
+      environment: process.env.NODE_ENV,
+    });
+
+    // 定期清理
+    const cleanupInterval = setInterval(() => {
+      monitoring.cleanup();
+      logger.cleanup();
+    }, 5 * 60 * 1000); // 每5分钟清理一次
+
+    return () => {
+      clearInterval(cleanupInterval);
+    };
+  }, [theme, locale]);
+
+  // 应用主题
+  useEffect(() => {
+    document.documentElement.className = theme;
+  }, [theme]);
+
+  // 应用语言
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
+
   return (
-    <Routes>
-      {/* 使用嵌套路由，所有页面共享 Layout 组件 */}
-      <Route path="/" element={<Layout />}>
-        {/* 首页路由 */}
-        <Route index element={<Home />} />
-
-        {/* 关于页面路由 */}
-        <Route path="about" element={<About />} />
-
-        {/* 认证相关路由 */}
-        <Route path="login" element={<Auth />} />
-        <Route path="register" element={<Auth />} />
-
-        {/* 受保护的路由 */}
-        <Route
-          path="profile"
-          element={
-            <ProtectedRoute>
-              <UserProfile />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* API 示例页面路由 */}
-        <Route path="api-example" element={<ApiExample />} />
-
-        {/* 状态管理演示页面路由 */}
-        <Route path="state-demo" element={<StateManagementDemo />} />
-
-        {/* 国际化演示页面路由 */}
-        <Route path="i18n-demo" element={<I18nDemo />} />
-
-        {/* 404 页面路由 - 捕获所有未匹配的路径 */}
-        <Route path="*" element={<NotFound />} />
-      </Route>
-    </Routes>
+    <EnterpriseErrorBoundary {...errorBoundaryConfig}>
+      <Router>
+        <div
+          className={`min-h-screen transition-colors duration-300 ${
+            theme === 'dark'
+              ? 'bg-gray-900 text-white'
+              : 'bg-white text-gray-900'
+          }`}
+        >
+          <Suspense fallback={<LoadingSpinner />}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <UserProfile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/state-management"
+                element={<StateManagementDemo />}
+              />
+              <Route path="/i18n" element={<I18nDemo />} />
+              <Route path="/micro-frontend" element={<MicroFrontendDemo />} />
+              <Route path="/api-example" element={<ApiExample />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </div>
+      </Router>
+    </EnterpriseErrorBoundary>
   );
 }
 
