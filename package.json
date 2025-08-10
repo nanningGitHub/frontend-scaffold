@@ -28,6 +28,8 @@
     "build-storybook": "storybook build",
     "deploy": "./scripts/deploy.sh",
     "deploy:prod": "NODE_ENV=production ./scripts/deploy.sh",
+    "release": "./scripts/github-release.sh",
+    "github:status": "./scripts/check-github-status.sh",
     "docker:build": "docker build -t frontend-scaffold .",
     "docker:run": "docker run -p 3000:3000 frontend-scaffold",
     "docker:compose": "docker-compose up -d",
