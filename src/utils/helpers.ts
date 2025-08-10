@@ -50,7 +50,7 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
   return function executedFunction(...args: Parameters<T>) {
     const later = () => {
       timeout = null;
-      if (!immediate) func(..._args);
+      if (!immediate) func(...args);
     };
 
     const callNow = immediate && !timeout;

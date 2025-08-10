@@ -1,211 +1,326 @@
-import { PERFORMANCE_CONFIG } from '../constants';
-import { logger } from './logger';
+// import { PERFORMANCE_CONFIG } from '../constants';
+// import { logger } from './logger';
+
+// 定义 IntersectionObserverInit 类型（如果不存在）
+interface IntersectionObserverInit {
+  root?: Element | null;
+  rootMargin?: string;
+  threshold?: number | number[];
+}
+
+/**
+ * 性能优化工具函数
+ */
+
+/**
+ * 防抖函数 - 延迟执行，避免频繁调用
+ * @param func 要执行的函数
+ * @param wait 等待时间（毫秒）
+ * @param immediate 是否立即执行
+ */
+export function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number,
+  immediate = false
+): (...args: Parameters<T>) => void {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+  
+  return function executedFunction(...args: Parameters<T>) {
+    const later = () => {
+      timeout = null;
+      if (!immediate) func(...args);
+    };
+    
+    const callNow = immediate && !timeout;
+    
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    
+    if (callNow) func(...args);
+  };
+}
+
+/**
+ * 节流函数 - 限制函数执行频率
+ * @param func 要执行的函数
+ * @param limit 时间限制（毫秒）
+ */
+export function throttle<T extends (...args: any[]) => any>(
+  func: T,
+  limit: number
+): (...args: Parameters<T>) => void {
+  let inThrottle: boolean;
+  
+  return function executedFunction(...args: Parameters<T>) {
+    if (!inThrottle) {
+      func(...args);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
+    }
+  };
+}
+
+/**
+ * 懒加载工具 - 使用 Intersection Observer API
+ * @param callback 当元素进入视口时执行的回调
+ * @param options Intersection Observer 选项
+ */
+export function createLazyLoader(
+  callback: (entry: IntersectionObserverEntry) => void,
+  options: IntersectionObserverInit = {}
+) {
+  const defaultOptions: IntersectionObserverInit = {
+    root: null,
+    rootMargin: '50px',
+    threshold: 0.1,
+    ...options,
+  };
+
+  return new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        callback(entry);
+      }
+    });
+  }, defaultOptions);
+}
+
+/**
+ * 虚拟滚动工具 - 计算可见项范围
+ * @param totalItems 总项目数
+ * @param itemHeight 每项高度
+ * @param containerHeight 容器高度
+ * @param scrollTop 滚动位置
+ * @param overscan 预渲染项数
+ */
+export function calculateVisibleRange(
+  totalItems: number,
+  itemHeight: number,
+  containerHeight: number,
+  scrollTop: number,
+  overscan = 5
+) {
+  const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);
+  const endIndex = Math.min(
+    totalItems - 1,
+    Math.ceil((scrollTop + containerHeight) / itemHeight) + overscan
+  );
+  
+  return {
+    startIndex,
+    endIndex,
+    visibleCount: endIndex - startIndex + 1,
+    offsetY: startIndex * itemHeight,
+  };
+}
+
+/**
+ * 内存泄漏检测工具
+ * @param componentName 组件名称
+ * @param cleanup 清理函数
+ */
+export function createMemoryLeakDetector(componentName: string, cleanup: () => void) {
+  const startTime = performance.now();
+  const startMemory = performance.memory?.usedJSHeapSize || 0;
+  
+  return {
+    logMount: () => {
+      console.log(`[${componentName}] 组件挂载 - 内存使用: ${(startMemory / 1024 / 1024).toFixed(2)}MB`);
+    },
+    logUnmount: () => {
+      const endTime = performance.now();
+      const endMemory = performance.memory?.usedJSHeapSize || 0;
+      const memoryDiff = endMemory - startMemory;
+      const duration = endTime - startTime;
+      
+      console.log(`[${componentName}] 组件卸载 - 生命周期: ${duration.toFixed(2)}ms, 内存变化: ${(memoryDiff / 1024 / 1024).toFixed(2)}MB`);
+      
+      // 执行清理
+      cleanup();
+    },
+  };
+}
 
 /**
  * 性能监控工具
- *
- * 功能：
- * 1. 监控组件渲染性能
- * 2. 监控 API 请求性能
- * 3. 监控用户交互性能
- * 4. 性能数据收集和分析
  */
-
-interface PerformanceMetric {
-  name: string;
-  startTime: number;
-  endTime?: number;
-  duration?: number;
-  metadata?: Record<string, any>;
-}
-
-class PerformanceMonitor {
-  private metrics: Map<string, PerformanceMetric> = new Map();
-  private observers: Set<(metric: PerformanceMetric) => void> = new Set();
-
+export class PerformanceMonitor {
+  private marks: Map<string, number> = new Map();
+  private measures: Map<string, number> = new Map();
+  
   /**
-   * 开始性能监控
+   * 开始计时
    */
-  startTimer(name: string, metadata?: Record<string, any>): void {
-    const metric: PerformanceMetric = {
-      name,
-      startTime: performance.now(),
-      metadata,
-    };
-
-    this.metrics.set(name, metric);
-    logger.debug('Performance timer started', { name, metadata });
+  startMeasure(name: string): void {
+    this.marks.set(name, performance.now());
   }
-
+  
   /**
-   * 结束性能监控
+   * 结束计时并记录
    */
-  endTimer(name: string): PerformanceMetric | null {
-    const metric = this.metrics.get(name);
-    if (!metric) {
-      logger.warn('Performance timer not found', { name });
-      return null;
+  endMeasure(name: string): number {
+    const startTime = this.marks.get(name);
+    if (!startTime) {
+      console.warn(`性能标记 "${name}" 未找到`);
+      return 0;
     }
-
-    metric.endTime = performance.now();
-    metric.duration = metric.endTime - metric.startTime;
-
-    // 记录性能数据
-    logger.debug('Performance timer ended', {
-      name,
-      duration: `${metric.duration.toFixed(2)}ms`,
-      metadata: metric.metadata,
+    
+    const duration = performance.now() - startTime;
+    this.measures.set(name, duration);
+    this.marks.delete(name);
+    
+    return duration;
+  }
+  
+  /**
+   * 获取性能指标
+   */
+  getMeasures(): Record<string, number> {
+    return Object.fromEntries(this.measures);
+  }
+  
+  /**
+   * 清除所有性能数据
+   */
+  clear(): void {
+    this.marks.clear();
+    this.measures.clear();
+  }
+  
+  /**
+   * 输出性能报告
+   */
+  generateReport(): void {
+    const measures = this.getMeasures();
+    if (Object.keys(measures).length === 0) {
+      console.log('暂无性能数据');
+      return;
+    }
+    
+    console.group('🚀 性能报告');
+    Object.entries(measures).forEach(([name, duration]) => {
+      console.log(`${name}: ${duration.toFixed(2)}ms`);
     });
-
-    // 性能警告
-    if (metric.duration > PERFORMANCE_CONFIG.SLOW_THRESHOLD) {
-      logger.warn('Slow performance detected', {
-        name,
-        duration: `${metric.duration.toFixed(2)}ms`,
-        threshold: `${PERFORMANCE_CONFIG.SLOW_THRESHOLD}ms`,
-      });
-    }
-
-    // 通知观察者
-    this.notifyObservers(metric);
-
-    this.metrics.delete(name);
-    return metric;
+    console.groupEnd();
   }
-
-  /**
-   * 测量函数执行时间
-   */
-  async measureAsync<T>(
-    name: string,
-    fn: () => Promise<T>,
-    metadata?: Record<string, any>
-  ): Promise<T> {
-    this.startTimer(name, metadata);
-
-    try {
-      const result = await fn();
-      this.endTimer(name);
-      return result;
-    } catch (error) {
-      this.endTimer(name);
-      throw error;
-    }
-  }
-
-  /**
-   * 测量同步函数执行时间
-   */
-  measureSync<T>(name: string, fn: () => T, metadata?: Record<string, any>): T {
-    this.startTimer(name, metadata);
-
-    try {
-      const result = fn();
-      this.endTimer(name);
-      return result;
-    } catch (error) {
-      this.endTimer(name);
-      throw error;
-    }
-  }
-
-  /**
-   * 添加性能观察者
-   */
-  addObserver(observer: (metric: PerformanceMetric) => void): void {
-    this.observers.add(observer);
-  }
-
-  /**
-   * 移除性能观察者
-   */
-  removeObserver(observer: (_metric: PerformanceMetric) => void): void {
-    this.observers.delete(observer);
-  }
-
-  /**
-   * 通知所有观察者
-   */
-  private notifyObservers(metric: PerformanceMetric): void {
-    this.observers.forEach((observer) => {
-      try {
-        observer(metric);
-      } catch (error) {
-        logger.error('Performance observer error', error);
-      }
-    });
-  }
-
-  /**
-   * 获取所有性能指标
-   */
-  getMetrics(): PerformanceMetric[] {
-    return Array.from(this.metrics.values());
-  }
-
-  /**
-   * 清除所有性能指标
-   */
-  clearMetrics(): void {
-    this.metrics.clear();
-  }
-}
-
-export const performanceMonitor = new PerformanceMonitor();
-
-/**
- * React 组件性能监控 Hook
- */
-export function usePerformanceMonitor(componentName: string) {
-  const startRender = () => {
-    performanceMonitor.startTimer(`${componentName}-render`);
-  };
-
-  const endRender = () => {
-    performanceMonitor.endTimer(`${componentName}-render`);
-  };
-
-  const measureAsync = <T>(name: string, fn: () => Promise<T>) => {
-    return performanceMonitor.measureAsync(`${componentName}-${name}`, fn);
-  };
-
-  const measureSync = <T>(name: string, fn: () => T) => {
-    return performanceMonitor.measureSync(`${componentName}-${name}`, fn);
-  };
-
-  return {
-    startRender,
-    endRender,
-    measureAsync,
-    measureSync,
-  };
 }
 
 /**
- * 装饰器：自动监控函数性能
+ * 创建全局性能监控实例
  */
-export function measurePerformance(name?: string) {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
-    const originalMethod = descriptor.value;
+export const globalPerformanceMonitor = new PerformanceMonitor();
 
-    descriptor.value = function (...args: any[]) {
-      const methodName = name || `${target.constructor.name}.${propertyKey}`;
-
-      if (originalMethod.constructor.name === 'AsyncFunction') {
-        return performanceMonitor.measureAsync(methodName, () =>
-          originalMethod.apply(this, args)
-        );
-      } else {
-        return performanceMonitor.measureSync(methodName, () =>
-          originalMethod.apply(this, args)
-        );
-      }
-    };
-
-    return descriptor;
+/**
+ * 性能装饰器 - 用于类方法
+ */
+export function measurePerformance(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  const originalMethod = descriptor.value;
+  
+  descriptor.value = function (...args: any[]) {
+    const startTime = performance.now();
+    const result = originalMethod.apply(this, args);
+    const duration = performance.now() - startTime;
+    
+    console.log(`[${target.constructor.name}] ${propertyKey} 执行时间: ${duration.toFixed(2)}ms`);
+    
+    return result;
   };
+  
+  return descriptor;
+}
+
+/**
+ * 异步性能监控
+ */
+export async function measureAsyncPerformance<T>(
+  name: string,
+  asyncFn: () => Promise<T>
+): Promise<T> {
+  globalPerformanceMonitor.startMeasure(name);
+  
+  try {
+    const result = await asyncFn();
+    return result;
+  } finally {
+    globalPerformanceMonitor.endMeasure(name);
+  }
+}
+
+/**
+ * 批量操作优化 - 分批处理大量数据
+ * @param items 要处理的项目
+ * @param batchSize 批次大小
+ * @param processor 处理函数
+ * @param delay 批次间延迟
+ */
+export async function processBatch<T, R>(
+  items: T[],
+  batchSize: number,
+  processor: (item: T) => Promise<R> | R,
+  delay = 0
+): Promise<R[]> {
+  const results: R[] = [];
+  
+  for (let i = 0; i < items.length; i += batchSize) {
+    const batch = items.slice(i, i + batchSize);
+    const batchResults = await Promise.all(batch.map(processor));
+    results.push(...batchResults);
+    
+    if (delay > 0 && i + batchSize < items.length) {
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  
+  return results;
+}
+
+/**
+ * 缓存工具 - 带过期时间的缓存
+ */
+export class Cache<T> {
+  private cache = new Map<string, { value: T; expiry: number }>();
+  
+  constructor(private defaultTTL = 5 * 60 * 1000) {} // 默认5分钟
+  
+  set(key: string, value: T, ttl = this.defaultTTL): void {
+    const expiry = Date.now() + ttl;
+    this.cache.set(key, { value, expiry });
+  }
+  
+  get(key: string): T | undefined {
+    const item = this.cache.get(key);
+    if (!item) return undefined;
+    
+    if (Date.now() > item.expiry) {
+      this.cache.delete(key);
+      return undefined;
+    }
+    
+    return item.value;
+  }
+  
+  has(key: string): boolean {
+    return this.get(key) !== undefined;
+  }
+  
+  delete(key: string): boolean {
+    return this.cache.delete(key);
+  }
+  
+  clear(): void {
+    this.cache.clear();
+  }
+  
+  size(): number {
+    return this.cache.size;
+  }
+  
+  cleanup(): void {
+    const now = Date.now();
+    for (const [key, item] of this.cache.entries()) {
+      if (now > item.expiry) {
+        this.cache.delete(key);
+      }
+    }
+  }
 }

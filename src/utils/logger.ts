@@ -61,8 +61,10 @@ class Logger {
   debug(message: string, data?: any): void {
     if (this.shouldLog(LOG_LEVELS.DEBUG)) {
       if (data !== undefined) {
+        // eslint-disable-next-line no-console
         console.debug(this.formatMessage('DEBUG', message), data);
       } else {
+        // eslint-disable-next-line no-console
         console.debug(this.formatMessage('DEBUG', message));
       }
     }
@@ -71,18 +73,22 @@ class Logger {
   info(message: string, _data?: any): void {
     if (this.shouldLog(LOG_LEVELS.INFO)) {
       if (_data !== undefined) {
+        // eslint-disable-next-line no-console
         console.info(this.formatMessage('INFO', message), _data);
       } else {
+        // eslint-disable-next-line no-console
         console.info(this.formatMessage('INFO', message));
       }
     }
   }
 
-  warn(message: string, _data?: any): void {
+  warn(message: string, data?: any): void {
     if (this.shouldLog(LOG_LEVELS.WARN)) {
-      if (_data !== undefined) {
-        console.warn(this.formatMessage('WARN', message), _data);
+      if (data !== undefined) {
+        // eslint-disable-next-line no-console
+        console.warn(this.formatMessage('WARN', message), data);
       } else {
+        // eslint-disable-next-line no-console
         console.warn(this.formatMessage('WARN', message));
       }
     }
@@ -91,8 +97,10 @@ class Logger {
   error(message: string, _error?: Error | any): void {
     if (this.shouldLog(LOG_LEVELS.ERROR)) {
       if (_error !== undefined) {
+        // eslint-disable-next-line no-console
         console.error(this.formatMessage('ERROR', message), _error);
       } else {
+        // eslint-disable-next-line no-console
         console.error(this.formatMessage('ERROR', message));
       }
 
@@ -103,20 +111,22 @@ class Logger {
     }
   }
 
-  private reportError(message: string, error: Error | any): void {
+  private reportError(message: string, _error: Error | any): void {
     // 这里可以集成错误监控服务，如 Sentry
-    // Sentry.captureException(error, { extra: { message } })
+    // Sentry.captureException(_error, { extra: { message } })
   }
 
   // 性能监控
   time(label: string): void {
     if (this.isDevelopment) {
+      // eslint-disable-next-line no-console
       console.time(label);
     }
   }
 
   timeEnd(label: string): void {
     if (this.isDevelopment) {
+      // eslint-disable-next-line no-console
       console.timeEnd(label);
     }
   }
@@ -124,12 +134,14 @@ class Logger {
   // 分组日志
   group(label: string): void {
     if (this.isDevelopment) {
+      // eslint-disable-next-line no-console
       console.group(label);
     }
   }
 
   groupEnd(): void {
     if (this.isDevelopment) {
+      // eslint-disable-next-line no-console
       console.groupEnd();
     }
   }

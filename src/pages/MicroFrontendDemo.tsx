@@ -68,10 +68,10 @@ export const MicroFrontendDemo: React.FC = () => {
     });
   };
 
-  // 发送消息到微应用
-  const _sendMessage = (appId: string, eventType: string, payload: any) => {
-    globalCommunication.sendMessage(appId, { type: eventType, payload, source: 'host' });
-  };
+  // 发送消息到微应用（暂时未使用，保留以备将来使用）
+  // const sendMessage = (appId: string, eventType: string, payload: any) => {
+  //   globalCommunication.sendMessage(appId, { type: eventType, payload, source: 'host' });
+  // };
 
   // 广播消息
   const broadcastMessage = (eventType: string, payload: any) => {

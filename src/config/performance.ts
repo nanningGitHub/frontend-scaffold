@@ -3,6 +3,13 @@
  * 集中管理各种性能优化策略和配置
  */
 
+// 定义 IntersectionObserverInit 类型（如果不存在）
+interface IntersectionObserverInit {
+  root?: Element | null;
+  rootMargin?: string;
+  threshold?: number | number[];
+}
+
 export interface PerformanceConfig {
   // 懒加载配置
   lazyLoading: {
@@ -404,7 +411,7 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout;
+  let timeout: ReturnType<typeof setTimeout>;
   return (...args: Parameters<T>) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);

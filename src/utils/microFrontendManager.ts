@@ -193,7 +193,7 @@ export class MicroFrontendManager {
    * 使用 React 18 createRoot API 渲染组件
    */
   private async renderReactComponent(
-    Component: ComponentType<Record<string, unknown>>,
+    Component: any,
     props: Record<string, unknown>,
     container: HTMLElement
   ): Promise<void> {

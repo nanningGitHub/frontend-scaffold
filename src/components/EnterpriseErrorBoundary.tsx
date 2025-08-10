@@ -118,15 +118,10 @@ export class EnterpriseErrorBoundary extends Component<Props, State> {
 
     // 开发环境打印详细信息
     if (process.env.NODE_ENV === 'development') {
-      // eslint-disable-next-line no-console
       console.group('🚨 Enterprise Error Boundary');
-      // eslint-disable-next-line no-console
       console.error('Error:', error);
-      // eslint-disable-next-line no-console
       console.error('Error Info:', errorInfo);
-      // eslint-disable-next-line no-console
       console.error('Context:', errorContext);
-      // eslint-disable-next-line no-console
       console.groupEnd();
     }
   }
