@@ -1,0 +1,511 @@
+{
+  "auditReportVersion": 2,
+  "vulnerabilities": {
+    "@joshwooding/vite-plugin-react-docgen-typescript": {
+      "name": "@joshwooding/vite-plugin-react-docgen-typescript",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["vite"],
+      "effects": [],
+      "range": "<=0.0.0-snapshot-20231005222330 || 0.1.0 - 0.4.1",
+      "nodes": [
+        "node_modules/@joshwooding/vite-plugin-react-docgen-typescript"
+      ],
+      "fixAvailable": true
+    },
+    "@sentry/node": {
+      "name": "@sentry/node",
+      "severity": "low",
+      "isDirect": false,
+      "via": ["cookie"],
+      "effects": ["lighthouse"],
+      "range": "4.0.0-beta.0 - 7.74.2-alpha.1",
+      "nodes": ["node_modules/@sentry/node"],
+      "fixAvailable": {
+        "name": "lighthouse",
+        "version": "12.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@storybook/addon-controls": {
+      "name": "@storybook/addon-controls",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@storybook/blocks"],
+      "effects": [],
+      "range": "<=0.0.0-pr-28385-sha-9aab3bd7 || 6.5.17-alpha.0 - 8.2.0-beta.3",
+      "nodes": ["node_modules/@storybook/addon-controls"],
+      "fixAvailable": true
+    },
+    "@storybook/addon-docs": {
+      "name": "@storybook/addon-docs",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@storybook/blocks"],
+      "effects": ["@storybook/addon-essentials"],
+      "range": "<=0.0.0-pr-30567-sha-cd9d89ab || 6.5.17-alpha.0 - 8.2.0-beta.3",
+      "nodes": ["node_modules/@storybook/addon-docs"],
+      "fixAvailable": {
+        "name": "@storybook/addon-essentials",
+        "version": "8.6.14",
+        "isSemVerMajor": true
+      }
+    },
+    "@storybook/addon-essentials": {
+      "name": "@storybook/addon-essentials",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@storybook/addon-controls",
+        "@storybook/addon-docs",
+        "@storybook/core-common"
+      ],
+      "effects": [],
+      "range": "<=0.0.0-pr-30567-sha-cd9d89ab || 6.5.17-alpha.0 - 8.2.0-beta.3",
+      "nodes": ["node_modules/@storybook/addon-essentials"],
+      "fixAvailable": {
+        "name": "@storybook/addon-essentials",
+        "version": "8.6.14",
+        "isSemVerMajor": true
+      }
+    },
+    "@storybook/addon-onboarding": {
+      "name": "@storybook/addon-onboarding",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": ["@storybook/telemetry"],
+      "effects": [],
+      "range": "0.0.19--canary.33.684ad81.0 - 0.0.19--canary.40.e7afff4.0 || 0.0.20--canary.40.25bbf96.0 - 0.0.20--canary.42.babf260.0 || 0.0.29--canary.40.3282e5c.0 - 0.0.29--canary.40.4dba997.0 || 0.0.30-canary.40.9cbd35d.0 - 2.0.0-next.2",
+      "nodes": ["node_modules/@storybook/addon-onboarding"],
+      "fixAvailable": {
+        "name": "@storybook/addon-onboarding",
+        "version": "9.1.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@storybook/blocks": {
+      "name": "@storybook/blocks",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": ["@storybook/docs-tools"],
+      "effects": ["@storybook/addon-controls", "@storybook/addon-docs"],
+      "range": "<=8.2.0-beta.3",
+      "nodes": ["node_modules/@storybook/blocks"],
+      "fixAvailable": {
+        "name": "@storybook/blocks",
+        "version": "8.6.14",
+        "isSemVerMajor": true
+      }
+    },
+    "@storybook/builder-manager": {
+      "name": "@storybook/builder-manager",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@storybook/core-common", "esbuild"],
+      "effects": [],
+      "range": "<=8.2.0-beta.3",
+      "nodes": ["node_modules/@storybook/builder-manager"],
+      "fixAvailable": true
+    },
+    "@storybook/builder-vite": {
+      "name": "@storybook/builder-vite",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@storybook/core-common", "vite"],
+      "effects": [],
+      "range": "<=0.0.0-pr-29687-sha-d977033a || 7.0.0-alpha.25 - 8.4.5 || 8.5.0-alpha.0 - 8.5.0-beta.11",
+      "nodes": ["node_modules/@storybook/builder-vite"],
+      "fixAvailable": true
+    },
+    "@storybook/cli": {
+      "name": "@storybook/cli",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@storybook/core-common",
+        "@storybook/core-server",
+        "@storybook/telemetry"
+      ],
+      "effects": ["storybook"],
+      "range": "<=0.0.0-pr-28385-sha-9aab3bd7 || 6.5.17-alpha.0 - 8.2.0-beta.3",
+      "nodes": ["node_modules/@storybook/cli"],
+      "fixAvailable": {
+        "name": "storybook",
+        "version": "9.1.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@storybook/core-common": {
+      "name": "@storybook/core-common",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["esbuild"],
+      "effects": [
+        "@storybook/addon-essentials",
+        "@storybook/builder-vite",
+        "@storybook/cli",
+        "@storybook/core-server",
+        "@storybook/docs-tools",
+        "@storybook/telemetry"
+      ],
+      "range": "<=0.0.0-pr-28385-sha-9aab3bd7 || 6.5.17-alpha.0 - 8.2.0-beta.3",
+      "nodes": ["node_modules/@storybook/core-common"],
+      "fixAvailable": {
+        "name": "@storybook/addon-essentials",
+        "version": "8.6.14",
+        "isSemVerMajor": true
+      }
+    },
+    "@storybook/core-server": {
+      "name": "@storybook/core-server",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@storybook/builder-manager",
+        "@storybook/core-common",
+        "@storybook/telemetry"
+      ],
+      "effects": [],
+      "range": "<=0.0.0-pr-28385-sha-9aab3bd7 || 6.5.17-alpha.0 - 8.2.0-beta.3",
+      "nodes": ["node_modules/@storybook/core-server"],
+      "fixAvailable": true
+    },
+    "@storybook/docs-tools": {
+      "name": "@storybook/docs-tools",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@storybook/core-common"],
+      "effects": ["@storybook/blocks", "@storybook/react"],
+      "range": "<=0.0.0-pr-28385-sha-9aab3bd7 || 6.5.17-alpha.0 - 8.2.0-beta.3",
+      "nodes": ["node_modules/@storybook/docs-tools"],
+      "fixAvailable": {
+        "name": "@storybook/blocks",
+        "version": "8.6.14",
+        "isSemVerMajor": true
+      }
+    },
+    "@storybook/react": {
+      "name": "@storybook/react",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": ["@storybook/docs-tools"],
+      "effects": ["@storybook/react-vite"],
+      "range": "<=0.0.0-pr-28385-sha-9aab3bd7 || 6.5.17-alpha.0 - 8.2.0-beta.3",
+      "nodes": ["node_modules/@storybook/react"],
+      "fixAvailable": {
+        "name": "@storybook/react",
+        "version": "9.1.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@storybook/react-vite": {
+      "name": "@storybook/react-vite",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@joshwooding/vite-plugin-react-docgen-typescript",
+        "@storybook/builder-vite",
+        "@storybook/react",
+        "@vitejs/plugin-react",
+        "vite"
+      ],
+      "effects": [],
+      "range": "<=8.4.5 || 8.5.0-alpha.0 - 8.5.0-beta.11",
+      "nodes": ["node_modules/@storybook/react-vite"],
+      "fixAvailable": {
+        "name": "@storybook/react-vite",
+        "version": "9.1.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@storybook/telemetry": {
+      "name": "@storybook/telemetry",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@storybook/core-common"],
+      "effects": ["@storybook/addon-onboarding"],
+      "range": "<=0.0.0-pr-28385-sha-9aab3bd7 || 6.5.17-alpha.0 - 8.2.0-beta.3",
+      "nodes": ["node_modules/@storybook/telemetry"],
+      "fixAvailable": {
+        "name": "@storybook/addon-onboarding",
+        "version": "9.1.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@vitejs/plugin-react": {
+      "name": "@vitejs/plugin-react",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["vite"],
+      "effects": ["@storybook/react-vite"],
+      "range": "2.0.0-alpha.0 - 4.3.3",
+      "nodes": [
+        "node_modules/@storybook/react-vite/node_modules/@vitejs/plugin-react"
+      ],
+      "fixAvailable": {
+        "name": "@storybook/react-vite",
+        "version": "9.1.1",
+        "isSemVerMajor": true
+      }
+    },
+    "cookie": {
+      "name": "cookie",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1103907,
+          "name": "cookie",
+          "dependency": "cookie",
+          "title": "cookie accepts cookie name, path, and domain with out of bounds characters",
+          "url": "https://github.com/advisories/GHSA-pxg6-pf52-xh8x",
+          "severity": "low",
+          "cwe": ["CWE-74"],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<0.7.0"
+        }
+      ],
+      "effects": ["@sentry/node"],
+      "range": "<0.7.0",
+      "nodes": ["node_modules/@sentry/node/node_modules/cookie"],
+      "fixAvailable": {
+        "name": "lighthouse",
+        "version": "12.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "esbuild": {
+      "name": "esbuild",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1102341,
+          "name": "esbuild",
+          "dependency": "esbuild",
+          "title": "esbuild enables any website to send any requests to the development server and read the response",
+          "url": "https://github.com/advisories/GHSA-67mh-4wv8-2f99",
+          "severity": "moderate",
+          "cwe": ["CWE-346"],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:N/A:N"
+          },
+          "range": "<=0.24.2"
+        }
+      ],
+      "effects": [
+        "@storybook/builder-manager",
+        "@storybook/core-common",
+        "vite"
+      ],
+      "range": "<=0.24.2",
+      "nodes": ["node_modules/esbuild"],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "7.1.1",
+        "isSemVerMajor": true
+      }
+    },
+    "external-editor": {
+      "name": "external-editor",
+      "severity": "low",
+      "isDirect": false,
+      "via": ["tmp"],
+      "effects": ["inquirer"],
+      "range": ">=1.1.1",
+      "nodes": ["node_modules/external-editor"],
+      "fixAvailable": {
+        "name": "inquirer",
+        "version": "12.9.1",
+        "isSemVerMajor": true
+      }
+    },
+    "inquirer": {
+      "name": "inquirer",
+      "severity": "low",
+      "isDirect": true,
+      "via": ["external-editor"],
+      "effects": [],
+      "range": "3.0.0 - 8.2.6 || 9.0.0 - 9.3.7",
+      "nodes": ["node_modules/inquirer"],
+      "fixAvailable": {
+        "name": "inquirer",
+        "version": "12.9.1",
+        "isSemVerMajor": true
+      }
+    },
+    "lighthouse": {
+      "name": "lighthouse",
+      "severity": "low",
+      "isDirect": true,
+      "via": ["@sentry/node"],
+      "effects": [],
+      "range": "9.4.0-dev.20220216 - 12.2.1",
+      "nodes": ["node_modules/lighthouse"],
+      "fixAvailable": {
+        "name": "lighthouse",
+        "version": "12.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "lint-staged": {
+      "name": "lint-staged",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": ["micromatch"],
+      "effects": [],
+      "range": "7.0.0 - 8.2.1 || 13.3.0 - 15.2.4",
+      "nodes": ["node_modules/lint-staged"],
+      "fixAvailable": true
+    },
+    "micromatch": {
+      "name": "micromatch",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1098681,
+          "name": "micromatch",
+          "dependency": "micromatch",
+          "title": "Regular Expression Denial of Service (ReDoS) in micromatch",
+          "url": "https://github.com/advisories/GHSA-952p-6rrq-rcjv",
+          "severity": "moderate",
+          "cwe": ["CWE-1333"],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+          },
+          "range": "<4.0.8"
+        }
+      ],
+      "effects": ["lint-staged"],
+      "range": "<4.0.8",
+      "nodes": ["node_modules/lint-staged/node_modules/micromatch"],
+      "fixAvailable": true
+    },
+    "pm2": {
+      "name": "pm2",
+      "severity": "low",
+      "isDirect": true,
+      "via": [
+        {
+          "source": 1106240,
+          "name": "pm2",
+          "dependency": "pm2",
+          "title": "pm2 Regular Expression Denial of Service vulnerability",
+          "url": "https://github.com/advisories/GHSA-x5gf-qvw8-r2rm",
+          "severity": "low",
+          "cwe": ["CWE-400", "CWE-1333"],
+          "cvss": {
+            "score": 4.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:L"
+          },
+          "range": "<=6.0.8"
+        }
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": ["node_modules/pm2"],
+      "fixAvailable": false
+    },
+    "storybook": {
+      "name": "storybook",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": ["@storybook/cli"],
+      "effects": [],
+      "range": "<=0.0.0-pr-32218-sha-525e5323 || 6.5.17-alpha.0 - 8.2.0-beta.3",
+      "nodes": ["node_modules/storybook"],
+      "fixAvailable": {
+        "name": "storybook",
+        "version": "9.1.1",
+        "isSemVerMajor": true
+      }
+    },
+    "tmp": {
+      "name": "tmp",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1106849,
+          "name": "tmp",
+          "dependency": "tmp",
+          "title": "tmp allows arbitrary temporary file / directory write via symbolic link `dir` parameter",
+          "url": "https://github.com/advisories/GHSA-52f5-9888-hmc6",
+          "severity": "low",
+          "cwe": ["CWE-59"],
+          "cvss": {
+            "score": 2.5,
+            "vectorString": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:N/I:L/A:N"
+          },
+          "range": "<=0.2.3"
+        }
+      ],
+      "effects": ["external-editor"],
+      "range": "<=0.2.3",
+      "nodes": ["node_modules/tmp"],
+      "fixAvailable": {
+        "name": "inquirer",
+        "version": "12.9.1",
+        "isSemVerMajor": true
+      }
+    },
+    "vite": {
+      "name": "vite",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": ["esbuild"],
+      "effects": [
+        "@joshwooding/vite-plugin-react-docgen-typescript",
+        "@storybook/builder-vite",
+        "@storybook/react-vite",
+        "@vitejs/plugin-react",
+        "vite-plugin-pwa"
+      ],
+      "range": "0.11.0 - 6.1.6",
+      "nodes": ["node_modules/vite"],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "7.1.1",
+        "isSemVerMajor": true
+      }
+    },
+    "vite-plugin-pwa": {
+      "name": "vite-plugin-pwa",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": ["vite"],
+      "effects": [],
+      "range": "0.3.0 - 0.3.5 || 0.7.0 - 0.21.0",
+      "nodes": ["node_modules/vite-plugin-pwa"],
+      "fixAvailable": {
+        "name": "vite-plugin-pwa",
+        "version": "1.0.2",
+        "isSemVerMajor": true
+      }
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 7,
+      "moderate": 22,
+      "high": 0,
+      "critical": 0,
+      "total": 29
+    },
+    "dependencies": {
+      "prod": 227,
+      "dev": 1728,
+      "optional": 38,
+      "peer": 0,
+      "peerOptional": 0,
+      "total": 1954
+    }
+  }
+}
