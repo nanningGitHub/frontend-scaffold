@@ -27,6 +27,7 @@ export default defineConfig({
         'remote-app': 'http://localhost:3001/assets/remoteEntry.js',
         'user-module': 'http://localhost:3002/assets/remoteEntry.js',
         'admin-module': 'http://localhost:3003/assets/remoteEntry.js',
+        'vue-micro-app': 'http://localhost:3004/assets/remoteEntry.js',
       },
       shared: {
         // 共享依赖配置

@@ -19,6 +19,7 @@ const UserProfile = lazy(() => import('./components/UserProfile'));
 const StateManagementDemo = lazy(() => import('./pages/StateManagementDemo'));
 const I18nDemo = lazy(() => import('./pages/I18nDemo'));
 const MicroFrontendDemo = lazy(() => import('./pages/MicroFrontendDemo'));
+const VueMicroAppDemo = lazy(() => import('./pages/VueMicroAppDemo'));
 const ThemeTest = lazy(() => import('./pages/ThemeTest'));
 
 // 加载组件
@@ -144,6 +145,7 @@ function App() {
             <Route path="/state-management" element={<StateManagementDemo />} />
             <Route path="/i18n" element={<I18nDemo />} />
             <Route path="/micro-frontend" element={<MicroFrontendDemo />} />
+            <Route path="/vue-app/*" element={<VueMicroAppDemo />} />
             <Route path="/api-example" element={<ApiExample />} />
             <Route path="/theme-test" element={<ThemeTest />} />
             <Route path="*" element={<NotFound />} />

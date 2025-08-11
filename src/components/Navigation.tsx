@@ -132,6 +132,16 @@ const Navigation = () => {
                 微前端
               </Link>
               <Link
+                to="/vue-app"
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isActive('/vue-app')
+                    ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
+                }`}
+              >
+                Vue微应用
+              </Link>
+              <Link
                 to="/theme-test"
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   isActive('/theme-test')
@@ -278,6 +288,16 @@ const Navigation = () => {
               }`}
             >
               微前端
+            </Link>
+            <Link
+              to="/vue-app"
+              className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                isActive('/vue-app')
+                  ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
+              }`}
+            >
+              Vue微应用
             </Link>
             <Link
               to="/theme-test"

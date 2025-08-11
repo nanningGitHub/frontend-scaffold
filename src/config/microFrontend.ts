@@ -7,6 +7,17 @@ import { MicroApp, MicroFrontendConfig } from '../types/microfrontend';
 // 微应用配置
 export const microApps: MicroApp[] = [
   {
+    id: 'vue-micro-app',
+    name: 'Vue Micro Application',
+    entry: 'http://localhost:3004',
+    container: 'vue-micro-app-container',
+    activeRule: '/vue-app',
+    props: {
+      theme: 'light',
+      locale: 'zh-CN',
+    },
+  },
+  {
     id: 'remote-app',
     name: 'Remote Application',
     entry: 'http://localhost:3001/assets/remoteEntry.js',
@@ -45,28 +56,22 @@ export const microApps: MicroApp[] = [
 export const microFrontendConfig: MicroFrontendConfig = {
   apps: microApps,
   lifecycle: {
-    beforeLoad: async (app) => {
-      console.log(`Loading micro app: ${app.name}`);
+    beforeLoad: async () => {
       // 可以在这里添加权限检查、预加载等逻辑
     },
-    beforeMount: async (app) => {
-      console.log(`Mounting micro app: ${app.name}`);
+    beforeMount: async () => {
       // 可以在这里添加挂载前的准备工作
     },
-    afterMount: async (app) => {
-      console.log(`Micro app mounted: ${app.name}`);
+    afterMount: async () => {
       // 可以在这里添加挂载后的初始化工作
     },
-    beforeUnmount: async (app) => {
-      console.log(`Unmounting micro app: ${app.name}`);
+    beforeUnmount: async () => {
       // 可以在这里添加卸载前的清理工作
     },
-    afterUnmount: async (app) => {
-      console.log(`Micro app unmounted: ${app.name}`);
+    afterUnmount: async () => {
       // 可以在这里添加卸载后的清理工作
     },
-    onError: (error, app) => {
-      console.error(`Error in micro app ${app.name}:`, error);
+    onError: () => {
       // 可以在这里添加错误处理逻辑
     },
   },
@@ -76,6 +81,10 @@ export const microFrontendConfig: MicroFrontendConfig = {
 
 // 微应用路由配置
 export const microAppRoutes = [
+  {
+    path: '/vue-app/*',
+    app: 'vue-micro-app',
+  },
   {
     path: '/remote/*',
     app: 'remote-app',
