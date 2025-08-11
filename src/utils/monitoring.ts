@@ -1,5 +1,3 @@
-
-
 /**
  * 企业级监控系统
  * 集成多种监控指标和告警机制
@@ -33,7 +31,9 @@ export class EnterpriseMonitoring {
       type: 'performance',
     };
 
-    const metricId = `${name}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const metricId = `${name}_${Date.now()}_${Math.random()
+      .toString(36)
+      .substr(2, 9)}`;
     this.metrics.set(metricId, metric);
 
     // 检查告警阈值
@@ -62,7 +62,9 @@ export class EnterpriseMonitoring {
       type: 'business',
     };
 
-    const metricId = `${name}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const metricId = `${name}_${Date.now()}_${Math.random()
+      .toString(36)
+      .substr(2, 9)}`;
     this.metrics.set(metricId, metric);
     this.notifyObservers('business', metric);
   }
@@ -84,7 +86,9 @@ export class EnterpriseMonitoring {
       type: 'error',
     };
 
-    const errorId = `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const errorId = `error_${Date.now()}_${Math.random()
+      .toString(36)
+      .substr(2, 9)}`;
     this.metrics.set(errorId, errorMetric);
 
     // 错误告警
@@ -120,7 +124,9 @@ export class EnterpriseMonitoring {
       type: 'user_action',
     };
 
-    const actionId = `user_action_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const actionId = `user_action_${Date.now()}_${Math.random()
+      .toString(36)
+      .substr(2, 9)}`;
     this.metrics.set(actionId, actionMetric);
   }
 

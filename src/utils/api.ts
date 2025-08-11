@@ -83,8 +83,9 @@ api.interceptors.request.use(
         .find((row) => row.startsWith(`${AUTH_SECURITY.CSRF_COOKIE_NAME}=`))
         ?.split('=')[1];
       if (csrfToken) {
-        (config.headers as Record<string, string>)[AUTH_SECURITY.CSRF_HEADER_NAME] =
-          decodeURIComponent(csrfToken);
+        (config.headers as Record<string, string>)[
+          AUTH_SECURITY.CSRF_HEADER_NAME
+        ] = decodeURIComponent(csrfToken);
       }
     }
 

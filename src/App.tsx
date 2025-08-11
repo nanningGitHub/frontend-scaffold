@@ -1,9 +1,5 @@
 import React, { lazy, Suspense, useEffect } from 'react';
-import {
-  Routes,
-  Route,
-  Navigate,
-} from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore, useThemeStore, useI18nStore } from './stores';
 import {
   EnterpriseErrorBoundary,
@@ -145,10 +141,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/state-management"
-              element={<StateManagementDemo />}
-            />
+            <Route path="/state-management" element={<StateManagementDemo />} />
             <Route path="/i18n" element={<I18nDemo />} />
             <Route path="/micro-frontend" element={<MicroFrontendDemo />} />
             <Route path="/api-example" element={<ApiExample />} />

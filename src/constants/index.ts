@@ -8,7 +8,10 @@
 function readViteEnvSafe(): Record<string, any> | undefined {
   try {
     // 通过类型检查避免在非 ESM 环境下解析 import.meta 语法
-    if (typeof (globalThis as any).import !== 'undefined' && (globalThis as any).import?.meta?.env) {
+    if (
+      typeof (globalThis as any).import !== 'undefined' &&
+      (globalThis as any).import?.meta?.env
+    ) {
       return (globalThis as any).import.meta.env;
     }
     // 在测试环境中提供默认值

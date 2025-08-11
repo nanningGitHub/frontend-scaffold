@@ -24,18 +24,18 @@ export function debounce<T extends (...args: any[]) => any>(
   immediate = false
 ): (...args: Parameters<T>) => void {
   let timeout: ReturnType<typeof setTimeout> | null = null;
-  
+
   return function executedFunction(...args: Parameters<T>) {
     const later = () => {
       timeout = null;
       if (!immediate) func(...args);
     };
-    
+
     const callNow = immediate && !timeout;
-    
+
     if (timeout) clearTimeout(timeout);
     timeout = setTimeout(later, wait);
-    
+
     if (callNow) func(...args);
   };
 }
@@ -50,12 +50,12 @@ export function throttle<T extends (...args: any[]) => any>(
   limit: number
 ): (...args: Parameters<T>) => void {
   let inThrottle: boolean;
-  
+
   return function executedFunction(...args: Parameters<T>) {
     if (!inThrottle) {
       func(...args);
       inThrottle = true;
-      setTimeout(() => inThrottle = false, limit);
+      setTimeout(() => (inThrottle = false), limit);
     }
   };
 }
@@ -105,7 +105,7 @@ export function calculateVisibleRange(
     totalItems - 1,
     Math.ceil((scrollTop + containerHeight) / itemHeight) + overscan
   );
-  
+
   return {
     startIndex,
     endIndex,
@@ -119,22 +119,35 @@ export function calculateVisibleRange(
  * @param componentName 组件名称
  * @param cleanup 清理函数
  */
-export function createMemoryLeakDetector(componentName: string, cleanup: () => void) {
+export function createMemoryLeakDetector(
+  componentName: string,
+  cleanup: () => void
+) {
   const startTime = performance.now();
   const startMemory = performance.memory?.usedJSHeapSize || 0;
-  
+
   return {
     logMount: () => {
-      console.log(`[${componentName}] 组件挂载 - 内存使用: ${(startMemory / 1024 / 1024).toFixed(2)}MB`);
+      console.log(
+        `[${componentName}] 组件挂载 - 内存使用: ${(
+          startMemory /
+          1024 /
+          1024
+        ).toFixed(2)}MB`
+      );
     },
     logUnmount: () => {
       const endTime = performance.now();
       const endMemory = performance.memory?.usedJSHeapSize || 0;
       const memoryDiff = endMemory - startMemory;
       const duration = endTime - startTime;
-      
-      console.log(`[${componentName}] 组件卸载 - 生命周期: ${duration.toFixed(2)}ms, 内存变化: ${(memoryDiff / 1024 / 1024).toFixed(2)}MB`);
-      
+
+      console.log(
+        `[${componentName}] 组件卸载 - 生命周期: ${duration.toFixed(
+          2
+        )}ms, 内存变化: ${(memoryDiff / 1024 / 1024).toFixed(2)}MB`
+      );
+
       // 执行清理
       cleanup();
     },
@@ -147,14 +160,14 @@ export function createMemoryLeakDetector(componentName: string, cleanup: () => v
 export class PerformanceMonitor {
   private marks: Map<string, number> = new Map();
   private measures: Map<string, number> = new Map();
-  
+
   /**
    * 开始计时
    */
   startMeasure(name: string): void {
     this.marks.set(name, performance.now());
   }
-  
+
   /**
    * 结束计时并记录
    */
@@ -164,21 +177,21 @@ export class PerformanceMonitor {
       console.warn(`性能标记 "${name}" 未找到`);
       return 0;
     }
-    
+
     const duration = performance.now() - startTime;
     this.measures.set(name, duration);
     this.marks.delete(name);
-    
+
     return duration;
   }
-  
+
   /**
    * 获取性能指标
    */
   getMeasures(): Record<string, number> {
     return Object.fromEntries(this.measures);
   }
-  
+
   /**
    * 清除所有性能数据
    */
@@ -186,7 +199,7 @@ export class PerformanceMonitor {
     this.marks.clear();
     this.measures.clear();
   }
-  
+
   /**
    * 输出性能报告
    */
@@ -196,7 +209,7 @@ export class PerformanceMonitor {
       console.log('暂无性能数据');
       return;
     }
-    
+
     console.group('🚀 性能报告');
     Object.entries(measures).forEach(([name, duration]) => {
       console.log(`${name}: ${duration.toFixed(2)}ms`);
@@ -213,19 +226,27 @@ export const globalPerformanceMonitor = new PerformanceMonitor();
 /**
  * 性能装饰器 - 用于类方法
  */
-export function measurePerformance(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+export function measurePerformance(
+  target: any,
+  propertyKey: string,
+  descriptor: PropertyDescriptor
+) {
   const originalMethod = descriptor.value;
-  
+
   descriptor.value = function (...args: any[]) {
     const startTime = performance.now();
     const result = originalMethod.apply(this, args);
     const duration = performance.now() - startTime;
-    
-    console.log(`[${target.constructor.name}] ${propertyKey} 执行时间: ${duration.toFixed(2)}ms`);
-    
+
+    console.log(
+      `[${target.constructor.name}] ${propertyKey} 执行时间: ${duration.toFixed(
+        2
+      )}ms`
+    );
+
     return result;
   };
-  
+
   return descriptor;
 }
 
@@ -237,7 +258,7 @@ export async function measureAsyncPerformance<T>(
   asyncFn: () => Promise<T>
 ): Promise<T> {
   globalPerformanceMonitor.startMeasure(name);
-  
+
   try {
     const result = await asyncFn();
     return result;
@@ -260,17 +281,17 @@ export async function processBatch<T, R>(
   delay = 0
 ): Promise<R[]> {
   const results: R[] = [];
-  
+
   for (let i = 0; i < items.length; i += batchSize) {
     const batch = items.slice(i, i + batchSize);
     const batchResults = await Promise.all(batch.map(processor));
     results.push(...batchResults);
-    
+
     if (delay > 0 && i + batchSize < items.length) {
-      await new Promise(resolve => setTimeout(resolve, delay));
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
-  
+
   return results;
 }
 
@@ -279,42 +300,42 @@ export async function processBatch<T, R>(
  */
 export class Cache<T> {
   private cache = new Map<string, { value: T; expiry: number }>();
-  
+
   constructor(private defaultTTL = 5 * 60 * 1000) {} // 默认5分钟
-  
+
   set(key: string, value: T, ttl = this.defaultTTL): void {
     const expiry = Date.now() + ttl;
     this.cache.set(key, { value, expiry });
   }
-  
+
   get(key: string): T | undefined {
     const item = this.cache.get(key);
     if (!item) return undefined;
-    
+
     if (Date.now() > item.expiry) {
       this.cache.delete(key);
       return undefined;
     }
-    
+
     return item.value;
   }
-  
+
   has(key: string): boolean {
     return this.get(key) !== undefined;
   }
-  
+
   delete(key: string): boolean {
     return this.cache.delete(key);
   }
-  
+
   clear(): void {
     this.cache.clear();
   }
-  
+
   size(): number {
     return this.cache.size;
   }
-  
+
   cleanup(): void {
     const now = Date.now();
     for (const [key, item] of this.cache.entries()) {

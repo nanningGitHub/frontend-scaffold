@@ -41,12 +41,14 @@ export const useI18nStore = create<I18nStore>()(
       // 设置语言
       setLocale: (locale: Locale) => {
         set({ locale });
-        
+
         // 应用语言到 DOM
         document.documentElement.lang = locale;
-        
+
         // 触发语言变更事件
-        window.dispatchEvent(new CustomEvent('localeChange', { detail: { locale } }));
+        window.dispatchEvent(
+          new CustomEvent('localeChange', { detail: { locale } })
+        );
       },
 
       // 切换语言

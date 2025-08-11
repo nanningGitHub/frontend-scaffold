@@ -1,7 +1,4 @@
-import {
-  MicroAppMessage,
-  MicroAppEvent,
-} from '../types/microfrontend';
+import { MicroAppMessage, MicroAppEvent } from '../types/microfrontend';
 
 /**
  * 微前端应用间通信管理器

@@ -9,7 +9,10 @@ import zhTranslations from './locales/zh.json';
 function readViteEnvDevFlag(): boolean {
   try {
     // 使用类型安全的方式检查环境
-    if (typeof (globalThis as any).import !== 'undefined' && (globalThis as any).import?.meta?.env) {
+    if (
+      typeof (globalThis as any).import !== 'undefined' &&
+      (globalThis as any).import?.meta?.env
+    ) {
       return (globalThis as any).import.meta.env.DEV === true;
     }
     // 在测试环境中提供默认值

@@ -170,7 +170,11 @@ export function isEmpty(value: unknown): boolean {
 /**
  * 安全获取嵌套对象属性
  */
-export function get(obj: unknown, path: string, defaultValue?: unknown): unknown {
+export function get(
+  obj: unknown,
+  path: string,
+  defaultValue?: unknown
+): unknown {
   const keys = path.split('.');
   let result = obj;
 
@@ -187,7 +191,11 @@ export function get(obj: unknown, path: string, defaultValue?: unknown): unknown
 /**
  * 设置嵌套对象属性
  */
-export function set(obj: Record<string, unknown>, path: string, value: unknown): Record<string, unknown> {
+export function set(
+  obj: Record<string, unknown>,
+  path: string,
+  value: unknown
+): Record<string, unknown> {
   const keys = path.split('.');
   const result = { ...obj };
   let current = result;

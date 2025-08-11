@@ -73,7 +73,9 @@ export const useUIStore = create<UIStore>((set, get) => ({
   // 通知系统
   addNotification: (_notification) => {
     // 使用递增计数器 + 时间戳 + 随机数确保唯一性
-    const id = `notification_${++notificationIdCounter}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const id = `notification_${++notificationIdCounter}_${Date.now()}_${Math.random()
+      .toString(36)
+      .substr(2, 9)}`;
     const newNotification = { ..._notification, id };
 
     set((state) => ({

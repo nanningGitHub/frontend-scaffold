@@ -37,9 +37,12 @@ const initializeTheme = () => {
         console.warn('Failed to parse theme from localStorage:', e);
       }
     }
-    
+
     // 检测系统主题偏好
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    if (
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches
+    ) {
       if (!document.documentElement.classList.contains('dark')) {
         document.documentElement.classList.add('dark');
       }

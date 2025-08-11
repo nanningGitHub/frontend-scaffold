@@ -20,9 +20,23 @@ type RequestInit = {
 
 type RequestMode = 'navigate' | 'same-origin' | 'no-cors' | 'cors';
 type RequestCredentials = 'omit' | 'same-origin' | 'include';
-type RequestCache = 'default' | 'no-store' | 'reload' | 'no-cache' | 'force-cache' | 'only-if-cached';
+type RequestCache =
+  | 'default'
+  | 'no-store'
+  | 'reload'
+  | 'no-cache'
+  | 'force-cache'
+  | 'only-if-cached';
 type RequestRedirect = 'follow' | 'error' | 'manual';
-type ReferrerPolicy = 'no-referrer' | 'no-referrer-when-downgrade' | 'origin' | 'origin-when-cross-origin' | 'same-origin' | 'strict-origin' | 'strict-origin-when-cross-origin' | 'unsafe-url';
+type ReferrerPolicy =
+  | 'no-referrer'
+  | 'no-referrer-when-downgrade'
+  | 'origin'
+  | 'origin-when-cross-origin'
+  | 'same-origin'
+  | 'strict-origin'
+  | 'strict-origin-when-cross-origin'
+  | 'unsafe-url';
 
 /**
  * 企业级安全管理器
@@ -107,8 +121,11 @@ export class SecurityManager {
     // 将 nonce 存储到全局，供其他脚本使用
     (window as any).__CSP_NONCE__ = nonce;
 
-    logger.info('Content Security Policy configured', { csp: cspDirectives, nonce });
-    
+    logger.info('Content Security Policy configured', {
+      csp: cspDirectives,
+      nonce,
+    });
+
     // 注意：frame-ancestors 指令只能通过 HTTP 响应头设置，不能通过 meta 标签设置
     // 建议在服务器端设置：X-Frame-Options: DENY 或 Content-Security-Policy: frame-ancestors 'none'
   }
@@ -119,7 +136,9 @@ export class SecurityManager {
   private generateNonce(): string {
     const array = new Uint8Array(16);
     crypto.getRandomValues(array);
-    return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+    return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join(
+      ''
+    );
   }
 
   /**
@@ -142,7 +161,7 @@ export class SecurityManager {
 
     logger.info('Security headers check configured', {
       headers: requiredHeaders,
-      note: 'frame-ancestors 需要通过服务器端 HTTP 响应头设置'
+      note: 'frame-ancestors 需要通过服务器端 HTTP 响应头设置',
     });
   }
 

@@ -151,7 +151,7 @@ export class EnterpriseLogger {
         };
 
         this.error('Uncaught error', errorContext);
-        
+
         // 在控制台中也显示详细错误信息
         console.error('🔴 Uncaught Error Details:', errorContext);
       });
@@ -168,25 +168,32 @@ export class EnterpriseLogger {
         };
 
         this.error('Unhandled promise rejection', rejectionContext);
-        
+
         // 在控制台中也显示详细错误信息
-        console.error('🔴 Unhandled Promise Rejection Details:', rejectionContext);
+        console.error(
+          '🔴 Unhandled Promise Rejection Details:',
+          rejectionContext
+        );
       });
 
       // 监听资源加载错误
-      window.addEventListener('error', (event) => {
-        if (event.target && event.target !== window) {
-          const resourceContext = {
-            target: event.target,
-            type: event.type,
-            url: (event.target as any).src || (event.target as any).href,
-            errorType: 'resource_load_error',
-            timestamp: new Date().toISOString(),
-          };
+      window.addEventListener(
+        'error',
+        (event) => {
+          if (event.target && event.target !== window) {
+            const resourceContext = {
+              target: event.target,
+              type: event.type,
+              url: (event.target as any).src || (event.target as any).href,
+              errorType: 'resource_load_error',
+              timestamp: new Date().toISOString(),
+            };
 
-          this.warn('Resource load error', resourceContext);
-        }
-      }, true);
+            this.warn('Resource load error', resourceContext);
+          }
+        },
+        true
+      );
     }
   }
 
@@ -329,7 +336,10 @@ export class EnterpriseLogger {
       [LogLevel.FATAL]: { icon: '💀', color: 'color: #7C2D12' },
     };
 
-    const config = levelConfig[level] || { icon: '❓', color: 'color: #6B7280' };
+    const config = levelConfig[level] || {
+      icon: '❓',
+      color: 'color: #6B7280',
+    };
     const logData = {
       level: levelName,
       message,
@@ -341,7 +351,9 @@ export class EnterpriseLogger {
     };
 
     // 创建格式化的日志消息
-    const formattedMessage = `%c${config.icon} [${levelName.toUpperCase()}] ${message}`;
+    const formattedMessage = `%c${
+      config.icon
+    } [${levelName.toUpperCase()}] ${message}`;
     const style = `font-weight: bold; ${config.color}`;
 
     switch (level) {
@@ -358,7 +370,7 @@ export class EnterpriseLogger {
       case LogLevel.ERROR:
       case LogLevel.FATAL:
         console.error(formattedMessage, style, logData);
-        
+
         // 对于错误级别，额外显示错误详情
         if (error && error.stack) {
           console.group('📋 Error Details');

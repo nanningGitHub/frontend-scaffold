@@ -29,7 +29,7 @@ const ThemeTest = () => {
       const hasDarkClass = htmlElement.classList.contains('dark');
       const computedStyle = window.getComputedStyle(htmlElement);
       const backgroundColor = computedStyle.backgroundColor;
-      
+
       setDebugInfo(`
         HTML class: ${htmlElement.className}
         hasDarkClass: ${hasDarkClass}
@@ -80,7 +80,7 @@ const ThemeTest = () => {
         <pre className="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
           {debugInfo}
         </pre>
-        
+
         {/* 主题存储状态 */}
         <div className="mt-4 p-3 bg-gray-200 dark:bg-gray-700 rounded">
           <h4 className="font-semibold mb-2">主题存储状态:</h4>

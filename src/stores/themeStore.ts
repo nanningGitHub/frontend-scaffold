@@ -34,7 +34,7 @@ export type ThemeStore = ThemeState & ThemeActions;
  */
 const applyThemeToDOM = (theme: Theme) => {
   console.log('applyThemeToDOM called with:', theme);
-  
+
   try {
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
@@ -44,7 +44,7 @@ const applyThemeToDOM = (theme: Theme) => {
       console.log('Removed dark class from document.documentElement');
     }
     // 对于 'system' 类型，不直接应用，而是通过 detectSystemTheme 处理
-    
+
     // 验证结果
     const hasDarkClass = document.documentElement.classList.contains('dark');
     console.log('Theme applied successfully. Has dark class:', hasDarkClass);
@@ -98,11 +98,13 @@ export const useThemeStore = create<ThemeStore>()(
       // 检测系统主题
       detectSystemTheme: () => {
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        const systemTheme: 'light' | 'dark' = mediaQuery.matches ? 'dark' : 'light';
-        
+        const systemTheme: 'light' | 'dark' = mediaQuery.matches
+          ? 'dark'
+          : 'light';
+
         console.log('detectSystemTheme called, system theme:', systemTheme);
         set({ systemTheme });
-        
+
         // 如果当前主题是系统主题，则应用检测到的主题
         if (get().theme === 'system') {
           applyThemeToDOM(systemTheme);

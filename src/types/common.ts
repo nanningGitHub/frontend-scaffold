@@ -12,10 +12,16 @@ export type Primitive = string | number | boolean | null | undefined;
 export type GenericObject<T = unknown> = Record<string, T>;
 
 // 函数类型
-export type FunctionType<TArgs extends unknown[] = unknown[], TReturn = unknown> = (...args: TArgs) => TReturn;
+export type FunctionType<
+  TArgs extends unknown[] = unknown[],
+  TReturn = unknown
+> = (...args: TArgs) => TReturn;
 
 // 异步函数类型
-export type AsyncFunctionType<TArgs extends unknown[] = unknown[], TReturn = unknown> = (...args: TArgs) => Promise<TReturn>;
+export type AsyncFunctionType<
+  TArgs extends unknown[] = unknown[],
+  TReturn = unknown
+> = (...args: TArgs) => Promise<TReturn>;
 
 // 事件处理器类型
 export type EventHandler<T = Event> = (event: T) => void;
@@ -202,7 +208,18 @@ export type SortConfig = {
 // 过滤类型
 export type FilterConfig = {
   field: string;
-  operator: 'eq' | 'ne' | 'gt' | 'gte' | 'lt' | 'lte' | 'contains' | 'startsWith' | 'endsWith' | 'in' | 'notIn';
+  operator:
+    | 'eq'
+    | 'ne'
+    | 'gt'
+    | 'gte'
+    | 'lt'
+    | 'lte'
+    | 'contains'
+    | 'startsWith'
+    | 'endsWith'
+    | 'in'
+    | 'notIn';
   value: unknown;
 };
 
@@ -222,7 +239,8 @@ export type DeepPartial<T> = {
 
 export type RequiredFields<T, K extends keyof T> = T & Required<Pick<T, K>>;
 
-export type OptionalFields<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+export type OptionalFields<T, K extends keyof T> = Omit<T, K> &
+  Partial<Pick<T, K>>;
 
 export type PickByType<T, U> = {
   [K in keyof T]: T[K] extends U ? K : never;

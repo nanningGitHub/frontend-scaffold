@@ -280,7 +280,10 @@ export class MicroFrontendManager {
       }
 
       // 清理 React 根节点
-      if (appState.container && (appState.container as Record<string, unknown>).__reactRoot) {
+      if (
+        appState.container &&
+        (appState.container as Record<string, unknown>).__reactRoot
+      ) {
         try {
           (appState.container as Record<string, unknown>).__reactRoot.unmount();
         } catch (error) {

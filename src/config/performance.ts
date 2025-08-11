@@ -17,35 +17,35 @@ export interface PerformanceConfig {
     threshold: number;
     rootMargin: string;
   };
-  
+
   // 预加载配置
   preloading: {
     enabled: boolean;
     criticalPaths: string[];
     delay: number;
   };
-  
+
   // 缓存配置
   caching: {
     enabled: boolean;
     maxAge: number;
     maxSize: number;
   };
-  
+
   // 压缩配置
   compression: {
     enabled: boolean;
     algorithm: 'gzip' | 'brotli';
     level: number;
   };
-  
+
   // 监控配置
   monitoring: {
     enabled: boolean;
     sampleRate: number;
     reportInterval: number;
   };
-  
+
   // 资源优化配置
   resources: {
     imageOptimization: boolean;
@@ -63,31 +63,31 @@ export const defaultPerformanceConfig: PerformanceConfig = {
     threshold: 0.1,
     rootMargin: '50px',
   },
-  
+
   preloading: {
     enabled: true,
     criticalPaths: ['/dashboard', '/profile'],
     delay: 1000,
   },
-  
+
   caching: {
     enabled: true,
     maxAge: 24 * 60 * 60 * 1000, // 24小时
     maxSize: 100, // 最大缓存条目数
   },
-  
+
   compression: {
     enabled: true,
     algorithm: 'gzip',
     level: 6,
   },
-  
+
   monitoring: {
     enabled: true,
     sampleRate: 0.1, // 10%采样率
     reportInterval: 60000, // 1分钟
   },
-  
+
   resources: {
     imageOptimization: true,
     fontDisplay: 'swap',
@@ -124,11 +124,11 @@ export class PerformanceManager {
     if (this.config.monitoring.enabled) {
       this.startMonitoring();
     }
-    
+
     if (this.config.lazyLoading.enabled) {
       this.setupLazyLoading();
     }
-    
+
     if (this.config.preloading.enabled) {
       this.setupPreloading();
     }
@@ -162,17 +162,17 @@ export class PerformanceManager {
   private loadLazyContent(element: HTMLElement): void {
     const src = element.getAttribute('data-src');
     const srcset = element.getAttribute('data-srcset');
-    
+
     if (src && element instanceof HTMLImageElement) {
       element.src = src;
       element.removeAttribute('data-src');
     }
-    
+
     if (srcset && element instanceof HTMLImageElement) {
       element.srcset = srcset;
       element.removeAttribute('data-srcset');
     }
-    
+
     element.classList.remove('lazy');
     element.classList.add('loaded');
   }
@@ -203,18 +203,18 @@ export class PerformanceManager {
    */
   private startMonitoring(): void {
     if (this.isMonitoring) return;
-    
+
     this.isMonitoring = true;
-    
+
     // 监控页面加载性能
     this.observePageLoad();
-    
+
     // 监控资源加载性能
     this.observeResourceTiming();
-    
+
     // 监控用户交互性能
     this.observeUserInteractions();
-    
+
     // 定期报告性能数据
     setInterval(() => {
       this.reportPerformance();
@@ -233,7 +233,7 @@ export class PerformanceManager {
           }
         });
       });
-      
+
       observer.observe({ entryTypes: ['navigation'] });
     }
   }
@@ -250,7 +250,7 @@ export class PerformanceManager {
           }
         });
       });
-      
+
       observer.observe({ entryTypes: ['resource'] });
     }
   }
@@ -267,7 +267,7 @@ export class PerformanceManager {
           }
         });
       });
-      
+
       observer.observe({ entryTypes: ['interaction'] });
     }
   }
@@ -277,12 +277,12 @@ export class PerformanceManager {
    */
   private reportPerformance(): void {
     if (Math.random() > this.config.monitoring.sampleRate) return;
-    
+
     const metrics = this.calculateMetrics();
-    
+
     // 发送到监控系统
     this.sendMetrics(metrics);
-    
+
     // 清理旧数据
     this.cleanupOldEntries();
   }
@@ -294,26 +294,56 @@ export class PerformanceManager {
     const navigationEntries = this.performanceEntries.filter(
       (entry) => entry.entryType === 'navigation'
     );
-    
+
     const resourceEntries = this.performanceEntries.filter(
       (entry) => entry.entryType === 'resource'
     );
-    
+
     return {
-      pageLoad: navigationEntries.length > 0 ? {
-        dns: this.getAverageTime(navigationEntries, 'domainLookupEnd', 'domainLookupStart'),
-        tcp: this.getAverageTime(navigationEntries, 'connectEnd', 'connectStart'),
-        ttfb: this.getAverageTime(navigationEntries, 'responseStart', 'requestStart'),
-        domContentLoaded: this.getAverageTime(navigationEntries, 'domContentLoadedEventEnd', 'domContentLoadedEventStart'),
-        load: this.getAverageTime(navigationEntries, 'loadEventEnd', 'loadEventStart'),
-      } : null,
-      
-      resources: resourceEntries.length > 0 ? {
-        count: resourceEntries.length,
-        totalSize: this.calculateTotalSize(resourceEntries),
-        averageLoadTime: this.getAverageTime(resourceEntries, 'responseEnd', 'fetchStart'),
-      } : null,
-      
+      pageLoad:
+        navigationEntries.length > 0
+          ? {
+              dns: this.getAverageTime(
+                navigationEntries,
+                'domainLookupEnd',
+                'domainLookupStart'
+              ),
+              tcp: this.getAverageTime(
+                navigationEntries,
+                'connectEnd',
+                'connectStart'
+              ),
+              ttfb: this.getAverageTime(
+                navigationEntries,
+                'responseStart',
+                'requestStart'
+              ),
+              domContentLoaded: this.getAverageTime(
+                navigationEntries,
+                'domContentLoadedEventEnd',
+                'domContentLoadedEventStart'
+              ),
+              load: this.getAverageTime(
+                navigationEntries,
+                'loadEventEnd',
+                'loadEventStart'
+              ),
+            }
+          : null,
+
+      resources:
+        resourceEntries.length > 0
+          ? {
+              count: resourceEntries.length,
+              totalSize: this.calculateTotalSize(resourceEntries),
+              averageLoadTime: this.getAverageTime(
+                resourceEntries,
+                'responseEnd',
+                'fetchStart'
+              ),
+            }
+          : null,
+
       timestamp: Date.now(),
     };
   }
@@ -321,7 +351,11 @@ export class PerformanceManager {
   /**
    * 计算平均时间
    */
-  private getAverageTime(entries: PerformanceEntry[], endKey: string, startKey: string): number {
+  private getAverageTime(
+    entries: PerformanceEntry[],
+    endKey: string,
+    startKey: string
+  ): number {
     const times = entries
       .map((entry) => {
         const end = (entry as any)[endKey];
@@ -329,8 +363,10 @@ export class PerformanceManager {
         return end && start ? end - start : 0;
       })
       .filter((time) => time > 0);
-    
-    return times.length > 0 ? times.reduce((a, b) => a + b, 0) / times.length : 0;
+
+    return times.length > 0
+      ? times.reduce((a, b) => a + b, 0) / times.length
+      : 0;
   }
 
   /**
@@ -350,7 +386,7 @@ export class PerformanceManager {
     if (process.env.NODE_ENV === 'development') {
       console.log('Performance metrics:', metrics);
     }
-    
+
     // 发送到分析服务
     if (typeof window !== 'undefined' && (window as any).gtag) {
       (window as any).gtag('event', 'performance_metrics', metrics);
@@ -481,11 +517,11 @@ export function measureTime<T>(fn: () => T, label: string): T {
   const start = performance.now();
   const result = fn();
   const end = performance.now();
-  
+
   if (process.env.NODE_ENV === 'development') {
     console.log(`${label} took ${end - start}ms`);
   }
-  
+
   return result;
 }
 
@@ -499,11 +535,11 @@ export async function measureTimeAsync<T>(
   const start = performance.now();
   const result = await fn();
   const end = performance.now();
-  
+
   if (process.env.NODE_ENV === 'development') {
     console.log(`${label} took ${end - start}ms`);
   }
-  
+
   return result;
 }
 
