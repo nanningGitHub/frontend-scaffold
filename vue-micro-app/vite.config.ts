@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
-import federation from '@originjs/vite-plugin-federation';
+import { federation } from '@originjs/vite-plugin-federation';
 import { resolve } from 'path';
 
 /**
