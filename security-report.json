@@ -179,8 +179,8 @@
       "range": "<=0.0.0-pr-28385-sha-9aab3bd7 || 6.5.17-alpha.0 - 8.2.0-beta.3",
       "nodes": ["node_modules/@storybook/docs-tools"],
       "fixAvailable": {
-        "name": "@storybook/blocks",
-        "version": "8.6.14",
+        "name": "@storybook/react",
+        "version": "9.1.1",
         "isSemVerMajor": true
       }
     },
