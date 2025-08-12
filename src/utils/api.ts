@@ -5,6 +5,7 @@ import axios, {
 } from 'axios';
 import { API_CONFIG, STORAGE_KEYS, AUTH_SECURITY } from '../constants';
 import { logger } from './logger';
+// 导入类型定义，用于后续使用
 
 /**
  * API 工具模块
@@ -65,7 +66,8 @@ api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     // 记录请求开始时间
     const startTime = Date.now();
-    (config as any).startTime = startTime;
+    (config as InternalAxiosRequestConfig & { startTime?: number }).startTime =
+      startTime;
 
     // 从 localStorage 获取认证 token
     // Cookie 会话模式下不加 Authorization；否则按 Bearer 添加

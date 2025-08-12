@@ -1,251 +1,265 @@
 /**
  * 通用类型定义
- * 用于减少 any 类型的使用，提高类型安全性
+ * 用于替代代码中的 any 类型，提高类型安全性
  */
 
 import React from 'react';
 
-// 基础类型
-export type Primitive = string | number | boolean | null | undefined;
+// API 相关类型
+export interface ApiResponse<T = unknown> {
+  data: T;
+  message: string;
+  success: boolean;
+  code: number;
+}
 
-// 通用对象类型
-export type GenericObject<T = unknown> = Record<string, T>;
+export interface ApiError {
+  message: string;
+  code: number;
+  details?: unknown;
+}
 
-// 函数类型
-export type FunctionType<
-  TArgs extends unknown[] = unknown[],
-  TReturn = unknown
-> = (...args: TArgs) => TReturn;
-
-// 异步函数类型
-export type AsyncFunctionType<
-  TArgs extends unknown[] = unknown[],
-  TReturn = unknown
-> = (...args: TArgs) => Promise<TReturn>;
-
-// 事件处理器类型
-export type EventHandler<T = Event> = (event: T) => void;
-
-// 表单事件类型
-export type FormEvent = Event & {
-  target: HTMLFormElement;
-};
-
-// 输入事件类型
-export type InputEvent = Event & {
-  target: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
-};
-
-// 网络请求类型
-export type RequestConfig = {
-  url: string;
-  method?: string;
+export interface ApiRequestConfig {
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   headers?: Record<string, string>;
   body?: unknown;
   timeout?: number;
-};
+  retry?: number;
+}
 
-// 响应类型
-export type ApiResponse<T = unknown> = {
-  data: T;
-  status: number;
-  message?: string;
-  success: boolean;
-};
-
-// 错误类型
-export type AppError = {
-  message: string;
-  code?: string | number;
-  details?: unknown;
+// 事件相关类型
+export interface EventData {
+  type: string;
+  payload: unknown;
   timestamp: number;
-};
+  source: string;
+}
 
-// 日志级别
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
+export interface EventHandler<T = unknown> {
+  (event: T): void;
+}
 
-// 日志条目类型
-export type LogEntry = {
-  level: LogLevel;
-  message: string;
-  timestamp: number;
-  context?: GenericObject;
-  error?: Error;
-};
-
-// 配置类型
-export type AppConfig = {
-  environment: 'development' | 'staging' | 'production';
+// 配置相关类型
+export interface AppConfig {
+  apiBaseUrl: string;
+  environment: 'development' | 'production' | 'test';
   debug: boolean;
-  api: {
-    baseUrl: string;
-    timeout: number;
-  };
-  features: {
-    [key: string]: boolean;
-  };
-};
+  version: string;
+}
 
-// 用户类型
-export type User = {
+// 用户相关类型
+export interface User {
   id: string;
   username: string;
   email: string;
   role: string;
   permissions: string[];
-  profile?: GenericObject;
-};
+  profile?: UserProfile;
+}
 
-// 认证状态类型
-export type AuthState = {
-  isAuthenticated: boolean;
-  user: User | null;
-  token: string | null;
-  loading: boolean;
-  error: AppError | null;
-};
+export interface UserProfile {
+  firstName?: string;
+  lastName?: string;
+  avatar?: string;
+  bio?: string;
+  preferences?: Record<string, unknown>;
+}
 
-// 微前端应用类型
-export type MicroApp = {
-  name: string;
-  url: string;
-  scope: string;
-  version: string;
-  entry: string;
-  dependencies?: string[];
-  config?: GenericObject;
-};
-
-// 微前端通信消息类型
-export type MicroAppMessage = {
-  type: string;
-  payload: unknown;
-  source: string;
-  target?: string;
-  timestamp: number;
-  id: string;
-};
-
-// 安全事件类型
-export type SecurityEvent = {
-  type: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  message: string;
-  details: GenericObject;
-  timestamp: number;
-  source: string;
-};
-
-// 性能指标类型
-export type PerformanceMetric = {
-  name: string;
-  value: number;
-  unit: string;
-  timestamp: number;
-  context?: GenericObject;
-};
-
-// 国际化类型
-export type I18nConfig = {
-  locale: string;
-  fallbackLocale: string;
-  messages: Record<string, GenericObject>;
-  dateTimeFormats?: Record<string, GenericObject>;
-  numberFormats?: Record<string, GenericObject>;
-};
-
-// 主题类型
-export type Theme = {
+// 主题相关类型
+export interface ThemeConfig {
   name: string;
   colors: {
     primary: string;
     secondary: string;
     background: string;
-    surface: string;
     text: string;
-    error: string;
-    warning: string;
-    success: string;
+    accent: string;
   };
-  spacing: Record<string, string>;
-  typography: Record<string, GenericObject>;
-};
+  dark: boolean;
+}
 
-// 路由类型
-export type Route = {
-  path: string;
-  component: React.ComponentType<Record<string, unknown>>;
-  exact?: boolean;
-  strict?: boolean;
-  sensitive?: boolean;
-  children?: Route[];
-  meta?: GenericObject;
-};
+// 国际化相关类型
+export interface LocaleConfig {
+  code: string;
+  name: string;
+  flag?: string;
+  direction: 'ltr' | 'rtl';
+}
 
-// 状态管理类型
-export type StoreState<T = GenericObject> = T & {
-  loading: boolean;
-  error: AppError | null;
-  lastUpdated: number;
-};
+// 性能监控相关类型
+export interface PerformanceMetric {
+  name: string;
+  value: number;
+  unit: string;
+  timestamp: number;
+  metadata?: Record<string, unknown>;
+}
 
-// 分页类型
-export type Pagination = {
-  page: number;
-  pageSize: number;
-  total: number;
-  totalPages: number;
-};
+export interface PerformanceObserver {
+  (metric: PerformanceMetric): void;
+}
 
-// 排序类型
-export type SortOrder = 'asc' | 'desc';
+// 日志相关类型
+export interface LogEntry {
+  level: 'debug' | 'info' | 'warn' | 'error';
+  message: string;
+  timestamp: number;
+  context?: Record<string, unknown>;
+  error?: Error;
+}
 
-export type SortConfig = {
-  field: string;
-  order: SortOrder;
-};
-
-// 过滤类型
-export type FilterConfig = {
-  field: string;
-  operator:
-    | 'eq'
-    | 'ne'
-    | 'gt'
-    | 'gte'
-    | 'lt'
-    | 'lte'
-    | 'contains'
-    | 'startsWith'
-    | 'endsWith'
-    | 'in'
-    | 'notIn';
-  value: unknown;
-};
-
-// 查询参数类型
-export type QueryParams = {
-  search?: string;
-  filters?: FilterConfig[];
-  sort?: SortConfig[];
-  pagination?: Pagination;
+export interface LogContext {
+  app: string;
+  version: string;
+  environment: string;
+  userId?: string;
+  sessionId?: string;
   [key: string]: unknown;
-};
+}
+
+// 安全相关类型
+export interface SecurityPolicy {
+  csp: string;
+  hsts: boolean;
+  xss: boolean;
+  csrf: boolean;
+}
+
+export interface Permission {
+  resource: string;
+  action: string;
+  conditions?: Record<string, unknown>;
+}
+
+// 微前端相关类型
+export interface MicroAppConfig {
+  id: string;
+  name: string;
+  version: string;
+  entry: string;
+  container: string;
+  permissions: Permission[];
+  dependencies: string[];
+}
 
 // 工具类型
 export type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
 };
 
+export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
 export type RequiredFields<T, K extends keyof T> = T & Required<Pick<T, K>>;
 
-export type OptionalFields<T, K extends keyof T> = Omit<T, K> &
-  Partial<Pick<T, K>>;
+// 函数类型
+export type AsyncFunction<T = unknown, R = unknown> = (arg: T) => Promise<R>;
+export type SyncFunction<T = unknown, R = unknown> = (arg: T) => R;
+export type VoidFunction<T = unknown> = (arg: T) => void;
 
-export type PickByType<T, U> = {
-  [K in keyof T]: T[K] extends U ? K : never;
-}[keyof T];
+// 组件相关类型
+export interface ComponentProps {
+  className?: string;
+  style?: React.CSSProperties;
+  children?: React.ReactNode;
+  [key: string]: unknown;
+}
 
-export type ExcludeByType<T, U> = {
-  [K in keyof T]: T[K] extends U ? never : K;
-}[keyof T];
+// 表单相关类型
+export interface FormField {
+  name: string;
+  value: unknown;
+  error?: string;
+  touched: boolean;
+  required: boolean;
+  validation?: ValidationRule[];
+}
+
+export interface ValidationRule {
+  type: 'required' | 'min' | 'max' | 'pattern' | 'custom';
+  value?: unknown;
+  message: string;
+  validator?: (value: unknown) => boolean | string;
+}
+
+// 状态管理相关类型
+export interface StoreState {
+  loading: boolean;
+  error: string | null;
+  data: unknown;
+  timestamp: number;
+}
+
+export interface StoreAction<T = unknown> {
+  type: string;
+  payload?: T;
+  meta?: Record<string, unknown>;
+}
+
+// 路由相关类型
+export interface RouteConfig {
+  path: string;
+  component: React.ComponentType;
+  exact?: boolean;
+  strict?: boolean;
+  sensitive?: boolean;
+  permissions?: string[];
+}
+
+// 缓存相关类型
+export interface CacheEntry<T = unknown> {
+  key: string;
+  value: T;
+  timestamp: number;
+  ttl: number;
+  accessCount: number;
+}
+
+// 网络相关类型
+export interface NetworkRequest {
+  url: string;
+  method: string;
+  headers: Record<string, string>;
+  body?: unknown;
+  timeout: number;
+}
+
+export interface NetworkResponse {
+  status: number;
+  statusText: string;
+  headers: Record<string, string>;
+  data: unknown;
+  url: string;
+}
+
+// 错误处理相关类型
+export interface ErrorInfo {
+  message: string;
+  stack?: string;
+  componentStack?: string;
+  location?: string;
+  timestamp: number;
+  userId?: string;
+  sessionId?: string;
+}
+
+export interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+  errorInfo: ErrorInfo | null;
+}
+
+// 测试相关类型
+export interface TestConfig {
+  environment: 'unit' | 'integration' | 'e2e';
+  timeout: number;
+  retries: number;
+  parallel: boolean;
+}
+
+export interface TestResult {
+  name: string;
+  status: 'passed' | 'failed' | 'skipped';
+  duration: number;
+  error?: Error;
+  metadata?: Record<string, unknown>;
+}

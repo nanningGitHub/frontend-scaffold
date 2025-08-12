@@ -1,547 +1,556 @@
-/**
- * 性能优化配置
- * 集中管理各种性能优化策略和配置
- */
+import { PerformanceMetric } from '../types/common';
 
-// 定义 IntersectionObserverInit 类型（如果不存在）
-interface IntersectionObserverInit {
-  root?: Element | null;
-  rootMargin?: string;
-  threshold?: number | number[];
-}
-
-export interface PerformanceConfig {
-  // 懒加载配置
-  lazyLoading: {
-    enabled: boolean;
-    threshold: number;
-    rootMargin: string;
-  };
-
-  // 预加载配置
-  preloading: {
-    enabled: boolean;
-    criticalPaths: string[];
-    delay: number;
-  };
-
-  // 缓存配置
-  caching: {
-    enabled: boolean;
-    maxAge: number;
-    maxSize: number;
-  };
-
-  // 压缩配置
-  compression: {
-    enabled: boolean;
-    algorithm: 'gzip' | 'brotli';
-    level: number;
-  };
-
-  // 监控配置
-  monitoring: {
-    enabled: boolean;
-    sampleRate: number;
-    reportInterval: number;
-  };
-
-  // 资源优化配置
-  resources: {
-    imageOptimization: boolean;
-    fontDisplay: 'auto' | 'block' | 'swap' | 'fallback' | 'optional';
-    criticalCSS: boolean;
-  };
-}
+// 类型定义
+type PerformanceObserver = (metric: PerformanceMetric) => void;
 
 /**
- * 默认性能配置
+ * 性能监控配置
+ * 用于配置应用的性能监控策略
  */
-export const defaultPerformanceConfig: PerformanceConfig = {
-  lazyLoading: {
-    enabled: true,
-    threshold: 0.1,
-    rootMargin: '50px',
+
+// 性能监控配置
+export const PERFORMANCE_CONFIG: PerformanceConfig = {
+  // 监控开关
+  enabled: true,
+
+  // 采样率 (0-1)
+  sampleRate: 0.1,
+
+  // 监控间隔 (毫秒)
+  monitorInterval: 5000,
+
+  // 性能阈值配置
+  thresholds: {
+    // 页面加载时间阈值 (毫秒)
+    pageLoad: 3000,
+
+    // API 响应时间阈值 (毫秒)
+    apiResponse: 1000,
+
+    // 组件渲染时间阈值 (毫秒)
+    componentRender: 100,
+
+    // 内存使用阈值 (MB)
+    memoryUsage: 100,
+
+    // 帧率阈值 (FPS)
+    frameRate: 30,
   },
 
-  preloading: {
-    enabled: true,
-    criticalPaths: ['/dashboard', '/profile'],
-    delay: 1000,
+  // 监控指标
+  metrics: {
+    // 核心 Web 指标
+    coreWebVitals: true,
+
+    // 自定义指标
+    custom: true,
+
+    // 资源加载
+    resourceLoading: true,
+
+    // 内存使用
+    memoryUsage: true,
+
+    // 错误率
+    errorRate: true,
   },
 
-  caching: {
-    enabled: true,
-    maxAge: 24 * 60 * 60 * 1000, // 24小时
-    maxSize: 100, // 最大缓存条目数
-  },
+  // 上报配置
+  reporting: {
+    // 上报地址
+    endpoint: '/api/performance',
 
-  compression: {
-    enabled: true,
-    algorithm: 'gzip',
-    level: 6,
-  },
+    // 上报间隔 (毫秒)
+    interval: 30000,
 
-  monitoring: {
-    enabled: true,
-    sampleRate: 0.1, // 10%采样率
-    reportInterval: 60000, // 1分钟
-  },
+    // 批量上报大小
+    batchSize: 10,
 
-  resources: {
-    imageOptimization: true,
-    fontDisplay: 'swap',
-    criticalCSS: true,
+    // 是否实时上报
+    realTime: false,
   },
 };
 
-/**
- * 性能优化管理器
- */
-export class PerformanceManager {
-  private static instance: PerformanceManager;
-  private config: PerformanceConfig;
-  private observers: Map<string, IntersectionObserver> = new Map();
-  private performanceEntries: PerformanceEntry[] = [];
+// 性能指标类型
+export interface PerformanceConfig {
+  enabled: boolean;
+  sampleRate: number;
+  monitorInterval: number;
+  thresholds: {
+    pageLoad: number;
+    apiResponse: number;
+    componentRender: number;
+    memoryUsage: number;
+    frameRate: number;
+  };
+  metrics: {
+    coreWebVitals: boolean;
+    custom: boolean;
+    resourceLoading: boolean;
+    memoryUsage: boolean;
+    errorRate: boolean;
+  };
+  reporting: {
+    endpoint: string;
+    interval: number;
+    batchSize: number;
+    realTime: boolean;
+  };
+}
+
+// 性能监控器类
+export class PerformanceMonitor {
+  private observers: Set<PerformanceObserver> = new Set();
+  private metrics: PerformanceMetric[] = [];
   private isMonitoring = false;
+  private intervalId: ReturnType<typeof setInterval> | null = null;
 
-  private constructor(config: Partial<PerformanceConfig> = {}) {
-    this.config = { ...defaultPerformanceConfig, ...config };
-    this.init();
-  }
-
-  static getInstance(config?: Partial<PerformanceConfig>): PerformanceManager {
-    if (!PerformanceManager.instance) {
-      PerformanceManager.instance = new PerformanceManager(config);
-    }
-    return PerformanceManager.instance;
-  }
-
-  /**
-   * 初始化性能管理器
-   */
-  private init(): void {
-    if (this.config.monitoring.enabled) {
-      this.startMonitoring();
-    }
-
-    if (this.config.lazyLoading.enabled) {
-      this.setupLazyLoading();
-    }
-
-    if (this.config.preloading.enabled) {
-      this.setupPreloading();
-    }
-  }
-
-  /**
-   * 设置懒加载
-   */
-  private setupLazyLoading(): void {
-    const options: IntersectionObserverInit = {
-      threshold: this.config.lazyLoading.threshold,
-      rootMargin: this.config.lazyLoading.rootMargin,
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const target = entry.target as HTMLElement;
-          this.loadLazyContent(target);
-          observer.unobserve(target);
-        }
-      });
-    }, options);
-
-    this.observers.set('lazy', observer);
-  }
-
-  /**
-   * 加载懒加载内容
-   */
-  private loadLazyContent(element: HTMLElement): void {
-    const src = element.getAttribute('data-src');
-    const srcset = element.getAttribute('data-srcset');
-
-    if (src && element instanceof HTMLImageElement) {
-      element.src = src;
-      element.removeAttribute('data-src');
-    }
-
-    if (srcset && element instanceof HTMLImageElement) {
-      element.srcset = srcset;
-      element.removeAttribute('data-srcset');
-    }
-
-    element.classList.remove('lazy');
-    element.classList.add('loaded');
-  }
-
-  /**
-   * 设置预加载
-   */
-  private setupPreloading(): void {
-    setTimeout(() => {
-      this.config.preloading.criticalPaths.forEach((path) => {
-        this.preloadRoute(path);
-      });
-    }, this.config.preloading.delay);
-  }
-
-  /**
-   * 预加载路由
-   */
-  private preloadRoute(path: string): void {
-    const link = document.createElement('link');
-    link.rel = 'prefetch';
-    link.href = path;
-    document.head.appendChild(link);
-  }
+  constructor(private config: PerformanceConfig = PERFORMANCE_CONFIG) {}
 
   /**
    * 开始性能监控
    */
-  private startMonitoring(): void {
-    if (this.isMonitoring) return;
+  start(): void {
+    if (this.isMonitoring || !this.config.enabled) return;
 
     this.isMonitoring = true;
+    this.startCoreWebVitalsMonitoring();
+    this.startCustomMetricsMonitoring();
+    this.startResourceLoadingMonitoring();
+    this.startMemoryMonitoring();
+    this.startErrorMonitoring();
 
-    // 监控页面加载性能
-    this.observePageLoad();
+    // 定期清理和上报
+    this.intervalId = setInterval(() => {
+      this.cleanup();
+      this.report();
+    }, this.config.reporting.interval);
 
-    // 监控资源加载性能
-    this.observeResourceTiming();
-
-    // 监控用户交互性能
-    this.observeUserInteractions();
-
-    // 定期报告性能数据
-    setInterval(() => {
-      this.reportPerformance();
-    }, this.config.monitoring.reportInterval);
+    console.log('Performance monitoring started');
   }
 
   /**
-   * 监控页面加载性能
+   * 停止性能监控
    */
-  private observePageLoad(): void {
-    if ('PerformanceObserver' in window) {
-      const observer = new PerformanceObserver((list) => {
-        list.getEntries().forEach((entry) => {
-          if (entry.entryType === 'navigation') {
-            this.performanceEntries.push(entry);
-          }
-        });
-      });
+  stop(): void {
+    if (!this.isMonitoring) return;
 
-      observer.observe({ entryTypes: ['navigation'] });
+    this.isMonitoring = false;
+
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
+
+    this.observers.clear();
+    console.log('Performance monitoring stopped');
+  }
+
+  /**
+   * 添加性能观察者
+   */
+  addObserver(observer: PerformanceObserver): void {
+    this.observers.add(observer);
+  }
+
+  /**
+   * 移除性能观察者
+   */
+  removeObserver(observer: PerformanceObserver): void {
+    this.observers.delete(observer);
+  }
+
+  /**
+   * 记录性能指标
+   */
+  recordMetric(
+    name: string,
+    value: number,
+    metadata?: Record<string, unknown>
+  ): void {
+    if (!this.config.enabled || Math.random() > this.config.sampleRate) return;
+
+    const metric: PerformanceMetric = {
+      name,
+      value,
+      unit: this.getUnit(name),
+      timestamp: Date.now(),
+      metadata,
+    };
+
+    this.metrics.push(metric);
+    this.notifyObservers(metric);
+
+    // 检查阈值
+    this.checkThresholds(metric);
+  }
+
+  /**
+   * 获取指标单位
+   */
+  private getUnit(metricName: string): string {
+    const unitMap: Record<string, string> = {
+      pageLoad: 'ms',
+      apiResponse: 'ms',
+      componentRender: 'ms',
+      memoryUsage: 'MB',
+      frameRate: 'fps',
+      duration: 'ms',
+      size: 'bytes',
+    };
+
+    return unitMap[metricName] || 'units';
+  }
+
+  /**
+   * 检查性能阈值
+   */
+  private checkThresholds(metric: PerformanceMetric): void {
+    const threshold =
+      this.config.thresholds[
+        metric.name as keyof typeof this.config.thresholds
+      ];
+
+    if (threshold && metric.value > threshold) {
+      console.warn(
+        `Performance threshold exceeded: ${metric.name} = ${metric.value}${metric.unit} (threshold: ${threshold}${metric.unit})`
+      );
+
+      // 可以在这里添加告警逻辑
+      this.triggerAlert(metric, threshold);
     }
   }
 
   /**
-   * 监控资源加载性能
+   * 触发性能告警
    */
-  private observeResourceTiming(): void {
-    if ('PerformanceObserver' in window) {
-      const observer = new PerformanceObserver((list) => {
-        list.getEntries().forEach((entry) => {
-          if (entry.entryType === 'resource') {
-            this.performanceEntries.push(entry);
-          }
-        });
-      });
-
-      observer.observe({ entryTypes: ['resource'] });
-    }
-  }
-
-  /**
-   * 监控用户交互性能
-   */
-  private observeUserInteractions(): void {
-    if ('PerformanceObserver' in window) {
-      const observer = new PerformanceObserver((list) => {
-        list.getEntries().forEach((entry) => {
-          if (entry.entryType === 'interaction') {
-            this.performanceEntries.push(entry);
-          }
-        });
-      });
-
-      observer.observe({ entryTypes: ['interaction'] });
-    }
-  }
-
-  /**
-   * 报告性能数据
-   */
-  private reportPerformance(): void {
-    if (Math.random() > this.config.monitoring.sampleRate) return;
-
-    const metrics = this.calculateMetrics();
-
-    // 发送到监控系统
-    this.sendMetrics(metrics);
-
-    // 清理旧数据
-    this.cleanupOldEntries();
-  }
-
-  /**
-   * 计算性能指标
-   */
-  private calculateMetrics() {
-    const navigationEntries = this.performanceEntries.filter(
-      (entry) => entry.entryType === 'navigation'
-    );
-
-    const resourceEntries = this.performanceEntries.filter(
-      (entry) => entry.entryType === 'resource'
-    );
-
-    return {
-      pageLoad:
-        navigationEntries.length > 0
-          ? {
-              dns: this.getAverageTime(
-                navigationEntries,
-                'domainLookupEnd',
-                'domainLookupStart'
-              ),
-              tcp: this.getAverageTime(
-                navigationEntries,
-                'connectEnd',
-                'connectStart'
-              ),
-              ttfb: this.getAverageTime(
-                navigationEntries,
-                'responseStart',
-                'requestStart'
-              ),
-              domContentLoaded: this.getAverageTime(
-                navigationEntries,
-                'domContentLoadedEventEnd',
-                'domContentLoadedEventStart'
-              ),
-              load: this.getAverageTime(
-                navigationEntries,
-                'loadEventEnd',
-                'loadEventStart'
-              ),
-            }
-          : null,
-
-      resources:
-        resourceEntries.length > 0
-          ? {
-              count: resourceEntries.length,
-              totalSize: this.calculateTotalSize(resourceEntries),
-              averageLoadTime: this.getAverageTime(
-                resourceEntries,
-                'responseEnd',
-                'fetchStart'
-              ),
-            }
-          : null,
-
+  private triggerAlert(metric: PerformanceMetric, threshold: number): void {
+    // 这里可以集成告警系统
+    const alert = {
+      type: 'performance_threshold_exceeded',
+      metric: metric.name,
+      value: metric.value,
+      threshold,
       timestamp: Date.now(),
     };
+
+    console.warn('Performance alert:', alert);
   }
 
   /**
-   * 计算平均时间
+   * 通知观察者
    */
-  private getAverageTime(
-    entries: PerformanceEntry[],
-    endKey: string,
-    startKey: string
-  ): number {
-    const times = entries
-      .map((entry) => {
-        const end = (entry as any)[endKey];
-        const start = (entry as any)[startKey];
-        return end && start ? end - start : 0;
-      })
-      .filter((time) => time > 0);
-
-    return times.length > 0
-      ? times.reduce((a, b) => a + b, 0) / times.length
-      : 0;
+  private notifyObservers(metric: PerformanceMetric): void {
+    this.observers.forEach((observer) => {
+      try {
+        observer(metric);
+      } catch (error) {
+        console.error('Error in performance observer:', error);
+      }
+    });
   }
 
   /**
-   * 计算总大小
+   * 开始核心 Web 指标监控
    */
-  private calculateTotalSize(entries: PerformanceEntry[]): number {
-    return entries
-      .map((entry) => (entry as any).transferSize || 0)
-      .reduce((total, size) => total + size, 0);
-  }
+  private startCoreWebVitalsMonitoring(): void {
+    if (!this.config.metrics.coreWebVitals) return;
 
-  /**
-   * 发送性能指标
-   */
-  private sendMetrics(metrics: any): void {
-    // 这里可以集成具体的监控系统
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Performance metrics:', metrics);
+    // 监控 LCP (Largest Contentful Paint)
+    if ('PerformanceObserver' in window) {
+      try {
+        const lcpObserver = new PerformanceObserver((list) => {
+          const entries = list.getEntries();
+          const lastEntry = entries[entries.length - 1];
+          if (lastEntry) {
+            this.recordMetric('lcp', lastEntry.startTime, {
+              entryType: 'largest-contentful-paint',
+            });
+          }
+        });
+        lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
+      } catch (error) {
+        console.warn('Failed to observe LCP:', error);
+      }
+
+      // 监控 FID (First Input Delay)
+      try {
+        const fidObserver = new PerformanceObserver((list) => {
+          const entries = list.getEntries();
+          entries.forEach((entry) => {
+            const fidEntry = entry as PerformanceEntry & {
+              processingStart?: number;
+            };
+            if (fidEntry.processingStart) {
+              this.recordMetric(
+                'fid',
+                fidEntry.processingStart - entry.startTime,
+                { entryType: 'first-input' }
+              );
+            }
+          });
+        });
+        fidObserver.observe({ entryTypes: ['first-input'] });
+      } catch (error) {
+        console.warn('Failed to observe FID:', error);
+      }
+
+      // 监控 CLS (Cumulative Layout Shift)
+      try {
+        const clsObserver = new PerformanceObserver((list) => {
+          let clsValue = 0;
+          list.getEntries().forEach((entry: PerformanceEntry) => {
+            if ('value' in entry) {
+              clsValue += entry.value as number;
+            }
+          });
+          this.recordMetric('cls', clsValue, { entryType: 'layout-shift' });
+        });
+        clsObserver.observe({ entryTypes: ['layout-shift'] });
+      } catch (error) {
+        console.warn('Failed to observe CLS:', error);
+      }
     }
+  }
 
-    // 发送到分析服务
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', 'performance_metrics', metrics);
+  /**
+   * 开始自定义指标监控
+   */
+  private startCustomMetricsMonitoring(): void {
+    if (!this.config.metrics.custom) return;
+
+    // 监控页面加载时间
+    window.addEventListener('load', () => {
+      const loadTime = window.performance.now();
+      this.recordMetric('pageLoad', loadTime);
+    });
+
+    // 监控 DOM 内容加载时间
+    document.addEventListener('DOMContentLoaded', () => {
+      const domLoadTime = window.performance.now();
+      this.recordMetric('domContentLoaded', domLoadTime);
+    });
+  }
+
+  /**
+   * 开始资源加载监控
+   */
+  private startResourceLoadingMonitoring(): void {
+    if (!this.config.metrics.resourceLoading) return;
+
+    if ('PerformanceObserver' in window) {
+      try {
+        const resourceObserver = new PerformanceObserver((list) => {
+          list.getEntries().forEach((entry: PerformanceEntry) => {
+            if (entry.entryType === 'resource') {
+              const resourceEntry = entry as PerformanceResourceTiming;
+              this.recordMetric('resourceLoad', resourceEntry.duration, {
+                name: resourceEntry.name,
+                type: resourceEntry.initiatorType,
+              });
+            }
+          });
+        });
+        resourceObserver.observe({ entryTypes: ['resource'] });
+      } catch (error) {
+        console.warn('Failed to observe resource loading:', error);
+      }
     }
   }
 
   /**
-   * 清理旧的性能条目
+   * 开始内存监控
    */
-  private cleanupOldEntries(): void {
-    const oneHourAgo = Date.now() - 60 * 60 * 1000;
-    this.performanceEntries = this.performanceEntries.filter(
-      (entry) => entry.startTime > oneHourAgo
+  private startMemoryMonitoring(): void {
+    if (!this.config.metrics.memoryUsage) return;
+
+    // 定期检查内存使用情况
+    setInterval(() => {
+      if ('memory' in window.performance) {
+        const memory = (
+          window.performance as Performance & {
+            memory: {
+              usedJSHeapSize: number;
+              totalJSHeapSize: number;
+              jsHeapSizeLimit: number;
+            };
+          }
+        ).memory;
+        const usedMemoryMB = memory.usedJSHeapSize / (1024 * 1024);
+        this.recordMetric('memoryUsage', usedMemoryMB, {
+          total: memory.totalJSHeapSize / (1024 * 1024),
+          limit: memory.jsHeapSizeLimit / (1024 * 1024),
+        });
+      }
+    }, 10000);
+  }
+
+  /**
+   * 开始错误监控
+   */
+  private startErrorMonitoring(): void {
+    if (!this.config.metrics.errorRate) return;
+
+    // 监控 JavaScript 错误
+    window.addEventListener('error', (event) => {
+      this.recordMetric('jsError', 1, {
+        message: event.message,
+        filename: event.filename,
+        lineno: event.lineno,
+        colno: event.colno,
+      });
+    });
+
+    // 监控 Promise 拒绝
+    window.addEventListener('unhandledrejection', (event) => {
+      this.recordMetric('promiseRejection', 1, {
+        reason: event.reason,
+      });
+    });
+  }
+
+  /**
+   * 清理旧的指标数据
+   */
+  private cleanup(): void {
+    const now = Date.now();
+    const maxAge = 5 * 60 * 1000; // 5分钟
+
+    this.metrics = this.metrics.filter(
+      (metric) => now - metric.timestamp < maxAge
     );
   }
 
   /**
-   * 获取性能配置
+   * 上报性能指标
    */
-  getConfig(): PerformanceConfig {
-    return { ...this.config };
-  }
+  private async report(): Promise<void> {
+    if (this.metrics.length === 0) return;
 
-  /**
-   * 更新性能配置
-   */
-  updateConfig(newConfig: Partial<PerformanceConfig>): void {
-    this.config = { ...this.config, ...newConfig };
-    this.init();
-  }
+    try {
+      const batch = this.metrics.splice(0, this.config.reporting.batchSize);
 
-  /**
-   * 手动触发性能报告
-   */
-  forceReport(): void {
-    this.reportPerformance();
-  }
+      const response = await fetch(this.config.reporting.endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          metrics: batch,
+          timestamp: Date.now(),
+        }),
+      });
 
-  /**
-   * 清理资源
-   */
-  cleanup(): void {
-    this.observers.forEach((observer) => observer.disconnect());
-    this.observers.clear();
-    this.performanceEntries = [];
-    this.isMonitoring = false;
-  }
-}
-
-/**
- * 性能优化工具函数
- */
-
-/**
- * 防抖函数
- */
-export function debounce<T extends (...args: unknown[]) => unknown>(
-  func: T,
-  wait: number
-): (...args: Parameters<T>) => void {
-  let timeout: ReturnType<typeof setTimeout>;
-  return (...args: Parameters<T>) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  };
-}
-
-/**
- * 节流函数
- */
-export function throttle<T extends (...args: unknown[]) => unknown>(
-  func: T,
-  limit: number
-): (...args: Parameters<T>) => void {
-  let inThrottle: boolean;
-  return (...args: Parameters<T>) => {
-    if (!inThrottle) {
-      func(...args);
-      inThrottle = true;
-      setTimeout(() => (inThrottle = false), limit);
+      if (!response.ok) {
+        console.warn('Failed to report performance metrics:', response.status);
+      }
+    } catch (error) {
+      console.error('Error reporting performance metrics:', error);
     }
-  };
-}
-
-/**
- * 异步加载脚本
- */
-export function loadScript(src: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = src;
-    script.onload = () => resolve();
-    script.onerror = reject;
-    document.head.appendChild(script);
-  });
-}
-
-/**
- * 异步加载样式
- */
-export function loadStyle(href: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = href;
-    link.onload = () => resolve();
-    link.onerror = reject;
-    document.head.appendChild(link);
-  });
-}
-
-/**
- * 预加载图片
- */
-export function preloadImage(src: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve();
-    img.onerror = reject;
-    img.src = src;
-  });
-}
-
-/**
- * 测量函数执行时间
- */
-export function measureTime<T>(fn: () => T, label: string): T {
-  const start = performance.now();
-  const result = fn();
-  const end = performance.now();
-
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`${label} took ${end - start}ms`);
   }
 
-  return result;
-}
+  /**
+   * 获取性能指标摘要
+   */
+  getSummary(): Record<
+    string,
+    { count: number; avg: number; min: number; max: number }
+  > {
+    const summary: Record<
+      string,
+      { count: number; avg: number; min: number; max: number }
+    > = {};
 
-/**
- * 异步测量函数执行时间
- */
-export async function measureTimeAsync<T>(
-  fn: () => Promise<T>,
-  label: string
-): Promise<T> {
-  const start = performance.now();
-  const result = await fn();
-  const end = performance.now();
+    this.metrics.forEach((metric) => {
+      if (!summary[metric.name]) {
+        summary[metric.name] = {
+          count: 0,
+          avg: 0,
+          min: Infinity,
+          max: -Infinity,
+        };
+      }
 
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`${label} took ${end - start}ms`);
+      const stats = summary[metric.name];
+      stats.count++;
+      stats.min = Math.min(stats.min, metric.value);
+      stats.max = Math.max(stats.max, metric.value);
+      stats.avg = (stats.avg * (stats.count - 1) + metric.value) / stats.count;
+    });
+
+    return summary;
   }
 
-  return result;
+  /**
+   * 重置性能监控器
+   */
+  reset(): void {
+    this.metrics = [];
+    this.observers.clear();
+    console.log('Performance monitor reset');
+  }
 }
 
-// 导出默认实例
-export const performanceManager = PerformanceManager.getInstance();
+// 创建全局性能监控器实例
+export const performanceMonitor = new PerformanceMonitor();
+
+// 导出性能监控工具函数
+export const performance = {
+  /**
+   * 记录性能指标
+   */
+  recordMetric: (
+    name: string,
+    value: number,
+    metadata?: Record<string, unknown>
+  ) => {
+    performanceMonitor.recordMetric(name, value, metadata);
+  },
+
+  /**
+   * 添加性能观察者
+   */
+  addObserver: (observer: PerformanceObserver) => {
+    performanceMonitor.addObserver(observer);
+  },
+
+  /**
+   * 移除性能观察者
+   */
+  removeObserver: (observer: PerformanceObserver) => {
+    performanceMonitor.removeObserver(observer);
+  },
+
+  /**
+   * 开始性能监控
+   */
+  start: () => {
+    performanceMonitor.start();
+  },
+
+  /**
+   * 停止性能监控
+   */
+  stop: () => {
+    performanceMonitor.stop();
+  },
+
+  /**
+   * 获取性能摘要
+   */
+  getSummary: () => {
+    return performanceMonitor.getSummary();
+  },
+
+  /**
+   * 重置性能监控
+   */
+  reset: () => {
+    performanceMonitor.reset();
+  },
+};
+
+// 自动启动性能监控
+if (PERFORMANCE_CONFIG.enabled) {
+  performance.start();
+}
