@@ -1,4 +1,4 @@
-# 前端脚手架（供coder，参考和学习前端架构）
+# 前端脚手架（供 coder，参考和学习前端架构）
 
 一个现代化的 React + TypeScript + Vite 企业级项目模板，集成了最新的前端开发工具和最佳实践。
 
@@ -11,7 +11,8 @@
 - 🛣️ **React Router** - 声明式路由
 - 🧪 **Jest + Testing Library** - 完整的测试解决方案
 - 📝 **ESLint + Prettier** - 代码质量和格式化
-- 🐶 **Husky + lint-staged** - Git hooks
+- 🐶 **Husky + lint-staged** - Git hooks 和代码质量检查
+- 📝 **Commitlint** - 提交信息格式规范检查
 - 📦 **Axios** - HTTP 客户端
 - 🌐 **i18next** - 国际化支持
 - 📚 **Storybook** - 组件文档和交互式示例
@@ -117,6 +118,7 @@ npm run build-storybook
 - **安全指南**: [docs/SECURITY.md](docs/SECURITY.md)
 - **部署指南**: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
 - **CI/CD 指南**: [docs/CI_CD.md](docs/CI_CD.md)
+- **提交信息规范**: [docs/COMMIT_CONVENTION.md](docs/COMMIT_CONVENTION.md)
 - **故障排查**: [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
 - **代码优化**: [docs/CODE_OPTIMIZATION.md](docs/CODE_OPTIMIZATION.md)
 
@@ -184,6 +186,12 @@ npm run lint:fix
 
 # 代码格式化
 npm run format
+
+# 检查格式
+npm run format:check
+
+# 提交信息检查
+npm run commitlint:check
 ```
 
 ## 🐳 Docker 支持
@@ -369,5 +377,5 @@ VITE_AUTH_USE_COOKIES=false
 
 ---
 
-*最后更新: 2024年12月*
-*项目版本: v1.0.0*
+_最后更新: 2024 年 12 月_
+_项目版本: v1.0.0_
