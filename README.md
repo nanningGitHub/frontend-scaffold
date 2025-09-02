@@ -109,18 +109,31 @@ npm run build-storybook
 
 ### 关键文档
 
+详细的文档请查看 [docs/README.md](./docs/README.md) 获取完整的文档索引。
+
+#### 核心架构
+
 - **架构总览**: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
-- **企业架构**: [docs/ENTERPRISE_ARCHITECTURE.md](docs/ENTERPRISE_ARCHITECTURE.md)
 - **微前端指南**: [docs/MICRO_FRONTEND.md](docs/MICRO_FRONTEND.md)
 - **状态管理**: [docs/ZUSTAND_GUIDE.md](docs/ZUSTAND_GUIDE.md)
-- **国际化**: [docs/INTERNATIONALIZATION.md](docs/INTERNATIONALIZATION.md)
+
+#### 开发指南
+
 - **测试策略**: [docs/TESTING.md](docs/TESTING.md)
 - **安全指南**: [docs/SECURITY.md](docs/SECURITY.md)
+- **故障排查**: [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
+- **提交信息规范**: [docs/COMMIT_CONVENTION.md](docs/COMMIT_CONVENTION.md)
+
+#### 部署运维
+
 - **部署指南**: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
 - **CI/CD 指南**: [docs/CI_CD.md](docs/CI_CD.md)
-- **提交信息规范**: [docs/COMMIT_CONVENTION.md](docs/COMMIT_CONVENTION.md)
-- **故障排查**: [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
-- **代码优化**: [docs/CODE_OPTIMIZATION.md](docs/CODE_OPTIMIZATION.md)
+- **环境配置**: [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md)
+
+#### 学习资源
+
+- **前端架构学习指南**: [FRONTEND_ARCHITECTURE_LEARNING_GUIDE.md](./FRONTEND_ARCHITECTURE_LEARNING_GUIDE.md)
+- **代码质量分析报告**: [CODE_QUALITY_ANALYSIS_REPORT.md](./CODE_QUALITY_ANALYSIS_REPORT.md)
 
 ## 🔐 认证与安全
 

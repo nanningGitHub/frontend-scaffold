@@ -1,5 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { monitoring } from '../utils/monitoring';
+import { monitoring } from '../utils/enterpriseMonitoring';
 
 interface Props {
   children: ReactNode;

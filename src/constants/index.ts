@@ -5,14 +5,19 @@
  */
 
 // 兼容测试环境与非 Vite 场景的环境变量读取
-function readViteEnvSafe(): Record<string, any> | undefined {
+function readViteEnvSafe(): Record<string, string> | undefined {
   try {
     // 通过类型检查避免在非 ESM 环境下解析 import.meta 语法
     if (
-      typeof (globalThis as any).import !== 'undefined' &&
-      (globalThis as any).import?.meta?.env
+      typeof (
+        globalThis as { import?: { meta?: { env?: Record<string, string> } } }
+      ).import !== 'undefined' &&
+      (globalThis as { import?: { meta?: { env?: Record<string, string> } } })
+        .import?.meta?.env
     ) {
-      return (globalThis as any).import.meta.env;
+      return (
+        globalThis as { import: { meta: { env: Record<string, string> } } }
+      ).import.meta.env;
     }
     // 在测试环境中提供默认值
     if (process.env.NODE_ENV === 'test') {
@@ -35,7 +40,8 @@ const viteEnv = readViteEnvSafe();
 export const API_CONFIG = {
   BASE_URL:
     (viteEnv && viteEnv.VITE_API_BASE_URL) ||
-    (globalThis as any).process?.env?.VITE_API_BASE_URL ||
+    (globalThis as { process?: { env?: { VITE_API_BASE_URL?: string } } })
+      .process?.env?.VITE_API_BASE_URL ||
     '/api',
   TIMEOUT: 10000,
   RETRY_TIMES: 3,

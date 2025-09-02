@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { logger } from '../utils/logger';
 
 /**
  * 主题类型
@@ -33,23 +34,23 @@ export type ThemeStore = ThemeState & ThemeActions;
  * 应用主题到DOM
  */
 const applyThemeToDOM = (theme: Theme) => {
-  console.log('applyThemeToDOM called with:', theme);
+  logger.debug('applyThemeToDOM called with:', theme);
 
   try {
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
-      console.log('Added dark class to document.documentElement');
+      logger.debug('Added dark class to document.documentElement');
     } else if (theme === 'light') {
       document.documentElement.classList.remove('dark');
-      console.log('Removed dark class from document.documentElement');
+      logger.debug('Removed dark class from document.documentElement');
     }
     // 对于 'system' 类型，不直接应用，而是通过 detectSystemTheme 处理
 
     // 验证结果
     const hasDarkClass = document.documentElement.classList.contains('dark');
-    console.log('Theme applied successfully. Has dark class:', hasDarkClass);
+    logger.debug('Theme applied successfully. Has dark class:', hasDarkClass);
   } catch (error) {
-    console.error('Error applying theme to DOM:', error);
+    logger.error('Error applying theme to DOM:', error);
   }
 };
 
@@ -65,16 +66,16 @@ export const useThemeStore = create<ThemeStore>()(
 
       // 设置主题
       setTheme: (theme: Theme) => {
-        console.log('setTheme called with:', theme);
+        logger.debug('setTheme called with:', theme);
         set({ theme });
 
         // 应用主题到 DOM
         if (theme === 'system') {
           const systemTheme = get().systemTheme;
-          console.log('Applying system theme:', systemTheme);
+          logger.debug('Applying system theme:', systemTheme);
           applyThemeToDOM(systemTheme);
         } else {
-          console.log('Applying direct theme:', theme);
+          logger.debug('Applying direct theme:', theme);
           applyThemeToDOM(theme);
         }
       },
@@ -82,15 +83,15 @@ export const useThemeStore = create<ThemeStore>()(
       // 切换主题
       toggleTheme: () => {
         const currentTheme = get().theme;
-        console.log('toggleTheme called, current theme:', currentTheme);
+        logger.debug('toggleTheme called, current theme:', currentTheme);
         if (currentTheme === 'system') {
           // 如果当前是系统主题，切换到浅色主题
-          console.log('Switching from system to light');
+          logger.debug('Switching from system to light');
           get().setTheme('light');
         } else {
           // 在浅色和深色之间切换
           const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-          console.log('Switching from', currentTheme, 'to', newTheme);
+          logger.debug('Switching from', currentTheme, 'to', newTheme);
           get().setTheme(newTheme);
         }
       },
@@ -102,7 +103,7 @@ export const useThemeStore = create<ThemeStore>()(
           ? 'dark'
           : 'light';
 
-        console.log('detectSystemTheme called, system theme:', systemTheme);
+        logger.debug('detectSystemTheme called, system theme:', systemTheme);
         set({ systemTheme });
 
         // 如果当前主题是系统主题，则应用检测到的主题
@@ -126,10 +127,10 @@ export const useThemeStore = create<ThemeStore>()(
       // 初始化时应用主题
       onRehydrateStorage: () => (state) => {
         if (state) {
-          console.log('onRehydrateStorage called, state:', state);
+          logger.debug('onRehydrateStorage called, state:', state);
           // 延迟应用主题，确保DOM已准备好
           setTimeout(() => {
-            console.log('Applying theme after rehydration');
+            logger.debug('Applying theme after rehydration');
             if (state.theme === 'system') {
               state.detectSystemTheme();
             } else {

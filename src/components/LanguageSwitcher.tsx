@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
 
 /**
  * 语言切换组件属性接口

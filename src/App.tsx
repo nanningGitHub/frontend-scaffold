@@ -9,7 +9,7 @@ import MonitoringDashboard from './components/MonitoringDashboard';
 import SecurityDashboard from './components/SecurityDashboard';
 import NotificationSystem from './components/NotificationSystem';
 import { monitoring } from './utils/enterpriseMonitoring';
-import { logger } from './utils/enterpriseLogger';
+import { logger } from './utils/logger';
 import { errorHandler } from './utils/enterpriseErrorHandler';
 
 // 懒加载页面组件

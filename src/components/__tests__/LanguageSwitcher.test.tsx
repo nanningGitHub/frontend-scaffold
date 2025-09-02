@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { LanguageSwitcher } from '../LanguageSwitcher';
+import LanguageSwitcher from '../LanguageSwitcher';
 import { useI18n } from '../../hooks/useI18n';
 
 // Mock the useI18n hook

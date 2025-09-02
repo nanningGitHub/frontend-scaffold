@@ -9,7 +9,7 @@
  * 5. 用户友好的错误提示
  */
 
-import { logger } from './simpleLogger';
+import { logger } from './logger';
 import { monitoring } from './enterpriseMonitoring';
 
 // 错误类型枚举
@@ -220,7 +220,6 @@ export class EnterpriseErrorHandler {
 
     // 这里可以集成真实的错误监控服务
     if (import.meta.env.DEV) {
-      // eslint-disable-next-line no-console
       console.error('🚨 Error reported:', errorInfo);
     }
   }

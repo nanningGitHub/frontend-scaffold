@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { NotificationSystem } from '../NotificationSystem';
+import NotificationSystem from '../NotificationSystem';
 import { useNotification } from '../../hooks/useNotification';
 
 // Mock the useNotification hook

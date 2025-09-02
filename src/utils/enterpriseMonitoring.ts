@@ -8,7 +8,7 @@
  * 4. 实时监控面板
  */
 
-import { logger } from './simpleLogger';
+import { logger } from './logger';
 
 // 性能指标接口
 interface PerformanceMetric {
@@ -90,9 +90,7 @@ export class EnterpriseMonitoring {
    * 测量页面加载性能
    */
   private measurePageLoadPerformance(): void {
-    const navigation = performance.getEntriesByType(
-      'navigation'
-    )[0] as PerformanceNavigationTiming;
+    const navigation = performance.getEntriesByType('navigation')[0];
 
     if (navigation) {
       this.trackMetric(

@@ -1,6 +1,5 @@
 import React from 'react';
-import { screen, fireEvent } from '@testing-library/react';
-import { render } from '@testing-library/react';
+import { screen, fireEvent, render } from '@testing-library/react';
 import ApiExample from '../ApiExample';
 
 // Mock API 调用

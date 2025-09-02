@@ -7,7 +7,7 @@
  * 3. 生命周期管理
  */
 
-import { logger } from './simpleLogger';
+import { logger } from './logger';
 
 export interface MicroApp {
   id: string;

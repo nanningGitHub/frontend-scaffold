@@ -1,6 +1,5 @@
 import React from 'react';
-import { screen, fireEvent, waitFor } from '@testing-library/react';
-import { render } from '@testing-library/react';
+import { screen, fireEvent, waitFor, render } from '@testing-library/react';
 import UserProfile from '../UserProfile';
 import { mockAuthStore } from '../../__tests__/mocks/stores';
 

@@ -113,7 +113,9 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response: AxiosResponse) => {
     // 计算请求耗时
-    const startTime = (response.config as any).startTime;
+    const startTime = (
+      response.config as InternalAxiosRequestConfig & { startTime?: number }
+    ).startTime;
     const duration = startTime ? Date.now() - startTime : 0;
 
     // 记录响应日志
@@ -136,7 +138,9 @@ api.interceptors.response.use(
   },
   async (error) => {
     // 计算请求耗时
-    const startTime = (error.config as any)?.startTime;
+    const startTime = (
+      error.config as InternalAxiosRequestConfig & { startTime?: number }
+    )?.startTime;
     const duration = startTime ? Date.now() - startTime : 0;
 
     // 记录错误日志
@@ -149,7 +153,7 @@ api.interceptors.response.use(
 
     // 401 未授权：尝试刷新令牌（非 Cookie 模式且未重试过刷新）
     if (error.response?.status === 401) {
-      const originalConfig: Record<string, any> = error.config || {};
+      const originalConfig: Record<string, unknown> = error.config || {};
       const isCookieMode = AUTH_SECURITY.USE_COOKIES;
       const hasTriedRefresh = originalConfig.__triedRefresh === true;
 
@@ -161,7 +165,7 @@ api.interceptors.response.use(
             const refreshResp = await api.post('auth/refresh', undefined, {
               headers: { Authorization: `Bearer ${currentToken}` },
             });
-            const newToken = (refreshResp as any)?.token;
+            const newToken = (refreshResp as { token?: string })?.token;
             if (newToken) {
               try {
                 localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, newToken);
@@ -190,7 +194,7 @@ api.interceptors.response.use(
     }
 
     // 简单重试：网络错误/超时/5xx，最多 RETRY_TIMES（指数退避）
-    const config: any = error.config || {};
+    const config: Record<string, unknown> = error.config || {};
     const shouldRetry =
       !error.response ||
       error.code === 'ECONNABORTED' ||
@@ -221,27 +225,30 @@ api.interceptors.response.use(
  */
 export const request = {
   // GET 请求
-  get: <T = any>(url: string, params?: any): Promise<T> => {
+  get: <T = unknown>(
+    url: string,
+    params?: Record<string, unknown>
+  ): Promise<T> => {
     return api.get(url, { params });
   },
 
   // POST 请求
-  post: <T = any>(url: string, data?: any): Promise<T> => {
+  post: <T = unknown>(url: string, data?: unknown): Promise<T> => {
     return api.post(url, data);
   },
 
   // PUT 请求
-  put: <T = any>(url: string, data?: any): Promise<T> => {
+  put: <T = unknown>(url: string, data?: unknown): Promise<T> => {
     return api.put(url, data);
   },
 
   // DELETE 请求
-  delete: <T = any>(url: string): Promise<T> => {
+  delete: <T = unknown>(url: string): Promise<T> => {
     return api.delete(url);
   },
 
   // PATCH 请求
-  patch: <T = any>(url: string, data?: any): Promise<T> => {
+  patch: <T = unknown>(url: string, data?: unknown): Promise<T> => {
     return api.patch(url, data);
   },
 };

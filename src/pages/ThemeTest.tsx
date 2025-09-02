@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useThemeStore } from '../stores/themeStore';
+import { logger } from '../utils/logger';
 
 /**
  * 主题测试页面
@@ -44,15 +45,15 @@ const ThemeTest = () => {
   }, [theme, currentTheme]);
 
   const handleToggleTheme = () => {
-    console.log('切换主题前:', { theme, currentTheme });
+    logger.debug('切换主题前:', { theme, currentTheme });
     toggleTheme();
-    console.log('切换主题后:', { theme: useThemeStore.getState().theme });
+    logger.debug('切换主题后:', { theme: useThemeStore.getState().theme });
   };
 
   const handleSetTheme = (newTheme: 'light' | 'dark' | 'system') => {
-    console.log('设置主题前:', { theme, currentTheme });
+    logger.debug('设置主题前:', { theme, currentTheme });
     setTheme(newTheme);
-    console.log('设置主题后:', { theme: useThemeStore.getState().theme });
+    logger.debug('设置主题后:', { theme: useThemeStore.getState().theme });
   };
 
   return (

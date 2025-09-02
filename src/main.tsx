@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './index.css';
-import './i18n';
 import i18n from './i18n';
 import * as Sentry from '@sentry/react';
 import { onCLS, onFID, onLCP } from 'web-vitals';
