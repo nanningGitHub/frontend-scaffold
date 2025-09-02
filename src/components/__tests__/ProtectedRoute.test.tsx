@@ -1,40 +1,44 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import ProtectedRoute from '../ProtectedRoute';
+import { mockAuthStore } from '../../__tests__/mocks/stores';
 
 // Mock stores
-const mockUseAuthStore = jest.fn();
 jest.mock('../../stores/authStore', () => ({
-  useAuthStore: () => mockUseAuthStore(),
+  useAuthStore: () => mockAuthStore,
+}));
+
+// Mock react-router-dom
+jest.mock('react-router-dom', () => ({
+  Navigate: ({ to }: { to: string }) => (
+    <div data-testid="navigate" data-to={to}>
+      Redirecting to {to}
+    </div>
+  ),
+  useLocation: () => ({ pathname: '/protected' }),
 }));
 
 const TestComponent = () => <div>受保护的内容</div>;
-const LoginComponent = () => <div>登录页面</div>;
-
-const renderWithRouter = (component: React.ReactElement) => {
-  return render(
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={component} />
-        <Route path="/login" element={<LoginComponent />} />
-      </Routes>
-    </BrowserRouter>
-  );
-};
 
 describe('ProtectedRoute Component', () => {
   beforeEach(() => {
-    mockUseAuthStore.mockClear();
+    // 重置所有 mock
+    jest.clearAllMocks();
+    // 重置 mock 状态
+    Object.assign(mockAuthStore, {
+      isAuthenticated: false,
+      user: null,
+      loading: false,
+      error: null,
+    });
   });
 
   it('renders children when user is authenticated', () => {
-    mockUseAuthStore.mockReturnValue({
-      isAuthenticated: true,
-      loading: false,
-    });
+    mockAuthStore.isAuthenticated = true;
+    mockAuthStore.loading = false;
 
-    renderWithRouter(
+    render(
       <ProtectedRoute>
         <TestComponent />
       </ProtectedRoute>
@@ -43,29 +47,11 @@ describe('ProtectedRoute Component', () => {
     expect(screen.getByText('受保护的内容')).toBeInTheDocument();
   });
 
-  it('redirects to login when user is not authenticated', () => {
-    mockUseAuthStore.mockReturnValue({
-      isAuthenticated: false,
-      loading: false,
-    });
-
-    renderWithRouter(
-      <ProtectedRoute>
-        <TestComponent />
-      </ProtectedRoute>
-    );
-
-    // 应该重定向到登录页面
-    expect(screen.getByText('登录页面')).toBeInTheDocument();
-  });
-
   it('shows loading state when loading', () => {
-    mockUseAuthStore.mockReturnValue({
-      isAuthenticated: false,
-      loading: true,
-    });
+    mockAuthStore.isAuthenticated = false;
+    mockAuthStore.loading = true;
 
-    renderWithRouter(
+    render(
       <ProtectedRoute>
         <TestComponent />
       </ProtectedRoute>
@@ -75,13 +61,26 @@ describe('ProtectedRoute Component', () => {
     expect(screen.getByText('页面加载中...')).toBeInTheDocument();
   });
 
-  it('renders with proper authentication check', () => {
-    mockUseAuthStore.mockReturnValue({
-      isAuthenticated: true,
-      loading: false,
-    });
+  it('redirects to login when user is not authenticated', () => {
+    mockAuthStore.isAuthenticated = false;
+    mockAuthStore.loading = false;
 
-    renderWithRouter(
+    render(
+      <ProtectedRoute>
+        <TestComponent />
+      </ProtectedRoute>
+    );
+
+    // 应该显示重定向组件
+    expect(screen.getByTestId('navigate')).toBeInTheDocument();
+    expect(screen.getByTestId('navigate')).toHaveAttribute('data-to', '/login');
+  });
+
+  it('renders with proper authentication check', () => {
+    mockAuthStore.isAuthenticated = true;
+    mockAuthStore.loading = false;
+
+    render(
       <ProtectedRoute>
         <TestComponent />
       </ProtectedRoute>

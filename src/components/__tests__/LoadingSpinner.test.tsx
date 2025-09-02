@@ -29,9 +29,9 @@ describe('LoadingSpinner Component', () => {
 
   it('renders with custom className', () => {
     const customClass = 'custom-spinner';
-    render(<LoadingSpinner className={customClass} />);
-    const container = screen.getByRole('status').closest('div');
-    expect(container).toHaveClass(customClass);
+    const { container } = render(<LoadingSpinner className={customClass} />);
+    // 检查最外层容器是否有自定义 className
+    expect(container.firstChild).toHaveClass(customClass);
   });
 
   it('renders without text when text is not provided', () => {
