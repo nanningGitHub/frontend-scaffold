@@ -5,9 +5,12 @@ import {
   EnterpriseErrorBoundary,
   defaultErrorTypes,
 } from './components/EnterpriseErrorBoundary';
-import { monitoring } from './utils/monitoring';
+import MonitoringDashboard from './components/MonitoringDashboard';
+import SecurityDashboard from './components/SecurityDashboard';
+import NotificationSystem from './components/NotificationSystem';
+import { monitoring } from './utils/enterpriseMonitoring';
 import { logger } from './utils/enterpriseLogger';
-// import { securityManager } from './utils/securityManager';
+import { errorHandler } from './utils/enterpriseErrorHandler';
 
 // 懒加载页面组件
 const Home = lazy(() => import('./pages/Home'));
@@ -76,9 +79,7 @@ function App() {
   // 初始化企业级系统
   useEffect(() => {
     // 初始化监控系统
-    monitoring.addObserver((type, data) => {
-      logger.info(`Monitoring event: ${type}`, data);
-    });
+    monitoring.trackEvent('app_start', 'application');
 
     // 记录应用启动
     logger.info('Application started', {
@@ -89,10 +90,7 @@ function App() {
     });
 
     // 记录性能指标
-    monitoring.recordMetric('app_startup_time', performance.now(), {
-      theme,
-      locale,
-    });
+    monitoring.trackMetric('app_startup_time', performance.now());
 
     // 设置日志上下文
     logger.addContext({
@@ -101,9 +99,24 @@ function App() {
       environment: process.env.NODE_ENV,
     });
 
+    // 初始化错误处理
+    window.addEventListener('error', (event) => {
+      errorHandler.handleError(event.error, {
+        filename: event.filename,
+        lineno: event.lineno,
+        colno: event.colno,
+      });
+    });
+
+    window.addEventListener('unhandledrejection', (event) => {
+      errorHandler.handleError(new Error(event.reason), {
+        type: 'unhandledrejection',
+      });
+    });
+
     // 定期清理
     const cleanupInterval = setInterval(() => {
-      monitoring.cleanup();
+      monitoring.clearData();
       logger.cleanup();
     }, 5 * 60 * 1000); // 每5分钟清理一次
 
@@ -151,6 +164,11 @@ function App() {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
+
+        {/* 企业级功能组件 */}
+        <NotificationSystem />
+        <MonitoringDashboard />
+        <SecurityDashboard />
       </div>
     </EnterpriseErrorBoundary>
   );

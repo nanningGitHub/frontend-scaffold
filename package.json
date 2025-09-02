@@ -41,6 +41,7 @@
     "security:check": "npm audit --json > security-report.json",
     "bundle:analyze": "npm run build:analyze && npx vite-bundle-analyzer dist",
     "performance:lighthouse": "lighthouse http://localhost:3000 --output=json --output-path=./lighthouse-report.json",
+    "performance:test": "node scripts/performance-test.js",
     "health:check": "node scripts/health-check.js",
     "monitoring:start": "node scripts/monitoring-server.js",
     "backup:create": "node scripts/backup.js",

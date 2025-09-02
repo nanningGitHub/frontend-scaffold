@@ -1,4 +1,4 @@
-import { useUIStore } from '../stores/uiStore';
+import { useNotification } from '../hooks/useNotification';
 
 /**
  * 通知系统组件
@@ -9,7 +9,7 @@ import { useUIStore } from '../stores/uiStore';
  * 3. 支持多种通知类型
  */
 const NotificationSystem = () => {
-  const { notifications, removeNotification } = useUIStore();
+  const { notifications, removeNotification } = useNotification();
 
   if (notifications.length === 0) {
     return null;
