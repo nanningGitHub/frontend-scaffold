@@ -36,6 +36,95 @@ import { useAuthStore, useThemeStore } from './stores';
 - **原因**: Store 类型定义未导出
 - **解决**: 在 store 文件中添加 `export type StoreName = ...`
 
+## 代码优化相关问题
+
+### ESLint 解析错误
+
+- **错误**: `Error while loading rule '@typescript-eslint/prefer-nullish-coalescing': You have used a rule which requires parserServices to be generated`
+- **原因**: ESLint 配置缺少 `parserOptions.project` 设置
+- **解决**: 在 `.eslintrc.cjs` 中添加 `project: './tsconfig.json'`
+
+```javascript
+// .eslintrc.cjs
+parserOptions: {
+  ecmaVersion: 'latest',
+  sourceType: 'module',
+  ecmaFeatures: {
+    jsx: true
+  },
+  project: './tsconfig.json'  // 添加这一行
+}
+```
+
+### 重复导入问题
+
+- **错误**: `no-duplicate-imports` ESLint 错误
+- **原因**: 同一个模块被多次导入
+- **解决**: 合并重复的导入语句
+
+```typescript
+// ❌ 错误方式
+import React from 'react';
+import { useState } from 'react';
+
+// ✅ 正确方式
+import React, { useState } from 'react';
+```
+
+### 类型安全改进
+
+- **问题**: 使用 `any` 类型导致类型不安全
+- **解决**: 替换为具体类型
+
+```typescript
+// ❌ 使用 any
+const response = await api.get<any>('/users');
+
+// ✅ 使用具体类型
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+const response = await api.get<User[]>('/users');
+```
+
+### 工具函数整合问题
+
+- **问题**: 导入已删除的工具函数导致编译错误
+- **错误**: `Module not found: Can't resolve './simpleLogger'`
+- **解决**: 更新导入路径使用企业级工具函数
+
+```typescript
+// ❌ 错误方式（已删除的文件）
+import { logger } from './simpleLogger';
+import { security } from './simpleSecurity';
+
+// ✅ 正确方式
+import { logger } from './logger';
+import { securityAuditor } from './securityAuditor';
+```
+
+### 组件导入问题
+
+- **问题**: 测试文件中组件导入方式不匹配
+- **错误**: `Element type is invalid: expected a string or a class/function`
+- **解决**: 确保导入方式与组件导出方式一致
+
+```typescript
+// 如果组件使用默认导出
+export default LanguageSwitcher;
+
+// 测试文件应该使用默认导入
+import LanguageSwitcher from './LanguageSwitcher';
+
+// 如果组件使用命名导出
+export { LanguageSwitcher };
+
+// 测试文件应该使用命名导入
+import { LanguageSwitcher } from './LanguageSwitcher';
+```
+
 ## Jest 测试环境问题
 
 ### import.meta 语法错误
